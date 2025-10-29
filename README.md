@@ -35,7 +35,6 @@ While maintaining compatibility with Vue 3's Composition API and SSR requirement
 - **🗂️ Nested routing** - Flexible route parameters and nested structures
 - **🔗 Active links** - Dynamic className support for active states
 - **💾 TypeScript** - Full type definitions included
-- **🔌 Plugin system** - Vite plugin for route generation
 
 ## 📊 Performance
 
@@ -1119,82 +1118,6 @@ const fullPath = computed(() => {
 
 > 📚 **Full Example:** Check out the [example directory](examples/example/) for a complete application with SSR, 200 routes, navigation, URL parameter handling, and performance testing.
 
-## Vite Plugin: Route Generation
-
-wouter-vue includes a Vite plugin for generating routes at build time, avoiding dynamic imports and optimizing bundle size.
-
-### Installation
-
-The plugin is included with wouter-vue:
-
-```js
-import { vitePluginRoutes } from 'wouter-vue/vite-plugin-routes';
-```
-
-### Basic Usage
-
-```js
-// vite.config.js
-import { defineConfig } from 'vite';
-import vue from '@vitejs/plugin-vue';
-import { vitePluginRoutes } from 'wouter-vue/vite-plugin-routes';
-
-export default defineConfig({
-  plugins: [
-    vue(),
-    vitePluginRoutes({
-      name: 'routes',              // Unique name for the router
-      dir: 'src/pages/routes',     // Directory containing routes
-      pattern: /Route(\d+)\.vue$/,  // File pattern regex
-      outputFile: 'src/generated-routes.js',
-      pathTemplate: (match) => `/route${match[1]}`, // Path generator
-      chunkName: 'routes',         // Manual chunks name
-      minify: true,                // Minify output
-      compress: true,              // Compress routes
-      rootDir: __dirname          // Project root
-    })
-  ]
-});
-```
-
-### Configuration Options
-
-- `name` (string, default: `'routes'`) - Unique identifier for the router instance
-- `dir` (string, default: `'src/pages/routes'`) - Directory containing route files
-- `pattern` (RegExp, default: `/Route(\d+)\.vue$/`) - Regex to match route files
-- `outputFile` (string, default: `'src/generated-routes.js'`) - Output file path
-- `pathTemplate` (function, default: `(match) => \`/route${match[1]}\``) - Path generator
-- `chunkName` (string, default: same as `name`) - Name for manualChunks
-- `minify` (boolean, default: `true`) - Remove line breaks in output
-- `compress` (boolean, default: `true`) - Compress routes using templates
-- `rootDir` (string) - Project root directory (auto-detected)
-
-### Using Generated Routes
-
-```vue
-<script setup>
-import testRoutesData from '#routes/generated-routes.js';
-
-// The plugin automatically registers the alias
-const testRoutes = testRoutesData;
-</script>
-
-<template>
-  <Route
-    v-for="route in testRoutes"
-    :key="route.path"
-    :path="route.path"
-    :component="route.component"
-  />
-</template>
-```
-
-The plugin automatically:
-- Registers import aliases (e.g., `#routes/*`)
-- Configures `manualChunks` for code splitting
-- Generates optimized route files
-- Handles numeric route sequences efficiently
-
 ## Migration Guide
 
 ### From vue-router
@@ -1316,7 +1239,7 @@ for (let i = 1; i <= 10; i++) {
   });
 }
 
-// ❌ Might fail - use vite-plugin-routes instead
+// ❌ Might fail - Vite can't analyze dynamic import paths
 ```
 
 ### Performance Issues
@@ -1335,8 +1258,7 @@ for (let i = 1; i <= 10; i++) {
 
 **Solution:** 
 1. Use code splitting with async components
-2. Use the vite-plugin-routes for route generation
-3. Configure manual chunks in Vite
+2. Configure manual chunks in Vite
 
 ## Performance Comparison
 
