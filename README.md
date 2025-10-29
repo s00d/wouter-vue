@@ -380,11 +380,13 @@ Creates a navigation link with active state support.
 
 #### `<Redirect>`
 
-Redirects to another path.
+Redirects to another path. In SSR mode, it automatically sets `ssrContext.redirectTo` to allow the server to send HTTP redirects.
 
 **Props:**
 - `to: string` - Target path
 - `href?: string` - Alias for `to`
+- `replace?: boolean` - Replace current history entry instead of pushing
+- `state?: unknown` - State to pass with navigation
 
 ```vue
 <template>
@@ -392,6 +394,38 @@ Redirects to another path.
     <Redirect to="/new-path" />
   </Route>
 </template>
+```
+
+**SSR Redirect:**
+
+When using SSR, pass `ssrContext` to the `Router` component. If a `<Redirect>` is encountered during render, it will set `ssrContext.redirectTo`:
+
+```js
+// entry-server.js
+export async function render(url) {
+  const ssrContext = {};
+  
+  const app = createSSRApp(() => 
+    h(Router, { ssrContext }, () => h(App, { ssrPath: url }))
+  );
+  
+  const html = await renderToString(app);
+  
+  // Check for redirects
+  if (ssrContext.redirectTo) {
+    return { html: '', redirect: ssrContext.redirectTo };
+  }
+  
+  return { html };
+}
+
+// server.js
+const result = await render(url);
+if (result.redirect) {
+  res.redirect(302, result.redirect);
+  return;
+}
+res.status(200).set({ 'Content-Type': 'text/html' }).end(template.replace(/<!--ssr-outlet-->/, result.html));
 ```
 
 ## Advanced Features
