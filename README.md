@@ -11,6 +11,29 @@
   <b>wouter-vue</b> is a minimal, high-performance router for Vue 3 (~2KB gzipped) that relies on Composition API and provides an intuitive routing experience.
 </div>
 
+## Table of Contents
+
+- [About](#about)
+- [Features](#-features)
+- [Performance](#-performance)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Core Concepts](#core-concepts)
+- [API Reference](#api-reference)
+  - [Composables](#composables)
+  - [Components](#components)
+- [Advanced Features](#advanced-features)
+- [Server-Side Rendering (SSR)](#server-side-rendering-ssr)
+- [Code Splitting & Performance](#code-splitting--performance)
+- [TypeScript Support](#typescript-support)
+- [Examples](#examples)
+- [Migration Guide](#migration-guide)
+- [Troubleshooting](#troubleshooting)
+- [Performance Comparison](#performance-comparison)
+- [Contributing](#contributing)
+- [License](#license)
+- [Acknowledgements](#acknowledgements)
+
 ## About
 
 **wouter-vue** is inspired by the original [wouter](https://github.com/molefrog/wouter) router for React and Preact. The original wouter's minimalist philosophy, hook-based architecture, and elegant simplicity resonated strongly, leading to the creation of this Vue 3 adaptation.
@@ -257,13 +280,16 @@ console.log(router.hook);      // location hook
 Optionally configures routing behavior. Can be used to set base path, custom location hook, or parser.
 
 **Props:**
-- `base?: string` - Base path for all routes
-- `hook?: LocationHook` - Custom location hook (e.g., `useHashLocation`)
-- `parser?: Parser` - Custom route parser
-- `ssrPath?: string` - Server-side rendering path override
-- `ssrSearch?: string` - Server-side rendering search override
-- `ssrContext?: SsrContext` - SSR context for redirect tracking
-- `hrefs?: HrefsFormatter` - Custom href formatter function
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `base` | `string?` | `''` | Base path for all routes |
+| `hook` | `LocationHook?` | `useBrowserLocation` | Custom location hook (e.g., `useHashLocation`) |
+| `parser` | `Parser?` | `parsePattern` | Custom route parser |
+| `ssrPath` | `string?` | `undefined` | Server-side rendering path override |
+| `ssrSearch` | `string?` | `undefined` | Server-side rendering search override |
+| `ssrContext` | `SsrContext?` | `undefined` | SSR context for redirect tracking |
+| `hrefs` | `HrefsFormatter?` | `(x) => x` | Custom href formatter function |
 
 ```vue
 <template>
@@ -284,10 +310,13 @@ const customHook = useHashLocation();
 Renders content when the path matches.
 
 **Props:**
-- `path?: string | RegExp` - Route pattern to match
-- `component?: Component` - Component to render when matched
-- `nest?: boolean` - Enable nested routing
-- `match?: [boolean, Params]` - Pre-computed match result
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `path` | `string \| RegExp?` | `undefined` | Route pattern to match (catch-all if omitted) |
+| `component` | `Component?` | `undefined` | Component to render when matched |
+| `nest` | `boolean?` | `false` | Enable nested routing mode |
+| `match` | `[boolean, RouteParams]?` | `undefined` | Pre-computed match result (internal use) |
 
 **Usage with slots:**
 ```vue
@@ -341,16 +370,19 @@ Renders only the first matching route. Useful for exclusive route matching.
 Creates a navigation link with active state support.
 
 **Props:**
-- `href: string` - Target path
-- `to?: string` - Alias for `href`
-- `replace?: boolean` - Replace history entry
-- `classFn?: (isActive: boolean) => string` - Function to compute class name based on active state
-- `className?: string` - Static class name (alias for `class` attribute)
-- `onClick?: (event: MouseEvent) => void` - Click handler
-- `asChild?: boolean` - Render as child element
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `href` | `string?` | `undefined` | Target path |
+| `to` | `string?` | `undefined` | Alias for `href` |
+| `replace` | `boolean?` | `false` | Replace history entry instead of pushing |
+| `classFn` | `(isActive: boolean) => string?` | `undefined` | Function to compute class name based on active state |
+| `className` | `string?` | `undefined` | Static class name (will be merged with `classFn` result) |
+| `onClick` | `(event: MouseEvent) => void?` | `undefined` | Click handler |
+| `asChild` | `boolean?` | `false` | Render as child element |
 
 **Attributes:**
-- `class?: string` - Static class name (will be merged with `classFn` result)
+- `class?: string` - Static class name (automatically merged with `classFn` result)
 
 ```vue
 <template>
@@ -389,10 +421,13 @@ Creates a navigation link with active state support.
 Redirects to another path. In SSR mode, it automatically sets `ssrContext.redirectTo` to allow the server to send HTTP redirects.
 
 **Props:**
-- `to: string` - Target path
-- `href?: string` - Alias for `to`
-- `replace?: boolean` - Replace current history entry instead of pushing
-- `state?: unknown` - State to pass with navigation
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `to` | `string?` | `undefined` | Target path |
+| `href` | `string?` | `undefined` | Alias for `to` |
+| `replace` | `boolean?` | `false` | Replace current history entry instead of pushing |
+| `state` | `unknown?` | `undefined` | State to pass with navigation |
 
 ```vue
 <template>
@@ -626,11 +661,11 @@ const { hook, navigate } = memoryLocation({ path: '/test' });
 
 ## Server-Side Rendering (SSR)
 
-wouter-vue provides full SSR support with Vite. Here's a complete setup:
+wouter-vue provides full SSR support with Vite. This guide walks you through setting up SSR step by step.
 
-Note: As of the latest changes, SSR now correctly handles URLs with query parameters. The server entry splits the incoming URL into `path` and `search` and passes them separately to `<Router>` via `ssrPath` and `ssrSearch`. This avoids false 404s when rendering routes like `/about?page=2`.
+> **Note:** As of the latest changes, SSR now correctly handles URLs with query parameters. The server entry splits the incoming URL into `path` and `search` and passes them separately to `<Router>` via `ssrPath` and `ssrSearch`. This avoids false 404s when rendering routes like `/about?page=2`.
 
-### Project Structure
+### Step 1: Project Structure
 
 ```
 examples/example/
@@ -644,7 +679,7 @@ examples/example/
 └── index.html           # HTML template
 ```
 
-### 1. Client Entry (`entry-client.js`)
+### Step 2: Client Entry (`entry-client.js`)
 
 ```js
 import { createApp } from 'vue';
@@ -653,7 +688,7 @@ import App from './App.vue';
 createApp(App).mount('#app');
 ```
 
-### 2. Server Entry (`entry-server.js`)
+### Step 3: Server Entry (`entry-server.js`)
 
 ```js
 import { createSSRApp, h } from 'vue';
@@ -678,7 +713,7 @@ export async function render(url) {
 }
 ```
 
-### 3. App Component with SSR Support
+### Step 4: App Component with SSR Support
 
 ```vue
 <template>
@@ -720,7 +755,7 @@ const AboutPage = () => import('./pages/AboutPage.vue');
 </script>
 ```
 
-### 4. Express Server (`server.js`)
+### Step 5: Express Server (`server.js`)
 
 ```js
 import fs from 'node:fs';
@@ -797,7 +832,7 @@ createServer().then((app) => {
 });
 ```
 
-### 5. HTML Template (`index.html`)
+### Step 6: HTML Template (`index.html`)
 
 ```html
 <!DOCTYPE html>
@@ -814,7 +849,7 @@ createServer().then((app) => {
 </html>
 ```
 
-### 6. Vite Configuration (`vite.config.js`)
+### Step 7: Vite Configuration (`vite.config.js`)
 
 ```js
 import { defineConfig } from 'vite';
@@ -843,7 +878,7 @@ export default defineConfig({
 });
 ```
 
-### 7. Package Scripts
+### Step 8: Package Scripts
 
 ```json
 {
@@ -1067,7 +1102,7 @@ const routes = computed(() =>
 
 ### Working with Query Parameters and Hash
 
-Access and display URL query parameters and hash:
+Access and display URL query parameters and hash using wouter-vue's reactive composables:
 
 ```vue
 <template>
@@ -1078,9 +1113,6 @@ Access and display URL query parameters and hash:
       <h2>URL Information</h2>
       <div class="info-item">
         <strong>Path:</strong> <code>{{ location }}</code>
-      </div>
-      <div class="info-item">
-        <strong>Full Path:</strong> <code>{{ fullPath }}</code>
       </div>
       
       <div class="info-item" v-if="Object.keys(queryParams).length > 0">
@@ -1103,81 +1135,22 @@ Access and display URL query parameters and hash:
 
 <script setup>
 import { computed } from 'vue';
-import { useLocation, useSearchParams, useSearch } from 'wouter-vue';
+import { useLocation, useSearchParams } from 'wouter-vue';
 
-  const [location] = useLocation();
+const [location] = useLocation();
 const [searchParams] = useSearchParams();
-const search = useSearch();
 
-// Parse query parameters
-const queryParams = computed(() => {
-  const params = {};
-  
-  // Access location to make computed reactive to location changes
-  location.value;
-  
-  // Primary source: window.location.search (most reliable)
-  if (typeof window !== 'undefined' && window.location && window.location.search) {
-    const urlParams = new URLSearchParams(window.location.search);
-    urlParams.forEach((value, key) => {
-      params[key] = value;
-    });
-    if (Object.keys(params).length > 0) return params;
-  }
-  
-  // Fallback: try searchParams from wouter-vue
-  if (searchParams.value && searchParams.value.size > 0) {
-    searchParams.value.forEach((value, key) => {
-      params[key] = value;
-    });
-    return params;
-  }
-  
-  // Fallback: try search.value if available
-  if (search.value) {
-    try {
-      const urlParams = new URLSearchParams(search.value);
-      urlParams.forEach((value, key) => {
-        params[key] = value;
-      });
-      if (Object.keys(params).length > 0) return params;
-    } catch (e) {
-      try {
-        const urlParams = new URLSearchParams(`?${search.value}`);
-        urlParams.forEach((value, key) => {
-          params[key] = value;
-        });
-      } catch (e2) {
-        // Silent fail
-      }
-    }
-  }
-  
-  return params;
-});
+// Reactive object with query parameters (simplified using wouter-vue hooks)
+const queryParams = computed(() => 
+  Object.fromEntries(searchParams.value.entries())
+);
 
-// Get hash from browser location
+// Get hash from browser location (for SSR compatibility)
 const hash = computed(() => {
   if (typeof window !== 'undefined' && window.location) {
     return window.location.hash || '';
   }
   return '';
-});
-
-// Construct full path
-const fullPath = computed(() => {
-  let path = location.value || '';
-  const searchStr = searchParams.value && searchParams.value.toString();
-  if (searchStr) {
-    path += `?${searchStr}`;
-  } else if (search.value) {
-    const searchString = search.value.startsWith('?') ? search.value : `?${search.value}`;
-    path += searchString;
-  }
-  if (hash.value) {
-    path += hash.value;
-  }
-  return path;
 });
 </script>
 ```
@@ -1186,9 +1159,10 @@ const fullPath = computed(() => {
 - Navigate to `/about?page=2&sort=asc#section-1`
 - The component will display:
   - Path: `/about`
-  - Full Path: `/about?page=2&sort=asc#section-1`
   - Query Parameters: `{ "page": "2", "sort": "asc" }`
   - Hash: `#section-1`
+
+All values are **fully reactive** and update automatically when the URL changes.
 
 > 📚 **Full Example:** Check out the [example directory](examples/example/) for a complete application with SSR, 200 routes, navigation, URL parameter handling, and performance testing.
 
@@ -1408,7 +1382,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-**Unlicense** - This is free and unencumbered software released into the public domain.
+**MIT** - This project is licensed under the MIT License.
 
 ---
 

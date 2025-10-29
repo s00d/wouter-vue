@@ -161,28 +161,25 @@ export const matchRoute = (
 
   if ($base !== undefined) {
     const params: RouteParams = (() => {
-      // for regex paths, `keys` will always be false
+      // Priority 1: If we have named keys from parser, use only them
+      if (keys !== false) {
+        return Object.fromEntries(
+          (keys as string[]).map((key: string, i: number) => [key, matches[i]])
+        ) as RouteParams
+      }
 
-      // an object with parameters matched, e.g. { foo: "bar" } for "/:foo"
-      // we "zip" two arrays here to construct the object
-      // ["foo"], ["bar"] → { foo: "bar" }
-      const groups =
-        keys !== false
-          ? Object.fromEntries(
-              (keys as string[]).map((key: string, i: number) => [key, matches[i]])
-            )
-          : (result as RegExpExecArray).groups
+      // Priority 2: If we have named capture groups from RegExp, use them
+      const groups = (result as RegExpExecArray).groups
+      if (groups) {
+        return { ...groups } as RouteParams
+      }
 
-      // Create clean RouteParams object without array properties
-      // Start with named capture groups if available
-      const routeParams: RouteParams = groups ? { ...groups } : {}
-
-      // Add array matches as numeric string keys (if any)
+      // Priority 3: Fallback to numeric indices only if no named keys/groups exist
+      const paramsFromMatches: RouteParams = {}
       matches.forEach((match, i) => {
-        routeParams[String(i)] = match
+        paramsFromMatches[String(i)] = match
       })
-
-      return routeParams
+      return paramsFromMatches
     })()
 
     // the third value is only present when parser is in "loose" mode,
@@ -328,6 +325,23 @@ const _useCachedParams = (value: unknown) => {
     }
   )
   return cached
+}
+
+// Normalize path for comparison by removing query params and hash
+const normalizePath = (path: string): string => {
+  if (!path) return '/'
+  // Remove query params (everything after ?)
+  let normalized = path.split('?')[0]
+  // Remove hash (everything after #)
+  normalized = normalized.split('#')[0]
+  // Ensure consistent trailing slash handling
+  // Both "/" and "" should match "/"
+  if (normalized === '') return '/'
+  // Normalize trailing slash: remove it except for root
+  if (normalized !== '/' && normalized.endsWith('/')) {
+    normalized = normalized.slice(0, -1)
+  }
+  return normalized
 }
 
 export function useSearchParams(): [ComputedRef<URLSearchParams>, SetSearchParamsFn] {
@@ -493,22 +507,6 @@ export const Link = {
 
     return () => {
       const currentPathValue = (currentPath as ComputedRef<Path>).value
-      // Normalize paths by removing query params and hash for comparison
-      const normalizePath = (path: string) => {
-        if (!path) return '/'
-        // Remove query params (everything after ?)
-        let normalized = path.split('?')[0]
-        // Remove hash (everything after #)
-        normalized = normalized.split('#')[0]
-        // Ensure consistent trailing slash handling
-        // Both "/" and "" should match "/"
-        if (normalized === '') return '/'
-        // Normalize trailing slash: remove it except for root
-        if (normalized !== '/' && normalized.endsWith('/')) {
-          normalized = normalized.slice(0, -1)
-        }
-        return normalized
-      }
       const normalizedCurrent = normalizePath(currentPathValue)
       // targetPath is already relative, just normalize it
       const normalizedTarget = normalizePath(targetPath)
