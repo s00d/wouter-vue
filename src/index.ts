@@ -5,6 +5,16 @@ import type { HrefsFormatter, Parser, RouterObject, SsrContext } from '../types/
 
 // Re-export types for use in tests
 export type { RouterObject, SsrContext, Parser, HrefsFormatter }
+
+// Type definitions for better DX in generated .d.ts files
+export type RouteParams = Record<string, string>
+export type MatchResult = [true, RouteParams, string?] | [false, null]
+export type NavigateFn = (path: Path, options?: { replace?: boolean; state?: unknown }) => void
+export type SetSearchParamsFn = (
+  nextInit: URLSearchParams | Record<string, string> | ((params: URLSearchParams) => URLSearchParams),
+  options?: { replace?: boolean; state?: unknown }
+) => void
+
 import { relativePath, sanitizeSearch } from './paths.js'
 import { useBrowserLocation, useSearch as useBrowserSearch } from './use-browser-location.js'
 import {
@@ -62,13 +72,13 @@ export const useRouter = () => injectVue(RouterKey, defaultRouter)
  */
 const Params0 = {}
 
-export const useParams = () => {
+export const useParams = (): Ref<RouteParams> => {
   const params = injectVue(ParamsKey, Params0)
   // If params is a ref, return it; otherwise wrap it in a ref
   if (params && typeof params === 'object' && 'value' in params) {
-    return params
+    return params as Ref<RouteParams>
   }
-  return ref(params)
+  return ref(params) as Ref<RouteParams>
 }
 
 /*
@@ -76,7 +86,7 @@ export const useParams = () => {
  */
 
 // Internal version of useLocation to avoid redundant useRouter calls
-const useLocationFromRouter = (router: RouterRef) => {
+const useLocationFromRouter = (router: RouterRef): [ComputedRef<Path>, NavigateFn] => {
   const routerValue = computed(() => {
     // router may be a function, ref, or plain object
     const r: RouterObject | Ref<RouterObject> | ComputedRef<RouterObject> =
@@ -89,7 +99,7 @@ const useLocationFromRouter = (router: RouterRef) => {
     return result as [Ref<Path> | Path, (path: Path, ...args: unknown[]) => unknown]
   })
 
-  const navigateFn = hookResult.value[1] as (path: Path, ...args: unknown[]) => unknown
+  const navigateFn = hookResult.value[1] as NavigateFn
 
   // Compute final location reactively, unwrapping refs with unref
   const finalLocation = computed(() => {
@@ -102,7 +112,7 @@ const useLocationFromRouter = (router: RouterRef) => {
   return [finalLocation, navigateFn]
 }
 
-export const useLocation = () => {
+export const useLocation = (): [ComputedRef<Path>, NavigateFn] => {
   const router = useRouter()
   const result = useLocationFromRouter(router)
   return result
@@ -130,7 +140,12 @@ export const useSearch = () => {
   return searchResult
 }
 
-export const matchRoute = (parser: Parser, route: string | RegExp, path: Path, loose?: boolean) => {
+export const matchRoute = (
+  parser: Parser,
+  route: string | RegExp,
+  path: Path,
+  loose?: boolean
+): MatchResult => {
   // if the input is a regexp, skip parsing
   const { pattern, keys } =
     route instanceof RegExp ? { keys: false, pattern: route } : parser(route || '*', loose)
@@ -144,43 +159,46 @@ export const matchRoute = (parser: Parser, route: string | RegExp, path: Path, l
   // we use this for route nesting
   const [$base, ...matches] = result
 
-  return $base !== undefined
-    ? [
-        true,
+  if ($base !== undefined) {
+    const params: RouteParams = (() => {
+      // for regex paths, `keys` will always be false
 
-        (() => {
-          // for regex paths, `keys` will always be false
+      // an object with parameters matched, e.g. { foo: "bar" } for "/:foo"
+      // we "zip" two arrays here to construct the object
+      // ["foo"], ["bar"] → { foo: "bar" }
+      const groups =
+        keys !== false
+          ? Object.fromEntries(
+              (keys as string[]).map((key: string, i: number) => [key, matches[i]])
+            )
+          : (result as RegExpExecArray).groups
 
-          // an object with parameters matched, e.g. { foo: "bar" } for "/:foo"
-          // we "zip" two arrays here to construct the object
-          // ["foo"], ["bar"] → { foo: "bar" }
-          const groups =
-            keys !== false
-              ? Object.fromEntries(
-                  (keys as string[]).map((key: string, i: number) => [key, matches[i]])
-                )
-              : (result as RegExpExecArray).groups
+      // Create clean RouteParams object without array properties
+      // Start with named capture groups if available
+      const routeParams: RouteParams = groups ? { ...groups } : {}
 
-          // convert the array to an instance of object
-          // this makes it easier to integrate with the existing param implementation
-          const obj = { ...matches }
+      // Add array matches as numeric string keys (if any)
+      matches.forEach((match, i) => {
+        routeParams[String(i)] = match
+      })
 
-          // merge named capture groups with matches array
-          groups && Object.assign(obj, groups)
+      return routeParams
+    })()
 
-          return obj
-        })(),
+    // the third value is only present when parser is in "loose" mode,
+    // so that we can extract the base path for nested routes
+    if (loose) {
+      return [true, params, $base] as MatchResult
+    }
+    return [true, params] as MatchResult
+  }
 
-        // the third value if only present when parser is in "loose" mode,
-        // so that we can extract the base path for nested routes
-        ...(loose ? [$base] : []),
-      ]
-    : [false, null]
+  return [false, null] as MatchResult
 }
 
 export const useRoute = (
   pattern: string | RegExp
-): [ComputedRef<boolean>, ComputedRef<unknown>] => {
+): [ComputedRef<boolean>, ComputedRef<RouteParams | null>] => {
   const [location] = useLocation()
   const router = useRouter()
 
@@ -196,7 +214,10 @@ export const useRoute = (
   })
 
   const matches = computed(() => Boolean(result.value[0]))
-  const params = computed(() => result.value[1] ?? null)
+  const params = computed(() => {
+    const matchResult = result.value
+    return matchResult[0] ? (matchResult[1] as RouteParams) : null
+  })
 
   return [matches, params]
 }
@@ -309,27 +330,21 @@ const _useCachedParams = (value: unknown) => {
   return cached
 }
 
-export function useSearchParams() {
+export function useSearchParams(): [ComputedRef<URLSearchParams>, SetSearchParamsFn] {
   const [location, navigate] = useLocation()
   const search = useSearch()
 
   const searchParams = computed(() => new URLSearchParams(search.value))
+  const navigateFn = navigate as NavigateFn
 
-  const setSearchParams = (
-    nextInit:
-      | URLSearchParams
-      | Record<string, string>
-      | ((params: URLSearchParams) => URLSearchParams),
-    options?: { replace?: boolean; state?: unknown }
+  const setSearchParams: SetSearchParamsFn = (
+    nextInit,
+    options
   ) => {
     const newParams = new URLSearchParams(
       typeof nextInit === 'function' ? nextInit(searchParams.value) : nextInit
     )
-    const locationValue = (location as ComputedRef<Path>).value
-    const navigateFn = navigate as (
-      path: string,
-      options?: { replace?: boolean; state?: unknown }
-    ) => void
+    const locationValue = location.value
     navigateFn(`${locationValue}?${newParams}`, options)
   }
 
@@ -684,8 +699,11 @@ export const Redirect = {
       ssrCtx.redirectTo = targetPath
     }
 
-    // Navigate immediately for client-side (in SSR, only ssrContext is set)
-    navigateFn(targetPath, { replace: props.replace, state: props.state })
+    // Client-side navigation should happen after mount to avoid side effects during render
+    // SSR context is set synchronously above for server-side redirects
+    onMounted(() => {
+      navigateFn(targetPath, { replace: props.replace, state: props.state })
+    })
 
     return () => null
   },

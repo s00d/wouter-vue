@@ -143,12 +143,16 @@ navigate('/users/123', { replace: true });
 
 #### `useRoute(pattern)`
 
-Matches the current location against a pattern and extracts route parameters.
+Matches the current location against a pattern and extracts route parameters. The hook is **fully reactive** and automatically re-evaluates when the location changes.
 
 **Parameters:**
 - `pattern: string | RegExp` - Route pattern to match (e.g., `/users/:id`)
 
-**Returns:** `[Ref<boolean>, Ref<Params>]` - `[matches, params]`
+**Returns:** `[ComputedRef<boolean>, ComputedRef<RouteParams | null>]` - `[matches, params]`
+- `matches` - `true` if location matches the pattern (reactive)
+- `params` - Extracted route parameters (reactive, `null` if no match)
+
+**Important:** The `match` and `params` values are `ComputedRef` that automatically update when the location changes, ensuring your components stay in sync with the current route.
 
 ```vue
 <script setup>
@@ -158,7 +162,7 @@ const [match, params] = useRoute('/users/:id');
 
 // Check if route matches
 if (match.value) {
-  console.log('User ID:', params.value.id); // '123'
+  console.log('User ID:', params.value?.id); // '123'
 }
 </script>
 ```
@@ -167,7 +171,7 @@ if (match.value) {
 
 Returns route parameters from the current matched route. Works inside `<Route>` components.
 
-**Returns:** `Ref<Params>`
+**Returns:** `Ref<RouteParams>` - Object with route parameter keys mapped to string values
 
 ```vue
 <template>
@@ -188,9 +192,9 @@ console.log(params.value.postId);  // '456'
 
 #### `useSearch()`
 
-Returns the current search string (query string).
+Returns the current search string (query string). The value is **reactive** and automatically updates when URL search parameters change.
 
-**Returns:** `Ref<string>`
+**Returns:** `ComputedRef<string>` - Raw query string (e.g., `'foo=bar&page=2'`)
 
 ```vue
 <script setup>
@@ -205,7 +209,9 @@ console.log(search.value); // 'foo=bar&page=2'
 
 Returns a reactive URLSearchParams object and a setter function.
 
-**Returns:** `[Ref<URLSearchParams>, (nextInit, options?) => void]`
+**Returns:** `[ComputedRef<URLSearchParams>, SetSearchParamsFn]`
+- `searchParams` - Reactive `URLSearchParams` object
+- `setSearchParams` - Function to update search params: `(nextInit: URLSearchParams | Record<string, string> | ((params: URLSearchParams) => URLSearchParams), options?: { replace?: boolean; state?: unknown }) => void`
 
 ```vue
 <script setup>
@@ -398,20 +404,31 @@ Redirects to another path. In SSR mode, it automatically sets `ssrContext.redire
 
 **SSR Redirect:**
 
-When using SSR, pass `ssrContext` to the `Router` component. If a `<Redirect>` is encountered during render, it will set `ssrContext.redirectTo`:
+When using SSR, pass `ssrContext` to the `Router` component. If a `<Redirect>` component is encountered during render, it will synchronously set `ssrContext.redirectTo` in its `setup` function (before mount). The navigation on the client side happens in `onMounted` to avoid side effects during render.
 
 ```js
 // entry-server.js
 export async function render(url) {
   const ssrContext = {};
   
+  // Split URL into path and search for proper SSR matching
+  let path = url || '/';
+  let search = '';
+  if (typeof url === 'string') {
+    const qIdx = url.indexOf('?');
+    if (qIdx >= 0) {
+      path = url.slice(0, qIdx) || '/';
+      search = url.slice(qIdx + 1);
+    }
+  }
+  
   const app = createSSRApp(() => 
-    h(Router, { ssrContext }, () => h(App, { ssrPath: url }))
+    h(Router, { ssrContext, ssrPath: path, ssrSearch: search }, () => h(App))
   );
   
   const html = await renderToString(app);
   
-  // Check for redirects
+  // Check for redirects set by <Redirect> component
   if (ssrContext.redirectTo) {
     return { html: '', redirect: ssrContext.redirectTo };
   }
@@ -420,7 +437,7 @@ export async function render(url) {
 }
 
 // server.js
-const result = await render(url);
+const result = await render(req.originalUrl);
 if (result.redirect) {
   res.redirect(302, result.redirect);
   return;
@@ -900,27 +917,50 @@ Use Vue's `<Suspense>` component to handle loading states:
 
 ## TypeScript Support
 
-wouter-vue includes full TypeScript definitions:
+wouter-vue includes full TypeScript definitions with precise types for better developer experience:
 
 ```typescript
-import { useRoute, useParams, type Params } from 'wouter-vue';
+import { 
+  useRoute, 
+  useParams, 
+  useLocation,
+  useSearchParams,
+  type RouteParams,
+  type NavigateFn,
+  type SetSearchParamsFn
+} from 'wouter-vue';
 
-// Type-safe route matching
-const [match, params] = useRoute<{ id: string }>('/users/:id');
-if (match.value) {
+// Type-safe route matching - returns [ComputedRef<boolean>, ComputedRef<RouteParams | null>]
+const [match, params] = useRoute('/users/:id');
+if (match.value && params.value) {
+  // params.value is RouteParams (Record<string, string>)
   console.log(params.value.id); // TypeScript knows this is string
 }
 
-// Typed params
-interface UserParams extends Params {
-  userId: string;
-  postId?: string;
-}
+// Typed params - returns Ref<RouteParams>
+const params = useParams();
+// params.value is always RouteParams (Record<string, string>)
+console.log(params.value.userId); // string (if userId param exists)
 
-const params = useParams<UserParams>();
-console.log(params.value.userId); // string
-console.log(params.value.postId); // string | undefined
+// Type-safe location and navigation
+const [location, navigate] = useLocation();
+// location: ComputedRef<string>
+// navigate: NavigateFn
+navigate('/about', { replace: true });
+
+// Type-safe search params
+const [searchParams, setSearchParams] = useSearchParams();
+// searchParams: ComputedRef<URLSearchParams>
+// setSearchParams: SetSearchParamsFn
+setSearchParams({ page: '2', sort: 'asc' });
 ```
+
+**Exported Types:**
+- `RouteParams` - `Record<string, string>` for route parameters
+- `MatchResult` - `[true, RouteParams, string?] | [false, null]` for match results
+- `NavigateFn` - Navigation function type
+- `SetSearchParamsFn` - Search params setter function type
+- `RouterObject`, `SsrContext`, `Parser`, `HrefsFormatter` - Core router types
 
 ## Examples
 
