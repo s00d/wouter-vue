@@ -403,14 +403,17 @@ type LinkProps = {
     to?: string;
     onClick?: (event: MouseEvent) => void;
     asChild?: boolean;
-    class?: string | ((isActive: boolean) => string);
+    classFn?: (isActive: boolean) => string;
     className?: string;
     replace?: boolean;
 };
 export declare const Link: {
     name: string;
     props: string[];
-    setup(props: LinkProps, { slots }: SetupContext): () => import('vue').VNode<import('vue').RendererNode, import('vue').RendererElement, {
+    inheritAttrs: boolean;
+    setup(props: LinkProps, { slots, attrs }: SetupContext & {
+        attrs?: Record<string, unknown>;
+    }): () => import('vue').VNode<import('vue').RendererNode, import('vue').RendererElement, {
         [key: string]: any;
     }>;
 };

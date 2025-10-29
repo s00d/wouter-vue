@@ -489,17 +489,18 @@ export const Link = {
       // targetPath is already relative, just normalize it
       const normalizedTarget = normalizePath(targetPath)
       const isActive = normalizedCurrent === normalizedTarget
-      
+
       // Handle classFn prop for active link styling
       let className: string | undefined = undefined
-      
+
       if (typeof props.classFn === 'function') {
         className = props.classFn(isActive)
       }
-      
+
       // Merge static classes from className prop or attrs.class
-      const staticClass = props.className || (typeof attrs?.class === 'string' ? attrs.class : undefined)
-      
+      const staticClass =
+        props.className || (typeof attrs?.class === 'string' ? attrs.class : undefined)
+
       // Combine active class with static class
       if (className && staticClass) {
         className = `${staticClass} ${className}`.trim()
