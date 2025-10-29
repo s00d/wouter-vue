@@ -1,6 +1,6 @@
 {
   "name": "wouter-vue",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Minimalist-friendly ~2KB router for Vue 3, inspired by wouter",
   "type": "module",
   "keywords": [
@@ -86,7 +86,7 @@
   "bugs": {
     "url": "https://github.com/s00d/wouter-vue/issues"
   },
-  "license": "Unlicense",
+  "license": "MIT",
   "peerDependencies": {
     "vue": "^3.5.22"
   },
