@@ -1,6 +1,6 @@
 {
   "name": "wouter-vue",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Minimalist-friendly ~2KB router for Vue 3, inspired by wouter",
   "type": "module",
   "keywords": [

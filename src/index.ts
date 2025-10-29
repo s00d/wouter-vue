@@ -414,15 +414,16 @@ type LinkProps = {
   to?: string
   onClick?: (event: MouseEvent) => void
   asChild?: boolean
-  class?: string | ((isActive: boolean) => string)
+  classFn?: (isActive: boolean) => string
   className?: string
   replace?: boolean
 }
 
 export const Link = {
   name: 'Link',
-  props: ['href', 'to', 'onClick', 'asChild', 'class', 'className'],
-  setup(props: LinkProps, { slots }: SetupContext) {
+  props: ['href', 'to', 'onClick', 'asChild', 'classFn', 'className'],
+  inheritAttrs: false,
+  setup(props: LinkProps, { slots, attrs }: SetupContext & { attrs?: Record<string, unknown> }) {
     const router = useRouter()
     const routerValue = computed(() => {
       const r: RouterObject | Ref<RouterObject> | ComputedRef<RouterObject> =
@@ -468,9 +469,43 @@ export const Link = {
 
     return () => {
       const currentPathValue = (currentPath as ComputedRef<Path>).value
-      const isActive = currentPathValue === targetPath
-      const className =
-        typeof props.class === 'function' ? props.class(isActive) : props.class || props.className
+      // Normalize paths by removing query params and hash for comparison
+      const normalizePath = (path: string) => {
+        if (!path) return '/'
+        // Remove query params (everything after ?)
+        let normalized = path.split('?')[0]
+        // Remove hash (everything after #)
+        normalized = normalized.split('#')[0]
+        // Ensure consistent trailing slash handling
+        // Both "/" and "" should match "/"
+        if (normalized === '') return '/'
+        // Normalize trailing slash: remove it except for root
+        if (normalized !== '/' && normalized.endsWith('/')) {
+          normalized = normalized.slice(0, -1)
+        }
+        return normalized
+      }
+      const normalizedCurrent = normalizePath(currentPathValue)
+      // targetPath is already relative, just normalize it
+      const normalizedTarget = normalizePath(targetPath)
+      const isActive = normalizedCurrent === normalizedTarget
+      
+      // Handle classFn prop for active link styling
+      let className: string | undefined = undefined
+      
+      if (typeof props.classFn === 'function') {
+        className = props.classFn(isActive)
+      }
+      
+      // Merge static classes from className prop or attrs.class
+      const staticClass = props.className || (typeof attrs?.class === 'string' ? attrs.class : undefined)
+      
+      // Combine active class with static class
+      if (className && staticClass) {
+        className = `${staticClass} ${className}`.trim()
+      } else if (staticClass) {
+        className = staticClass
+      }
 
       const content = slots.default?.()
 
@@ -479,7 +514,7 @@ export const Link = {
         {
           onClick,
           href: href.value,
-          class: className,
+          class: className || undefined,
         },
         content as Parameters<typeof h>[2]
       )

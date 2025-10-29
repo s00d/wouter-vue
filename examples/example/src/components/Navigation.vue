@@ -3,13 +3,14 @@
     <div class="nav-links">
       <Link 
         href="/" 
-        :class="isActive => isActive ? 'active' : ''"
+        :classFn="isActive => isActive ? 'active' : ''"
       >
         Home
       </Link>
       <Link 
         href="/about" 
-        :class="isActive => isActive ? 'active' : ''"
+         class="test"
+        :classFn="isActive => isActive ? 'active' : ''"
       >
         About
       </Link>
@@ -22,14 +23,14 @@
         <div v-if="isDropdownOpen" class="dropdown-menu">
           <Link 
             href="/users" 
-            :class="isActive => isActive ? 'active' : ''"
+            :classFn="isActive => isActive ? 'active' : ''"
             @click="closeDropdown"
           >
             Users List
           </Link>
           <Link 
             href="/users/1" 
-            :class="isActive => isActive ? 'active' : ''"
+            :classFn="isActive => isActive ? 'active' : ''"
             @click="closeDropdown"
           >
             User Details
@@ -39,7 +40,7 @@
       
       <Link 
         href="/heavy" 
-        :class="isActive => isActive ? 'active' : ''"
+        :classFn="isActive => isActive ? 'active' : ''"
       >
         Heavy (Async)
       </Link>

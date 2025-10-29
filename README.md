@@ -339,10 +339,13 @@ Creates a navigation link with active state support.
 - `href: string` - Target path
 - `to?: string` - Alias for `href`
 - `replace?: boolean` - Replace history entry
-- `class?: string | (isActive: boolean) => string` - Dynamic class name
-- `className?: string` - Alias for `class`
+- `classFn?: (isActive: boolean) => string` - Function to compute class name based on active state
+- `className?: string` - Static class name (alias for `class` attribute)
 - `onClick?: (event: MouseEvent) => void` - Click handler
 - `asChild?: boolean` - Render as child element
+
+**Attributes:**
+- `class?: string` - Static class name (will be merged with `classFn` result)
 
 ```vue
 <template>
@@ -350,8 +353,18 @@ Creates a navigation link with active state support.
   <Link href="/about">About</Link>
   
   <!-- Active link with dynamic class -->
-  <Link href="/" :class="isActive => isActive ? 'active' : ''">
+  <Link href="/" :classFn="isActive => isActive ? 'active' : ''">
     Home
+  </Link>
+  
+  <!-- Active link with static class and dynamic active state -->
+  <Link href="/about" class="nav-link" :classFn="isActive => isActive ? 'active' : ''">
+    About
+  </Link>
+  
+  <!-- Active link with multiple classes -->
+  <Link href="/users" :classFn="isActive => isActive ? 'nav-link active' : 'nav-link'">
+    Users
   </Link>
   
   <!-- Replace navigation -->
@@ -363,6 +376,8 @@ Creates a navigation link with active state support.
   </Route>
 </template>
 ```
+
+> **Note:** Static classes passed via `class` attribute are automatically merged with the result from `classFn`. For example, if `class="nav-link"` and `classFn` returns `"active"`, the final class will be `"nav-link active"`.
 
 #### `<Redirect>`
 
@@ -444,20 +459,20 @@ const params = useParams();
 
 ### Active Links
 
-Create navigation links with active state styling:
+Create navigation links with active state styling using the `classFn` prop:
 
 ```vue
 <template>
   <nav>
     <Link 
       href="/" 
-      :class="isActive => isActive ? 'nav-link active' : 'nav-link'"
+      :classFn="isActive => isActive ? 'nav-link active' : 'nav-link'"
     >
       Home
     </Link>
     <Link 
       href="/about"
-      :class="isActive => isActive ? 'nav-link active' : 'nav-link'"
+      :classFn="isActive => isActive ? 'nav-link active' : 'nav-link'"
     >
       About
     </Link>
@@ -478,6 +493,8 @@ Create navigation links with active state styling:
 }
 </style>
 ```
+
+**Important:** Use `classFn` prop instead of `:class` for active link styling. Vue's built-in `:class` directive interferes with function-based class computation, so `classFn` is the recommended approach.
 
 ### Programmatic Navigation
 
@@ -619,15 +636,15 @@ export async function render(url) {
     <div id="app">
       <Navigation />
       <main>
-        <Suspense>
-          <Switch>
-            <Route path="/" :component="HomePage" />
-            <Route path="/about" :component="AboutPage" />
-          </Switch>
-          <template #fallback>
+  <Suspense>
+    <Switch>
+      <Route path="/" :component="HomePage" />
+      <Route path="/about" :component="AboutPage" />
+    </Switch>
+    <template #fallback>
             <LoadingSpinner />
-          </template>
-        </Suspense>
+    </template>
+  </Suspense>
       </main>
     </div>
   </Router>
@@ -923,8 +940,8 @@ const userId = params.value.id;
 <script setup>
 import { useLocation } from 'wouter-vue';
 
-const [, navigate] = useLocation();
-
+  const [, navigate] = useLocation();
+  
 function handleSubmit() {
   // Process form...
   navigate('/success');
@@ -1015,7 +1032,7 @@ Access and display URL query parameters and hash:
 import { computed } from 'vue';
 import { useLocation, useSearchParams, useSearch } from 'wouter-vue';
 
-const [location] = useLocation();
+  const [location] = useLocation();
 const [searchParams] = useSearchParams();
 const search = useSearch();
 
