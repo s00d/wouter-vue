@@ -118,8 +118,8 @@ if (
     const original = history[type as keyof typeof history] as (...args: unknown[]) => unknown
     ;(history as unknown as Record<string, unknown>)[type] = function (...args: unknown[]) {
       const result = original.apply(this, args)
-      const event = new Event(type)
-      ;(event as unknown as Record<string, unknown>).arguments = args
+      // Use CustomEvent to pass arguments to listeners
+      const event = new CustomEvent(type, { detail: { args } })
 
       if (typeof dispatchEvent !== 'undefined') {
         dispatchEvent(event)

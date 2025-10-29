@@ -3,15 +3,25 @@ import { resolve } from 'path'
 import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [
+    vue({
+      template: {
+        compilerOptions: {
+          // Suppress warnings about unknown components in tests
+          isCustomElement: () => false,
+        },
+      },
+    }),
+  ],
   test: {
     globals: true,
-    exclude: ['**/node_modules/**', '**/dist/**'],
+    exclude: ['**/node_modules/**', '**/dist/**', '**/test/setup.ts'],
     // Default environment for unit tests
     environment: 'happy-dom',
     // Browser tests are now run separately via Playwright (see test:browser script)
     // Run only unit tests
     include: ['test/**/*.{ts,js}'],
+    setupFiles: ['./test/setup.ts'],
   },
   resolve: {
     alias: {

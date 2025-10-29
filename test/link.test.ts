@@ -196,5 +196,63 @@ describe("active links", () => {
     expect(element.classes()).toContain("link--active");
     wrapper.unmount();
   });
+
+  it("classFn prop adds class for active links", async () => {
+    const { hook } = memoryLocation({ path: "/about" });
+
+    const wrapper = mount(Router, {
+      props: { hook },
+      slots: {
+        default: () => [
+          h(Link, { 
+            href: "/about", 
+            classFn: (isActive: boolean) => isActive ? 'active-link' : '',
+            'data-testid': 'active-link'
+          }, () => 'About'),
+          h(Link, { 
+            href: "/other", 
+            classFn: (isActive: boolean) => isActive ? 'active-link' : '',
+            'data-testid': 'inactive-link'
+          }, () => 'Other'),
+        ],
+      },
+    });
+
+    await flushPromises();
+    // Wait for reactivity to update
+    await new Promise((r) => setTimeout(r, 10));
+
+    const activeLink = wrapper.find('[data-testid="active-link"]');
+    const inactiveLink = wrapper.find('[data-testid="inactive-link"]');
+
+    expect(activeLink.classes()).toContain("active-link");
+    expect(inactiveLink.classes()).not.toContain("active-link");
+    wrapper.unmount();
+  });
+
+  it("classFn merges with static class attribute", async () => {
+    const { hook } = memoryLocation({ path: "/home" });
+
+    const wrapper = mount(Router, {
+      props: { hook },
+      slots: {
+        default: () => h(Link, { 
+          href: "/home", 
+          className: "nav-link",
+          classFn: (isActive: boolean) => isActive ? 'active' : '',
+          'data-testid': 'link'
+        }, () => 'Home'),
+      },
+    });
+
+    await flushPromises();
+    // Wait for reactivity to update
+    await new Promise((r) => setTimeout(r, 10));
+
+    const link = wrapper.find('[data-testid="link"]');
+    expect(link.classes()).toContain("nav-link");
+    expect(link.classes()).toContain("active");
+    wrapper.unmount();
+  });
 });
 

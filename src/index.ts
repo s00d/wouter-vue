@@ -1,7 +1,10 @@
 import { parse as parsePattern } from 'regexparam'
 import type { ComputedRef } from 'vue'
-import type { Path, SearchString } from '../types/location-hook.d.js'
+import type { Path } from '../types/location-hook.d.js'
 import type { HrefsFormatter, Parser, RouterObject, SsrContext } from '../types/router.d.js'
+
+// Re-export types for use in tests
+export type { RouterObject, SsrContext, Parser, HrefsFormatter }
 import { relativePath, sanitizeSearch } from './paths.js'
 import { useBrowserLocation, useSearch as useBrowserSearch } from './use-browser-location.js'
 import {
@@ -14,6 +17,7 @@ import {
   provide as provideVue,
   type Ref,
   ref,
+  unref,
   watch,
 } from './vue-deps.js'
 
@@ -74,35 +78,25 @@ export const useParams = () => {
 // Internal version of useLocation to avoid redundant useRouter calls
 const useLocationFromRouter = (router: RouterRef) => {
   const routerValue = computed(() => {
-    // router может быть computed (от inject) или обычным объектом
+    // router may be a function, ref, or plain object
     const r: RouterObject | Ref<RouterObject> | ComputedRef<RouterObject> =
       typeof router === 'function' ? (router as () => RouterObject)() : router
-    return (
-      r && typeof r === 'object' && 'value' in r
-        ? (r as unknown as Ref<RouterObject> | ComputedRef<RouterObject>).value
-        : r
-    ) as RouterObject
+    return unref(r) as RouterObject
   })
 
   const hookResult = computed(() => {
     const result = routerValue.value.hook(routerValue.value)
     return result as [Ref<Path> | Path, (path: Path, ...args: unknown[]) => unknown]
   })
-  const location = computed(() => {
-    const loc = hookResult.value[0]
-    return loc
-  })
+
   const navigateFn = hookResult.value[1] as (path: Path, ...args: unknown[]) => unknown
 
-  // the function reference should stay the same between re-renders
+  // Compute final location reactively, unwrapping refs with unref
   const finalLocation = computed(() => {
     const base = routerValue.value.base
-    const loc = location.value
-    // location.value это RefImpl, нужно взять .value
-    const locValue =
-      loc && typeof loc === 'object' && 'value' in loc ? (loc as Ref<Path>).value : (loc as Path)
-    const rel = relativePath(base, locValue)
-    return rel
+    const loc = hookResult.value[0]
+    const locValue = unref(loc)
+    return relativePath(base, locValue)
   })
 
   return [finalLocation, navigateFn]
@@ -119,11 +113,7 @@ export const useSearch = () => {
   const routerValue = computed(() => {
     const r: RouterObject | Ref<RouterObject> | ComputedRef<RouterObject> =
       typeof router === 'function' ? (router as () => RouterObject)() : router
-    return (
-      r && typeof r === 'object' && 'value' in r
-        ? (r as unknown as Ref<RouterObject> | ComputedRef<RouterObject>).value
-        : r
-    ) as RouterObject
+    return unref(r) as RouterObject
   })
   const searchResult = computed(() => {
     const searchHookFn = routerValue.value.searchHook
@@ -131,10 +121,7 @@ export const useSearch = () => {
     try {
       const searchHookResult = searchHookFn(routerValue.value)
       if (!searchHookResult) return ''
-      const searchValue =
-        searchHookResult && typeof searchHookResult === 'object' && 'value' in searchHookResult
-          ? (searchHookResult as Ref<SearchString>).value
-          : (searchHookResult as SearchString)
+      const searchValue = unref(searchHookResult)
       return sanitizeSearch(searchValue)
     } catch {
       return ''
@@ -191,18 +178,27 @@ export const matchRoute = (parser: Parser, route: string | RegExp, path: Path, l
     : [false, null]
 }
 
-export const useRoute = (pattern: string | RegExp) => {
+export const useRoute = (
+  pattern: string | RegExp
+): [ComputedRef<boolean>, ComputedRef<unknown>] => {
   const [location] = useLocation()
   const router = useRouter()
-  const routerObj =
-    typeof router === 'function'
-      ? (router as () => RouterObject)()
-      : router && typeof router === 'object' && 'value' in router
-        ? (router as unknown as Ref<RouterObject> | ComputedRef<RouterObject>).value
-        : (router as RouterObject)
-  const locationValue = (location as ComputedRef<Path>).value
-  const result = matchRoute(routerObj.parser, pattern, locationValue)
-  return [ref(result[0]), ref(result[1])]
+
+  const result = computed(() => {
+    const routerObj =
+      typeof router === 'function'
+        ? (router as () => RouterObject)()
+        : (unref(router) as RouterObject)
+
+    // location is already computed, its value will be tracked automatically
+    const locationValue = (location as ComputedRef<Path>).value
+    return matchRoute(routerObj.parser, pattern, locationValue)
+  })
+
+  const matches = computed(() => Boolean(result.value[0]))
+  const params = computed(() => result.value[1] ?? null)
+
+  return [matches, params]
 }
 
 /*
@@ -211,6 +207,7 @@ export const useRoute = (pattern: string | RegExp) => {
 
 type RouterProps = {
   hook?: RouterObject['hook']
+  searchHook?: RouterObject['searchHook']
   base?: Path
   parser?: Parser
   ssrPath?: Path
@@ -227,7 +224,7 @@ type SetupContext = {
 
 export const Router = {
   name: 'Router',
-  props: ['hook', 'base', 'parser', 'ssrPath', 'ssrSearch', 'ssrContext', 'hrefs'],
+  props: ['hook', 'searchHook', 'base', 'parser', 'ssrPath', 'ssrSearch', 'ssrContext', 'hrefs'],
   setup(props: RouterProps, { slots }: SetupContext) {
     const parent = injectVue(RouterKey, defaultRouter)
 
@@ -242,20 +239,27 @@ export const Router = {
     const router = computed(() => {
       // Get parent value (it might be a computed ref)
       const parentValue: RouterObject =
-        typeof parent === 'function'
-          ? (parent as () => RouterObject)()
-          : parent && typeof parent === 'object' && 'value' in parent
-            ? (parent as unknown as Ref<RouterObject> | ComputedRef<RouterObject>).value
-            : (parent as RouterObject)
+        typeof parent === 'function' ? (parent as () => RouterObject)() : unref(parent)
 
       // Create new object without readonly constraints
-      const result: RouterObject = {
+      // Note: ssrContext is not part of RouterObject type but is used at runtime
+      // Pass ssrContext through if provided (runtime property, not in type)
+      const ssrContextValue =
+        props.ssrContext !== undefined
+          ? props.ssrContext
+          : (parentValue as unknown as { ssrContext?: SsrContext }).ssrContext !== undefined
+            ? (parentValue as unknown as { ssrContext?: SsrContext }).ssrContext
+            : undefined
+      const result = {
         base: props.base !== undefined ? parentValue.base + (props.base || '') : parentValue.base,
         ownBase: props.base !== undefined ? props.base : parentValue.ownBase,
         ssrPath: props.ssrPath !== undefined ? props.ssrPath : parentValue.ssrPath,
         ssrSearch: props.ssrSearch !== undefined ? props.ssrSearch : parentValue.ssrSearch,
         parser: props.parser ?? parentValue.parser,
-        searchHook: parentValue.searchHook,
+        searchHook:
+          props.searchHook !== undefined
+            ? (props.searchHook as RouterObject['searchHook'])
+            : parentValue.searchHook,
         hook: props.hook !== undefined ? (props.hook as RouterObject['hook']) : parentValue.hook,
         hrefs:
           props.hrefs !== undefined
@@ -263,7 +267,8 @@ export const Router = {
             : typeof props.hook === 'object' && props.hook && 'hrefs' in props.hook
               ? ((props.hook as { hrefs?: HrefsFormatter }).hrefs ?? defaultRouter.hrefs)
               : parentValue.hrefs || defaultRouter.hrefs,
-      }
+        ...(ssrContextValue !== undefined ? { ssrContext: ssrContextValue } : {}),
+      } as RouterObject & { ssrContext?: SsrContext }
       return result
     })
 
@@ -342,11 +347,7 @@ export const Route = {
     const result = computed(() => {
       const r: RouterObject | Ref<RouterObject> | ComputedRef<RouterObject> =
         typeof router === 'function' ? (router as () => RouterObject)() : router
-      const routerObj: RouterObject = (
-        r && typeof r === 'object' && 'value' in r
-          ? (r as unknown as Ref<RouterObject> | ComputedRef<RouterObject>).value
-          : r
-      ) as RouterObject
+      const routerObj: RouterObject = unref(r) as RouterObject
       const parserFn =
         (typeof routerObj.parser === 'function' ? routerObj.parser : null) ?? defaultRouter.parser
       const locationValue = (location as ComputedRef<Path>).value
@@ -360,7 +361,7 @@ export const Route = {
     const injectedParams = injectVue(ParamsKey, Params0)
     const parentParams = computed(() => {
       const val = typeof injectedParams === 'function' ? injectedParams() : injectedParams
-      return val && 'value' in val ? val.value : val
+      return unref(val)
     })
 
     // Merge params reactively
@@ -421,7 +422,15 @@ type LinkProps = {
 
 export const Link = {
   name: 'Link',
-  props: ['href', 'to', 'onClick', 'asChild', 'classFn', 'className'],
+  props: {
+    href: String,
+    to: String,
+    onClick: Function,
+    asChild: Boolean,
+    classFn: Function,
+    className: String,
+    replace: Boolean,
+  },
   inheritAttrs: false,
   setup(props: LinkProps, { slots, attrs }: SetupContext & { attrs?: Record<string, unknown> }) {
     const router = useRouter()
@@ -491,10 +500,12 @@ export const Link = {
       const isActive = normalizedCurrent === normalizedTarget
 
       // Handle classFn prop for active link styling
+      // Check both props and attrs for classFn (template syntax may pass via attrs)
+      const classFnValue = props.classFn ?? (attrs as Record<string, unknown>)?.classFn
       let className: string | undefined = undefined
 
-      if (typeof props.classFn === 'function') {
-        className = props.classFn(isActive)
+      if (typeof classFnValue === 'function') {
+        className = classFnValue(isActive)
       }
 
       // Merge static classes from className prop or attrs.class
@@ -516,6 +527,8 @@ export const Link = {
           onClick,
           href: href.value,
           class: className || undefined,
+          // Merge attrs (including data-testid) to root element
+          ...(attrs as Record<string, unknown>),
         },
         content as Parameters<typeof h>[2]
       )
@@ -602,12 +615,7 @@ export const Switch = {
         let match: ReturnType<typeof matchRoute> | null = null
 
         if (elementTyped.type && elementTyped.type !== Fragment) {
-          const locationForMatch =
-            typeof useLocation === 'string'
-              ? useLocation
-              : useLocation && typeof useLocation === 'object' && 'value' in useLocation
-                ? ((useLocation as unknown as ComputedRef<Path>).value as Path)
-                : (useLocation as Path)
+          const locationForMatch = unref(useLocation)
           match = matchRoute(parser, path, locationForMatch, elementTyped.props?.nest)
         }
 
@@ -639,27 +647,45 @@ type RedirectProps = {
 
 export const Redirect = {
   name: 'Redirect',
+  props: ['to', 'href', 'replace', 'state'],
   setup(props: RedirectProps) {
-    const { to, href = to } = props
+    const { to, href } = props
+    const targetPath = to || href || ''
     const router = useRouter()
     const [, navigate] = useLocationFromRouter(router)
-    const navigateFn = navigate as (path: string, options?: RedirectProps) => void
+    const navigateFn = navigate as (
+      path: string,
+      options?: { replace?: boolean; state?: unknown }
+    ) => void
 
-    onMounted(() => {
-      navigateFn(to || href || '', props)
-    })
-
-    const routerValue =
-      typeof router === 'function'
-        ? (router as () => RouterObject)()
-        : router && typeof router === 'object' && 'value' in router
-          ? (router as unknown as Ref<RouterObject> | ComputedRef<RouterObject>).value
-          : (router as RouterObject)
-
-    if ('ssrContext' in routerValue && routerValue.ssrContext) {
-      const ssrCtx = routerValue.ssrContext as { redirectTo?: Path }
-      ssrCtx.redirectTo = to
+    // Get ssrContext from router computed value synchronously
+    // The router is a computed ref, so we need to access its .value
+    // Directly access router.value to get the current computed value
+    let routerValueObj: RouterObject & { ssrContext?: SsrContext }
+    if (typeof router === 'function') {
+      routerValueObj = (router as () => RouterObject)() as RouterObject & {
+        ssrContext?: SsrContext
+      }
+    } else if (router && typeof router === 'object' && 'value' in router) {
+      routerValueObj = (router as unknown as ComputedRef<RouterObject> | Ref<RouterObject>)
+        .value as RouterObject & { ssrContext?: SsrContext }
+    } else {
+      routerValueObj = router as RouterObject & { ssrContext?: SsrContext }
     }
+    // Set SSR context synchronously if available (before mount)
+    // Read ssrContext using bracket notation to avoid type issues
+    const ssrCtx =
+      'ssrContext' in routerValueObj
+        ? ((routerValueObj as unknown as Record<string, unknown>).ssrContext as
+            | SsrContext
+            | undefined)
+        : undefined
+    if (ssrCtx) {
+      ssrCtx.redirectTo = targetPath
+    }
+
+    // Navigate immediately for client-side (in SSR, only ssrContext is set)
+    navigateFn(targetPath, { replace: props.replace, state: props.state })
 
     return () => null
   },

@@ -122,3 +122,16 @@ it("renders first matching route only", () => {
   wrapper.unmount();
 });
 
+it("renders catch-all route (Route without path) as last element in Switch", () => {
+  const wrapper = testRouteRender("/not-found", () =>
+    h(Switch, null, () => [
+      h(Route, { path: "/users" }, () => "users"),
+      h(Route, { path: "/about" }, () => "about"),
+      h(Route, () => "404 Not Found"),
+    ])
+  );
+
+  expect(wrapper.text()).toBe("404 Not Found");
+  wrapper.unmount();
+});
+

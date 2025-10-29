@@ -12,6 +12,8 @@ import {
   type Ref,
   reactive,
   ref as refVue,
+  unref,
+  isRef,
   watch,
   watchEffect,
 } from 'vue'
@@ -31,72 +33,15 @@ export {
   Fragment,
   h,
   defineAsyncComponent,
+  unref,
+  isRef,
 }
 
 export type { Ref }
 
-// Equivalent to React's Context, but for Vue we use provide/inject
-export const createContext = (defaultValue: unknown) => {
-  const key = Symbol('context')
-  return { key, defaultValue }
-}
-
-export const useContext = <T = unknown>(contextKey: unknown): T | null => {
-  return inject(contextKey as string | symbol, null) as T | null
-}
-
-// Vue doesn't have isValidElement like React, but we can check for VNode
-export const isValidElement = (vnode: unknown): boolean => {
-  return (
-    vnode != null &&
-    typeof vnode === 'object' &&
-    (vnode as { __v_isVNode?: boolean }).__v_isVNode === true
-  )
-}
-
-// Vue's cloneVNode is analogous to React's cloneElement
-export { cloneVNode as cloneElement } from 'vue'
-
-// Use ref for stable function references (similar to useEvent)
-export const useEvent = <T extends (...args: unknown[]) => unknown>(fn: T): T => {
-  const refValue = refVue(fn)
-  refValue.value = fn
-  return ((...args: unknown[]) => refValue.value(...args)) as T
-}
-
-// Copied from:
-// https://github.com/facebook/react/blob/main/packages/shared/ExecutionEnvironment.js
-const canUseDOM = !!(
-  typeof window !== 'undefined' &&
-  typeof window.document !== 'undefined' &&
-  typeof window.document.createElement !== 'undefined'
-)
-
-// Vue's equivalent of useIsomorphicLayoutEffect
-export const useIsomorphicLayoutEffect = canUseDOM ? onMountedVue : () => {}
-
-// Simplified useSyncExternalStore for Vue using ref + watch
-export function useSyncExternalStore<T>(
-  subscribe: (callback: () => void) => () => void,
-  getSnapshot: () => T,
-  getSSRSnapshot?: () => T
-): T {
-  const snapshot = refVue(getSSRSnapshot ? getSSRSnapshot() : getSnapshot())
-
-  watchEffect((onInvalidate) => {
-    const callback = () => {
-      snapshot.value = getSnapshot()
-    }
-
-    const unsubscribe = subscribe(callback)
-
-    onInvalidate(() => {
-      unsubscribe()
-    })
-  })
-
-  return snapshot.value
-}
-
-export const useRef = <T = unknown>(initialValue: T) => refVue(initialValue) as Ref<T>
-export const useMemo = <T = unknown>(fn: () => T, _deps: unknown[]) => computed(() => fn())
+// Note: React-like abstractions (useEvent, useMemo, useRef, useSyncExternalStore, etc.)
+// are removed as they're not used and Vue already provides better alternatives:
+// - useMemo: use computed() directly
+// - useRef: use ref() directly
+// - useEvent: functions in setup() are already stable in Vue
+// - useContext/createContext: use provide/inject directly

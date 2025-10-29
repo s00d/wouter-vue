@@ -12,6 +12,23 @@
     "composition-api",
     "useLocation"
   ],
+  "scripts": {
+    "build": "vite build",
+    "watch": "vite build --watch",
+    "test": "vitest --run",
+    "test:browser": "cd examples/example && pnpm exec playwright test",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
+    "format": "biome format --write .",
+    "check": "biome check .",
+    "check:fix": "biome check --write .",
+    "prepublishOnly": "pnpm run build",
+    "example": "cd examples/example && pnpm run dev",
+    "example:build": "cd examples/example && pnpm run build",
+    "example:preview": "cd examples/example && pnpm run preview",
+    "clean": "pnpm -r exec sh -c 'rm -rf node_modules' && rm -rf node_modules && rm -f pnpm-lock.yaml"
+  },
   "files": [
     "dist",
     "types/**/*.d.ts",
@@ -59,23 +76,6 @@
         "types/vite-plugin-routes.d.ts"
       ]
     }
-  },
-  "scripts": {
-    "build": "vite build",
-    "watch": "vite build --watch",
-    "test": "vitest --run",
-    "test:browser": "cd examples/example && pnpm exec playwright test",
-    "typecheck": "tsc --noEmit",
-    "lint": "biome lint .",
-    "lint:fix": "biome lint --write .",
-    "format": "biome format --write .",
-    "check": "biome check .",
-    "check:fix": "biome check --write .",
-    "prepublishOnly": "pnpm run build",
-    "example": "cd examples/example && pnpm run dev",
-    "example:build": "cd examples/example && pnpm run build",
-    "example:preview": "cd examples/example && pnpm run preview",
-    "clean": "pnpm -r exec sh -c 'rm -rf node_modules' && rm -rf node_modules && rm -f pnpm-lock.yaml"
   },
   "author": "s00d",
   "repository": {
