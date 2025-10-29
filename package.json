@@ -1,6 +1,6 @@
 {
   "name": "wouter-vue",
-  "version": "3.7.1",
+  "version": "1.0.0",
   "description": "Minimalist-friendly ~2KB router for Vue 3, inspired by wouter",
   "type": "module",
   "keywords": [
@@ -71,7 +71,7 @@
     "format": "biome format --write .",
     "check": "biome check .",
     "check:fix": "biome check --write .",
-    "prepublishOnly": "pnpm run build && cp ../../README.md .",
+    "prepublishOnly": "pnpm run build",
     "example": "cd examples/example && pnpm run dev",
     "example:build": "cd examples/example && pnpm run build",
     "example:preview": "cd examples/example && pnpm run preview",
