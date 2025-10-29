@@ -1,0 +1,23 @@
+{
+  "name": "wouter-vue-example",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node server.js",
+    "build": "pnpm run build:client && pnpm run build:server",
+    "build:client": "vite build --outDir dist/client",
+    "build:server": "vite build --ssr src/entry-server.js --outDir dist/server",
+    "preview": "NODE_ENV=production node server.js",
+    "test:all": "./test-all.sh"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.1",
+    "@vitejs/plugin-vue": "^6.0.1",
+    "@vue/server-renderer": "^3.5.22",
+    "express": "^4.21.2",
+    "vite": "^6.0.0",
+    "vue": "^3.5.22",
+    "wouter-vue": "workspace:*"
+  }
+}

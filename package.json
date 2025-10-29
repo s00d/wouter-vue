@@ -1,0 +1,110 @@
+{
+  "name": "wouter-vue",
+  "version": "3.7.1",
+  "description": "Minimalist-friendly ~2KB router for Vue 3, inspired by wouter",
+  "type": "module",
+  "keywords": [
+    "vue",
+    "vue3",
+    "router",
+    "tiny",
+    "routing",
+    "composition-api",
+    "useLocation"
+  ],
+  "files": [
+    "dist",
+    "types/**/*.d.ts",
+    "types/*.d.ts"
+  ],
+  "main": "dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./use-browser-location": {
+      "types": "./types/use-browser-location.d.ts",
+      "default": "./dist/use-browser-location.js"
+    },
+    "./use-hash-location": {
+      "types": "./types/use-hash-location.d.ts",
+      "default": "./dist/use-hash-location.js"
+    },
+    "./memory-location": {
+      "types": "./types/memory-location.d.ts",
+      "default": "./dist/memory-location.js"
+    },
+    "./vite-plugin-routes": {
+      "types": "./types/vite-plugin-routes.d.ts",
+      "default": "./src/vite-plugin-routes.js"
+    }
+  },
+  "types": "types/index.d.ts",
+  "typesVersions": {
+    ">=4.1": {
+      "types/index.d.ts": [
+        "types/index.d.ts"
+      ],
+      "use-browser-location": [
+        "types/use-browser-location.d.ts"
+      ],
+      "use-hash-location": [
+        "types/use-hash-location.d.ts"
+      ],
+      "memory-location": [
+        "types/memory-location.d.ts"
+      ],
+      "vite-plugin-routes": [
+        "types/vite-plugin-routes.d.ts"
+      ]
+    }
+  },
+  "scripts": {
+    "build": "vite build",
+    "watch": "vite build --watch",
+    "test": "vitest --run",
+    "test:browser": "cd examples/example && pnpm exec playwright test",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
+    "format": "biome format --write .",
+    "check": "biome check .",
+    "check:fix": "biome check --write .",
+    "prepublishOnly": "pnpm run build && cp ../../README.md .",
+    "example": "cd examples/example && pnpm run dev",
+    "example:build": "cd examples/example && pnpm run build",
+    "example:preview": "cd examples/example && pnpm run preview",
+    "clean": "pnpm -r exec sh -c 'rm -rf node_modules' && rm -rf node_modules && rm -f pnpm-lock.yaml"
+  },
+  "author": "s00d",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/s00d/wouter-vue.git"
+  },
+  "homepage": "https://github.com/s00d/wouter-vue#readme",
+  "bugs": {
+    "url": "https://github.com/s00d/wouter-vue/issues"
+  },
+  "license": "Unlicense",
+  "peerDependencies": {
+    "vue": "^3.5.22"
+  },
+  "dependencies": {
+    "mitt": "^3.0.1",
+    "regexparam": "^3.0.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.3.2",
+    "@rollup/plugin-typescript": "^12.3.0",
+    "@vitejs/plugin-vue": "^6.0.1",
+    "@vue/server-renderer": "^3.5.22",
+    "@vue/test-utils": "^2.4.6",
+    "happy-dom": "^20.0.10",
+    "tslib": "^2.8.1",
+    "typescript": "5.9.3",
+    "vite": "^7.1.12",
+    "vite-plugin-dts": "^4.5.4",
+    "vitest": "^4.0.4"
+  }
+}

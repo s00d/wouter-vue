@@ -1,0 +1,75 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.3.2/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "ignoreUnknown": false,
+    "includes": [
+      "src/**",
+      "*.ts",
+      "*.js",
+      "*.json",
+      "*.vue",
+      "!!**/node_modules",
+      "!!**/dist",
+      "!!**/types",
+      "!!**/examples",
+      "!!**/pnpm-lock.yaml",
+      "!!**/package-lock.json",
+      "!!**/yarn.lock",
+      "!!**/.git",
+      "!!**/*.d.ts"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineEnding": "lf",
+    "lineWidth": 100,
+    "formatWithErrors": false
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "complexity": {
+        "noForEach": "off"
+      },
+      "correctness": {
+        "useExhaustiveDependencies": "warn",
+        "noUnusedVariables": {
+          "level": "warn"
+        }
+      },
+      "style": {
+        "noParameterAssign": "off",
+        "useImportType": "error",
+        "useNodejsImportProtocol": "off"
+      },
+      "suspicious": {
+        "noExplicitAny": "warn"
+      }
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "semicolons": "asNeeded",
+      "trailingCommas": "es5"
+    }
+  },
+  "overrides": [
+    {
+      "includes": ["*.js"],
+      "javascript": {
+        "formatter": {
+          "semicolons": "always"
+        }
+      }
+    }
+  ]
+}
