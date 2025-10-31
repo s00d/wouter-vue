@@ -1,7 +1,7 @@
 import { ComputedRef } from 'vue';
 import { Path } from '../types/location-hook.d.js';
 import { HrefsFormatter, Parser, RouterObject, SsrContext } from '../types/router.d.js';
-import { Ref } from './vue-deps.js';
+import { Ref } from 'vue';
 export type { RouterObject, SsrContext, Parser, HrefsFormatter };
 export type RouteParams = Record<string, string>;
 export type MatchResult = [true, RouteParams, string?] | [false, null];

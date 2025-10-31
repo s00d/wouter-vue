@@ -1,5 +1,5 @@
 import mitt from 'mitt'
-import { type Ref, ref, watchEffect } from './vue-deps.js'
+import { type Ref, ref, watchEffect } from 'vue'
 
 type Path = string
 type SearchString = string

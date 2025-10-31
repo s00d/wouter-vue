@@ -1,5 +1,4 @@
 import vue from '@vitejs/plugin-vue'
-import { resolve } from 'path'
 import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
@@ -22,10 +21,5 @@ export default defineConfig({
     // Run only unit tests
     include: ['test/**/*.{ts,js}'],
     setupFiles: ['./test/setup.ts'],
-  },
-  resolve: {
-    alias: {
-      'vue-deps': resolve(__dirname, './src/vue-deps.ts'),
-    },
   },
 })

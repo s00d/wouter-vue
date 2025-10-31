@@ -1,4 +1,4 @@
-import { Ref } from './vue-deps.js';
+import { Ref } from 'vue';
 type Path = string;
 export declare const navigate: <S = unknown>(to: Path, { state, replace }?: {
     state?: S | null;

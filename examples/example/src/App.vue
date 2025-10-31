@@ -11,6 +11,9 @@
             <Route path="/users" :component="UsersPage" />
             <Route path="/users/:id" :component="UserDetailPage" />
             <Route path="/heavy" :component="HeavyPage" />
+            <Route :path="new RegExp('^/(?<locale>[a-zA-Z]{2})(?=/|$)')" nest>
+              <Route path="/test" :component="LocaleTestPage" />
+            </Route>
             <Route
               v-for="route in testRoutes"
               :key="route.path"
@@ -53,6 +56,9 @@ const UsersPage = () => import('./pages/UsersPage.vue');
 const UserDetailPage = () => import('./pages/UserDetailPage.vue');
 const HeavyPage = () => import('./pages/HeavyPage.vue');
 const NotFoundPage = () => import('./pages/NotFoundPage.vue');
+const LocaleTestPage = () => import('./pages/LocaleTestPage.vue');
+
+// (unused)
 
 // Lazy loading test routes
 const testRoutes = [];

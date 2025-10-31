@@ -29,13 +29,22 @@ import {
   ref,
   unref,
   watch,
-} from './vue-deps.js'
+} from 'vue'
 
 type RouterRef =
   | RouterObject
   | Ref<RouterObject>
   | ComputedRef<RouterObject>
   | ((...args: unknown[]) => RouterObject)
+
+/**
+ * Normalizes Vue boolean props (boolean shorthand support).
+ * Returns true if value is empty string ('') or true, false otherwise.
+ * This handles Vue's boolean prop shorthand: <Component prop /> results in prop="" on vnode.
+ */
+const normalizeBooleanProp = (value: unknown): boolean => {
+  return value === '' || value === true
+}
 
 /*
  * Router and router context. Router is a lightweight object that represents the current
@@ -106,7 +115,8 @@ const useLocationFromRouter = (router: RouterRef): [ComputedRef<Path>, NavigateF
     const base = routerValue.value.base
     const loc = hookResult.value[0]
     const locValue = unref(loc)
-    return relativePath(base, locValue)
+    const rel = relativePath(base, locValue)
+    return rel
   })
 
   return [finalLocation, navigateFn]
@@ -185,9 +195,11 @@ export const matchRoute = (
     // the third value is only present when parser is in "loose" mode,
     // so that we can extract the base path for nested routes
     if (loose) {
-      return [true, params, $base] as MatchResult
+      const out = [true, params, $base] as MatchResult
+      return out
     }
-    return [true, params] as MatchResult
+    const out = [true, params] as MatchResult
+    return out
   }
 
   return [false, null] as MatchResult
@@ -380,7 +392,7 @@ export const Route = {
       const parserFn =
         (typeof routerObj.parser === 'function' ? routerObj.parser : null) ?? defaultRouter.parser
       const locationValue = (location as ComputedRef<Path>).value
-      const match = props.match ?? matchRoute(parserFn, props.path, locationValue, props.nest)
+      const match = props.match ?? matchRoute(parserFn, props.path, locationValue, normalizeBooleanProp(props.nest))
       return match
     })
     const matches = computed(() => result.value[0])
@@ -421,7 +433,8 @@ export const Route = {
         ? h(component, { params: params.value })
         : slots.default?.(params.value)
 
-      if (props.nest && result.value[2]) {
+      const nestEnabled = normalizeBooleanProp(props.nest)
+      if (nestEnabled && result.value[2]) {
         // For nested routes, create a Router with the correct base
         // We need to re-provide params in the render function
         const Wrapper = {
@@ -486,7 +499,7 @@ export const Link = {
       props.onClick?.(event)
       if (!event.defaultPrevented) {
         event.preventDefault()
-        const options = { replace: props.replace || false }
+        const options = { replace: normalizeBooleanProp(props.replace) }
         const navigateFn = navigate as (
           path: string,
           options?: { replace?: boolean; state?: unknown }
@@ -629,10 +642,12 @@ export const Switch = {
 
         if (elementTyped.type && elementTyped.type !== Fragment) {
           const locationForMatch = unref(useLocation)
-          match = matchRoute(parser, path, locationForMatch, elementTyped.props?.nest)
+          const isNest = normalizeBooleanProp((elementTyped.props as Record<string, unknown> | undefined)?.nest)
+          match = matchRoute(parser, path, locationForMatch, isNest)
         }
 
         if (match?.[0]) {
+          
           return elementTyped.children
             ? h(
                 elementTyped.type as Parameters<typeof h>[0],

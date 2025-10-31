@@ -1,4 +1,4 @@
-import { Ref } from './vue-deps.js';
+import { Ref } from 'vue';
 type Path = string;
 type SearchString = string;
 type Primitive = string | number | bigint | boolean | null | undefined | symbol;

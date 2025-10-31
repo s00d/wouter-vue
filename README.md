@@ -516,6 +516,39 @@ const params = useParams();
 
 The `nest` prop enables nested routing mode, where child routes match relative to the parent route path.
 
+### RegExp routes and named groups
+
+You can use `RegExp` in the `path` for precise matching, including named capture groups.
+
+Important: inside `<template>` use the constructor `new RegExp(...)` rather than a literal `/.../`, otherwise the Vue SFC parser may fail. Named groups are supported by modern environments; if unavailable, the router falls back to numeric indices for params.
+
+```vue
+<template>
+  <Switch>
+    <!-- Parent route with named group `locale`, enables nesting -->
+    <Route :path="new RegExp('^/(?<locale>[a-zA-Z]{2})(?=/|$)')" nest>
+      <!-- Child route relative to /<locale> base -->
+      <Route path="/test" :component="LocaleTestPage" />
+    </Route>
+
+    <!-- Fallback -->
+    <Route>Not Found</Route>
+  </Switch>
+</template>
+
+<script setup>
+import { Route, Switch, useParams } from 'wouter-vue'
+
+// Inside LocaleTestPage.vue
+// const params = useParams()
+// params.value.locale === 'ru' for /ru/test
+</script>
+```
+
+Diagnostics: with `nest` enabled, the parent `Route` creates a nested `Router` whose `base` equals the matched prefix (e.g., `'/ru'`). Inside the nested `Router`, the current location becomes relative to this base (e.g., `'/test'`), so child routes must match that relative path.
+
+Note on boolean shorthand: You can write `nest` (without a value) in templates. The router normalizes it the same as `nest` even inside `<Switch>` (boolean shorthand is recognized in vnode props).
+
 ### Route Parameters
 
 Extract dynamic segments from URLs:
@@ -541,6 +574,21 @@ const params = useParams();
 ```vue
 <Route path="/files/*">All Files</Route>
 ```
+
+#### RegExp params with named groups
+
+```vue
+<template>
+  <!-- match /users/123/details, where 123 are digits only -->
+  <Route :path="new RegExp('^/users/(?<id>\\d+)/details$')">
+    <template #default="{ params }">
+      User ID: {{ params.id }}
+    </template>
+  </Route>
+</template>
+```
+
+Если именованные группы недоступны в окружении, роутер вернёт параметры с числовыми ключами (`'0'`, `'1'`), их можно прочитать вручную при необходимости.
 
 ### Active Links
 
