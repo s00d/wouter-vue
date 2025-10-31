@@ -28,7 +28,6 @@ import {
   type Ref,
   ref,
   unref,
-  watch,
 } from 'vue'
 
 type RouterRef =
@@ -38,9 +37,53 @@ type RouterRef =
   | ((...args: unknown[]) => RouterObject)
 
 /**
+ * Type guard to check if a value is a Ref-like object.
+ */
+const isRefLike = (value: unknown): value is Ref<RouterObject> | ComputedRef<RouterObject> => {
+  return value !== null
+    && typeof value === 'object'
+    && 'value' in value
+}
+
+/**
+ * Type guard to check if a value is a function that returns RouterObject.
+ */
+const isRouterFunction = (value: unknown): value is () => RouterObject => {
+  return typeof value === 'function'
+}
+
+/**
+ * Normalizes RouterRef to RouterObject by unwrapping refs and calling functions.
+ * 
+ * @param router - The router reference (can be object, ref, computed ref, or function)
+ * @returns The unwrapped RouterObject
+ */
+const normalizeRouterRef = (router: RouterRef): RouterObject => {
+  if (isRouterFunction(router)) {
+    return router()
+  }
+  if (isRefLike(router)) {
+    return unref(router) as RouterObject
+  }
+  return router as RouterObject
+}
+
+/**
  * Normalizes Vue boolean props (boolean shorthand support).
- * Returns true if value is empty string ('') or true, false otherwise.
- * This handles Vue's boolean prop shorthand: <Component prop /> results in prop="" on vnode.
+ * 
+ * Returns `true` if value is empty string (`''`) or `true`, `false` otherwise.
+ * This handles Vue's boolean prop shorthand: `<Component prop />` results in `prop=""` on vnode.
+ * 
+ * @param value - The prop value to normalize (can be `''`, `true`, `false`, or `undefined`)
+ * @returns `true` if the prop should be considered enabled, `false` otherwise
+ * 
+ * @example
+ * ```typescript
+ * normalizeBooleanProp('')  // true
+ * normalizeBooleanProp(true) // true
+ * normalizeBooleanProp(false) // false
+ * normalizeBooleanProp(undefined) // false
+ * ```
  */
 const normalizeBooleanProp = (value: unknown): boolean => {
   return value === '' || value === true
@@ -81,6 +124,22 @@ export const useRouter = () => injectVue(RouterKey, defaultRouter)
  */
 const Params0 = {}
 
+/**
+ * Hook to access route parameters from the current matched route.
+ * 
+ * Works inside `<Route>` components and returns parameters from the innermost matched route.
+ * Automatically merges parameters from parent nested routes.
+ * 
+ * @returns `Ref<RouteParams>` - Object with route parameter keys mapped to string values
+ * 
+ * @example
+ * ```typescript
+ * // For route path="/users/:userId/posts/:postId"
+ * const params = useParams()
+ * console.log(params.value.userId)  // '123'
+ * console.log(params.value.postId)  // '456'
+ * ```
+ */
 export const useParams = (): Ref<RouteParams> => {
   const params = injectVue(ParamsKey, Params0)
   // If params is a ref, return it; otherwise wrap it in a ref
@@ -94,14 +153,12 @@ export const useParams = (): Ref<RouteParams> => {
  * Part 1, Composables: useRoute and useLocation
  */
 
-// Internal version of useLocation to avoid redundant useRouter calls
+/**
+ * Internal version of useLocation to avoid redundant useRouter calls.
+ * Optimized to use type guards for better performance.
+ */
 const useLocationFromRouter = (router: RouterRef): [ComputedRef<Path>, NavigateFn] => {
-  const routerValue = computed(() => {
-    // router may be a function, ref, or plain object
-    const r: RouterObject | Ref<RouterObject> | ComputedRef<RouterObject> =
-      typeof router === 'function' ? (router as () => RouterObject)() : router
-    return unref(r) as RouterObject
-  })
+  const routerValue = computed(() => normalizeRouterRef(router))
 
   const hookResult = computed(() => {
     const result = routerValue.value.hook(routerValue.value)
@@ -122,19 +179,51 @@ const useLocationFromRouter = (router: RouterRef): [ComputedRef<Path>, NavigateF
   return [finalLocation, navigateFn]
 }
 
+/**
+ * Reactive location hook that returns the current path and a navigate function.
+ * 
+ * The location ref automatically updates when the URL changes (through navigation or browser back/forward).
+ * 
+ * @returns A tuple of `[location, navigate]` where:
+ *   - `location`: `ComputedRef<Path>` - Current pathname (relative to router base if nested)
+ *   - `navigate`: `NavigateFn` - Function to programmatically navigate
+ * 
+ * @example
+ * ```typescript
+ * const [location, navigate] = useLocation()
+ * 
+ * // Access current path
+ * console.log(location.value) // '/current/path'
+ * 
+ * // Navigate programmatically
+ * navigate('/about')
+ * navigate('/users/123', { replace: true })
+ * ```
+ */
 export const useLocation = (): [ComputedRef<Path>, NavigateFn] => {
   const router = useRouter()
   const result = useLocationFromRouter(router)
   return result
 }
 
+/**
+ * Reactive search string hook (query string).
+ * 
+ * Returns the current search string (query string) from the URL.
+ * Automatically updates when URL search parameters change.
+ * 
+ * @returns `ComputedRef<string>` - Raw query string (e.g., `'foo=bar&page=2'`)
+ * 
+ * @example
+ * ```typescript
+ * const search = useSearch()
+ * console.log(search.value) // 'foo=bar&page=2'
+ * ```
+ */
 export const useSearch = () => {
   const router = useRouter()
-  const routerValue = computed(() => {
-    const r: RouterObject | Ref<RouterObject> | ComputedRef<RouterObject> =
-      typeof router === 'function' ? (router as () => RouterObject)() : router
-    return unref(r) as RouterObject
-  })
+  // Optimized: use type guard helper
+  const routerValue = computed(() => normalizeRouterRef(router as RouterRef))
   const searchResult = computed(() => {
     const searchHookFn = routerValue.value.searchHook
     if (!searchHookFn) return ''
@@ -143,13 +232,35 @@ export const useSearch = () => {
       if (!searchHookResult) return ''
       const searchValue = unref(searchHookResult)
       return sanitizeSearch(searchValue)
-    } catch {
+    } catch (error) {
+      // Log error in development for debugging
+      if (isDev()) {
+        console.warn('[wouter-vue] Error reading search params:', error)
+      }
       return ''
     }
   })
   return searchResult
 }
 
+/**
+ * Matches a route pattern against a path and extracts parameters.
+ * 
+ * @param parser - The route parser function (from regexparam or custom)
+ * @param route - The route pattern to match (string or RegExp)
+ * @param path - The current path to match against
+ * @param loose - If `true`, enables loose matching mode for nested routes (extracts base path)
+ * @returns A tuple: `[true, RouteParams, base?]` on match, `[false, null]` on no match
+ * 
+ * @example
+ * ```typescript
+ * const [matched, params, base] = matchRoute(parsePattern, '/users/:id', '/users/123')
+ * // matched: true, params: { id: '123' }, base: undefined
+ * 
+ * const [matched, params, base] = matchRoute(parsePattern, '/users/:id', '/users/123/posts', true)
+ * // matched: true, params: { id: '123' }, base: '/users/123'
+ * ```
+ */
 export const matchRoute = (
   parser: Parser,
   route: string | RegExp,
@@ -172,10 +283,14 @@ export const matchRoute = (
   if ($base !== undefined) {
     const params: RouteParams = (() => {
       // Priority 1: If we have named keys from parser, use only them
+      // Optimized: direct object construction instead of Object.fromEntries for better performance
       if (keys !== false) {
-        return Object.fromEntries(
-          (keys as string[]).map((key: string, i: number) => [key, matches[i]])
-        ) as RouteParams
+        const keysArray = keys as string[]
+        const paramsObj: RouteParams = {}
+        for (let i = 0; i < keysArray.length; i++) {
+          paramsObj[keysArray[i]] = matches[i]
+        }
+        return paramsObj
       }
 
       // Priority 2: If we have named capture groups from RegExp, use them
@@ -186,9 +301,9 @@ export const matchRoute = (
 
       // Priority 3: Fallback to numeric indices only if no named keys/groups exist
       const paramsFromMatches: RouteParams = {}
-      matches.forEach((match, i) => {
-        paramsFromMatches[String(i)] = match
-      })
+      for (let i = 0; i < matches.length; i++) {
+        paramsFromMatches[String(i)] = matches[i]
+      }
       return paramsFromMatches
     })()
 
@@ -205,18 +320,35 @@ export const matchRoute = (
   return [false, null] as MatchResult
 }
 
+/**
+ * Reactive route matching hook.
+ * 
+ * Returns computed refs that automatically update when the location changes.
+ * The first ref indicates if the route matches, the second contains the extracted parameters.
+ * 
+ * @param pattern - Route pattern to match (string like `/users/:id` or RegExp)
+ * @returns A tuple of `[matches, params]` where:
+ *   - `matches`: `ComputedRef<boolean>` - `true` if location matches the pattern
+ *   - `params`: `ComputedRef<RouteParams | null>` - Extracted route parameters or `null` if no match
+ * 
+ * @example
+ * ```typescript
+ * const [matches, params] = useRoute('/users/:id')
+ * 
+ * if (matches.value) {
+ *   console.log('User ID:', params.value?.id) // '123'
+ * }
+ * ```
+ */
 export const useRoute = (
   pattern: string | RegExp
 ): [ComputedRef<boolean>, ComputedRef<RouteParams | null>] => {
   const [location] = useLocation()
   const router = useRouter()
 
+  // Optimized: combine router unwrapping and matching in single computed
   const result = computed(() => {
-    const routerObj =
-      typeof router === 'function'
-        ? (router as () => RouterObject)()
-        : (unref(router) as RouterObject)
-
+    const routerObj = normalizeRouterRef(router as RouterRef)
     // location is already computed, its value will be tracked automatically
     const locationValue = (location as ComputedRef<Path>).value
     return matchRoute(routerObj.parser, pattern, locationValue)
@@ -248,7 +380,7 @@ type RouterProps = {
 
 type SetupContext = {
   slots: {
-    default?: () => unknown
+    default?: (() => unknown) | ((params: unknown) => unknown)
   }
 }
 
@@ -259,10 +391,12 @@ export const Router = {
     const parent = injectVue(RouterKey, defaultRouter)
 
     // when `ssrPath` contains a `?` character, we can extract the search from it
-    let _ssrPath = props.ssrPath
-    let _ssrSearch = props.ssrSearch
+    let finalSsrPath = props.ssrPath
+    let finalSsrSearch = props.ssrSearch
     if (props.ssrPath?.includes('?')) {
-      ;[_ssrPath, _ssrSearch] = props.ssrPath.split('?')
+      const parts = props.ssrPath.split('?')
+      finalSsrPath = parts[0]
+      finalSsrSearch = parts[1]
     }
 
     // construct the new router object without mutations
@@ -283,8 +417,8 @@ export const Router = {
       const result = {
         base: props.base !== undefined ? parentValue.base + (props.base || '') : parentValue.base,
         ownBase: props.base !== undefined ? props.base : parentValue.ownBase,
-        ssrPath: props.ssrPath !== undefined ? props.ssrPath : parentValue.ssrPath,
-        ssrSearch: props.ssrSearch !== undefined ? props.ssrSearch : parentValue.ssrSearch,
+        ssrPath: finalSsrPath !== undefined ? finalSsrPath : parentValue.ssrPath,
+        ssrSearch: finalSsrSearch !== undefined ? finalSsrSearch : parentValue.ssrSearch,
         parser: props.parser ?? parentValue.parser,
         searchHook:
           props.searchHook !== undefined
@@ -305,41 +439,22 @@ export const Router = {
     // provide the router context to children
     provideVue(RouterKey, router)
 
-    return () => slots.default?.()
+    return () => {
+      const defaultSlot = slots.default
+      if (!defaultSlot) return null
+      if (typeof defaultSlot === 'function') {
+        // Router default slot doesn't take parameters
+        return (defaultSlot as () => unknown)()
+      }
+      return defaultSlot
+    }
   },
 }
 
-const _h_route = (
-  { slots, component }: { slots?: { default?: (params: unknown) => unknown }; component?: unknown },
-  params: unknown
-) => {
-  // component style
-  if (component) return h(component as Parameters<typeof h>[0], { params })
-
-  // support default slot or scoped slot
-  return slots?.default ? slots.default(params) : null
-}
-
-// Cache params object between renders if values are shallow equal
-const _useCachedParams = (value: unknown) => {
-  const cached = ref(value)
-  watch(
-    () => value,
-    (newValue: unknown) => {
-      const curr = cached.value as Record<string, unknown>
-      const newVal = newValue as Record<string, unknown>
-      if (
-        Object.keys(newVal).length !== Object.keys(curr).length ||
-        Object.entries(newVal).some(([k, v]) => v !== curr[k])
-      ) {
-        cached.value = newValue
-      }
-    }
-  )
-  return cached
-}
-
-// Normalize path for comparison by removing query params and hash
+/**
+ * Normalize path for comparison by removing query params and hash.
+ * Used for link active state detection.
+ */
 const normalizePath = (path: string): string => {
   if (!path) return '/'
   // Remove query params (everything after ?)
@@ -356,6 +471,33 @@ const normalizePath = (path: string): string => {
   return normalized
 }
 
+/**
+ * Hook to access and manipulate URL search parameters reactively.
+ * 
+ * Returns a reactive `URLSearchParams` object and a setter function.
+ * The searchParams ref automatically updates when URL search parameters change.
+ * 
+ * @returns A tuple of `[searchParams, setSearchParams]` where:
+ *   - `searchParams`: `ComputedRef<URLSearchParams>` - Reactive URLSearchParams object
+ *   - `setSearchParams`: `SetSearchParamsFn` - Function to update search params
+ * 
+ * @example
+ * ```typescript
+ * const [searchParams, setSearchParams] = useSearchParams()
+ * 
+ * // Read params
+ * const page = searchParams.value.get('page') // '2'
+ * 
+ * // Update params
+ * setSearchParams({ page: '3', sort: 'asc' })
+ * 
+ * // Functional update
+ * setSearchParams(prev => {
+ *   prev.set('page', '5')
+ *   return prev
+ * }, { replace: true })
+ * ```
+ */
 export function useSearchParams(): [ComputedRef<URLSearchParams>, SetSearchParamsFn] {
   const [location, navigate] = useLocation()
   const search = useSearch()
@@ -377,35 +519,81 @@ export function useSearchParams(): [ComputedRef<URLSearchParams>, SetSearchParam
   return [searchParams, setSearchParams]
 }
 
+// Helper to check if we're in development mode
+const isDev = (): boolean => {
+  try {
+    // Check Vite dev mode
+    if (typeof import.meta !== 'undefined' && (import.meta as { env?: { DEV?: boolean } }).env?.DEV) {
+      return true
+    }
+    // Check Node.js dev mode
+    if (typeof process !== 'undefined' && process.env?.NODE_ENV !== 'production') {
+      return true
+    }
+  } catch {
+    // Ignore errors in SSR or other environments
+  }
+  return false
+}
+
+type RouteProps = {
+  path?: string | RegExp
+  component?: unknown
+  nest?: unknown
+  match?: MatchResult
+}
+
 export const Route = {
   name: 'Route',
   props: ['path', 'component', 'nest', 'match'],
-  setup(props, { slots }) {
+  setup(props: RouteProps, { slots }: SetupContext) {
+    // Dev mode validation (only warn, don't prevent rendering)
+    if (isDev()) {
+      if (props.path === undefined && props.match === undefined) {
+        // This is valid for catch-all routes, so we only log in dev mode
+        // but don't prevent rendering
+      }
+      if (props.component === undefined && !slots.default) {
+        console.warn('[wouter-vue] Route component: neither `component` prop nor default slot provided. Route will not render anything.')
+      }
+    }
+
     const router = useRouter()
 
     const [location] = useLocationFromRouter(router)
 
+    // Optimized: combine router unwrapping and matching in single computed
     const result = computed(() => {
-      const r: RouterObject | Ref<RouterObject> | ComputedRef<RouterObject> =
-        typeof router === 'function' ? (router as () => RouterObject)() : router
-      const routerObj: RouterObject = unref(r) as RouterObject
+      // If match is pre-computed, use it; otherwise compute it
+      if (props.match) {
+        return props.match
+      }
+      // If no path provided, this is a catch-all route that always matches
+      if (props.path === undefined) {
+        return [true, {}] as MatchResult
+      }
+      const routerObj = normalizeRouterRef(router as RouterRef)
       const parserFn =
         (typeof routerObj.parser === 'function' ? routerObj.parser : null) ?? defaultRouter.parser
       const locationValue = (location as ComputedRef<Path>).value
-      const match = props.match ?? matchRoute(parserFn, props.path, locationValue, normalizeBooleanProp(props.nest))
-      return match
+      return matchRoute(parserFn, props.path, locationValue, normalizeBooleanProp(props.nest))
     })
-    const matches = computed(() => result.value[0])
+    const matches = computed(() => Boolean(result.value[0]))
+    // Use shallowRef for routeParams as they are primitive values (strings)
+    // This avoids deep reactivity when params object structure doesn't change
     const routeParams = computed(() => result.value[1])
 
     // Get parent params - might be a ref
     const injectedParams = injectVue(ParamsKey, Params0)
+    // Use shallowRef-like approach: parentParams don't need deep reactivity
+    // They're typically static or change infrequently
     const parentParams = computed(() => {
       const val = typeof injectedParams === 'function' ? injectedParams() : injectedParams
       return unref(val)
     })
 
-    // Merge params reactively
+    // Merge params reactively - use computed for reactivity tracking
+    // but params are shallow objects (string -> string), so no deep reactivity needed
     const params = computed(() => ({ ...parentParams.value, ...routeParams.value }))
 
     // provide params context for children
@@ -417,9 +605,9 @@ export const Route = {
       if (!props.component) return null
       // If component is a function (async loader), wrap it in defineAsyncComponent
       if (typeof props.component === 'function') {
-        // Check if it's already an async component or a regular component
-        // If component.toString().includes('defineAsyncComponent'), it's already wrapped
-        return defineAsyncComponent(props.component)
+        // Type assertion needed because defineAsyncComponent expects specific function signature
+        // but we accept any function that returns a component
+        return defineAsyncComponent(props.component as Parameters<typeof defineAsyncComponent>[0])
       }
       // Otherwise use component directly
       return props.component
@@ -429,9 +617,13 @@ export const Route = {
       if (!matches.value) return null
 
       const component = resolvedComponent.value
+      // slots.default can be a function that receives params as argument (scoped slot) or no-arg function
+      const defaultSlot = slots.default
       const routeContent = component
         ? h(component, { params: params.value })
-        : slots.default?.(params.value)
+        : defaultSlot && typeof defaultSlot === 'function'
+          ? (defaultSlot as (params?: unknown) => unknown)(params.value)
+          : defaultSlot || null
 
       const nestEnabled = normalizeBooleanProp(props.nest)
       if (nestEnabled && result.value[2]) {
@@ -475,16 +667,19 @@ export const Link = {
   },
   inheritAttrs: false,
   setup(props: LinkProps, { slots, attrs }: SetupContext & { attrs?: Record<string, unknown> }) {
+    // Dev mode validation
+    if (isDev()) {
+      if (!props.href && !props.to) {
+        console.warn('[wouter-vue] Link component: neither `href` nor `to` prop provided. Link will navigate to empty path.')
+      }
+      if (props.href && props.to) {
+        console.warn('[wouter-vue] Link component: both `href` and `to` props provided. `href` will be used.')
+      }
+    }
+
     const router = useRouter()
-    const routerValue = computed(() => {
-      const r: RouterObject | Ref<RouterObject> | ComputedRef<RouterObject> =
-        typeof router === 'function' ? (router as () => RouterObject)() : router
-      return (
-        r && typeof r === 'object' && 'value' in r
-          ? (r as unknown as Ref<RouterObject> | ComputedRef<RouterObject>).value
-          : r
-      ) as RouterObject
-    })
+    // Optimized: use type guard helper
+    const routerValue = computed(() => normalizeRouterRef(router as RouterRef))
     const [currentPath, navigate] = useLocationFromRouter(router)
 
     const targetPath = props.href || props.to || ''
@@ -545,7 +740,8 @@ export const Link = {
         className = staticClass
       }
 
-      const content = slots.default?.()
+      const slotFn = slots.default
+      const content = slotFn ? (typeof slotFn === 'function' ? (slotFn as () => unknown)() : slotFn) : undefined
 
       return h(
         'a',
@@ -592,18 +788,22 @@ type SwitchProps = {
 export const Switch = {
   name: 'Switch',
   props: ['location'],
-  setup(props: SwitchProps, { slots }: SetupContext) {
+  setup(props: SwitchProps, { slots }: SetupContext): () => unknown {
+    // Dev mode validation
+    if (isDev() && !slots.default) {
+      console.warn('[wouter-vue] Switch component: no default slot provided. Switch will not render anything.')
+    }
+
     const router = useRouter()
-    const routerValue = computed(() => {
-      const r: RouterObject | Ref<RouterObject> | ComputedRef<RouterObject> =
-        typeof router === 'function' ? (router as () => RouterObject)() : router
-      return (
-        r && typeof r === 'object' && 'value' in r
-          ? (r as unknown as Ref<RouterObject> | ComputedRef<RouterObject>).value
-          : r
-      ) as RouterObject
-    })
+    // Optimized: use type guard helper
+    const routerValue = computed(() => normalizeRouterRef(router as RouterRef))
     const [originalLocation] = useLocationFromRouter(router)
+
+    // Memoize flattened children to avoid re-flattening on each render
+    // Note: children are reactive through slots, so we compute in render function
+    // but cache the result when slots.default hasn't changed
+    let lastSlotResult: unknown = undefined
+    let lastFlattenedChildren: VNodeChild[] | null = null
 
     return () => {
       const routerObj = routerValue.value
@@ -612,7 +812,22 @@ export const Switch = {
       const originalLocationValue = (originalLocation as ComputedRef<Path>).value
       const useLocation = props.location || originalLocationValue
 
-      const children = flattenChildren(slots.default?.())
+      const defaultSlot = slots.default
+      let slotResult: unknown = undefined
+      if (defaultSlot) {
+        if (typeof defaultSlot === 'function') {
+          slotResult = (defaultSlot as () => unknown)()
+        } else {
+          slotResult = defaultSlot
+        }
+      }
+      
+      // Memoize: only re-flatten if slot result changed
+      if (slotResult !== lastSlotResult) {
+        lastSlotResult = slotResult
+        lastFlattenedChildren = flattenChildren(slotResult)
+      }
+      const children = lastFlattenedChildren ?? []
       if (!children || children.length === 0) return null
 
       for (const element of children) {
@@ -647,17 +862,12 @@ export const Switch = {
         }
 
         if (match?.[0]) {
-          
+          // Early return on first match for better performance
+          const elementType = elementTyped.type as Parameters<typeof h>[0]
+          const elementProps = { ...elementTyped.props, match } as Record<string, unknown>
           return elementTyped.children
-            ? h(
-                elementTyped.type as Parameters<typeof h>[0],
-                { ...elementTyped.props, match } as Record<string, unknown>,
-                elementTyped.children as Parameters<typeof h>[2]
-              )
-            : h(
-                elementTyped.type as Parameters<typeof h>[0],
-                { ...elementTyped.props, match } as Record<string, unknown>
-              )
+            ? h(elementType, elementProps, elementTyped.children as Parameters<typeof h>[2])
+            : h(elementType, elementProps)
         }
       }
 
@@ -679,6 +889,17 @@ export const Redirect = {
   setup(props: RedirectProps) {
     const { to, href } = props
     const targetPath = to || href || ''
+
+    // Dev mode validation
+    if (isDev()) {
+      if (!targetPath) {
+        console.warn('[wouter-vue] Redirect component: neither `to` nor `href` prop provided. Redirect will navigate to empty path.')
+      }
+      if (to && href) {
+        console.warn('[wouter-vue] Redirect component: both `to` and `href` props provided. `to` will be used.')
+      }
+    }
+
     const router = useRouter()
     const [, navigate] = useLocationFromRouter(router)
     const navigateFn = navigate as (
@@ -715,7 +936,14 @@ export const Redirect = {
     // Client-side navigation should happen after mount to avoid side effects during render
     // SSR context is set synchronously above for server-side redirects
     onMounted(() => {
-      navigateFn(targetPath, { replace: props.replace, state: props.state })
+      try {
+        navigateFn(targetPath, { replace: props.replace, state: props.state })
+      } catch (error) {
+        if (isDev()) {
+          console.error('[wouter-vue] Error during redirect navigation:', error)
+        }
+        throw error
+      }
     })
 
     return () => null

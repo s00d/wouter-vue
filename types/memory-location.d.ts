@@ -17,7 +17,7 @@ export declare const memoryLocation: ({ path, searchPath, static: staticLocation
     hook: () => [Ref<Path>, NavigateFn];
     searchHook: () => Ref<SearchString>;
     navigate: NavigateFn;
-    history: string[];
-    reset: () => void;
+    history: string[] | undefined;
+    reset: (() => void) | undefined;
 };
 export {};

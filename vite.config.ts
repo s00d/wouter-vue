@@ -29,6 +29,11 @@ export default defineConfig({
         preserveModules: true,
         preserveModulesRoot: 'src',
       },
+      treeshake: {
+        moduleSideEffects: false,
+        propertyReadSideEffects: false,
+        tryCatchDeoptimization: false,
+      },
     },
     outDir: 'dist',
     emptyOutDir: true,

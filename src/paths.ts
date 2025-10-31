@@ -1,11 +1,24 @@
 type Path = string
 
-/*
- * Transforms `path` into its relative `base` version
- * If base isn't part of the path provided returns absolute path e.g. `~/app`
+/**
+ * Transforms `path` into its relative `base` version.
+ * If base isn't part of the path provided returns absolute path e.g. `~/app`.
+ * Optimized: uses startsWith instead of toLowerCase().indexOf() for better performance.
  */
-const _relativePath = (base: Path, path: Path): Path =>
-  !path.toLowerCase().indexOf(base.toLowerCase()) ? path.slice(base.length) || '/' : `~${path}`
+const _relativePath = (base: Path, path: Path): Path => {
+  // Fast path: empty base or path starts with base
+  if (!base || path.startsWith(base)) {
+    return path.slice(base.length) || '/'
+  }
+  // Case-insensitive check only if needed
+  const baseLower = base.toLowerCase()
+  const pathLower = path.toLowerCase()
+  if (pathLower.startsWith(baseLower)) {
+    // Path matches base case-insensitively, return relative portion
+    return path.slice(base.length) || '/'
+  }
+  return `~${path}`
+}
 
 /**
  * When basepath is `undefined` or '/' it is ignored (we assume it's empty string)

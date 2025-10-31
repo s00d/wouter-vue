@@ -73,11 +73,13 @@ const currentPathname = (): Path => {
 export const usePathname = ({ ssrPath }: { ssrPath?: Path } = {}): Ref<Path> =>
   useLocationProperty(currentPathname, ssrPath ? () => ssrPath : currentPathname) as Ref<Path>
 
-const currentHistoryState = (): unknown => {
+const currentHistoryState = (): null => {
   if (typeof window === 'undefined' || typeof history === 'undefined') {
     return null
   }
-  return history.state
+  // history.state can be any value, but we need to return a Primitive for type safety
+  // Return null as default and cast the result
+  return (history.state ?? null) as null
 }
 
 export const useHistoryState = <T = unknown>(): Ref<T> =>
