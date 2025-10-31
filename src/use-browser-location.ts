@@ -1,4 +1,5 @@
 import { type Ref, ref, watchEffect } from 'vue'
+import { isSSR } from './helpers'
 
 type Path = string
 type SearchString = string
@@ -16,7 +17,7 @@ const events = [eventPopstate, eventPushState, eventReplaceState, eventHashchang
 
 const subscribeToLocationUpdates = (callback: () => void): (() => void) => {
   // SSR check - don't subscribe to events on server
-  if (typeof window === 'undefined' || typeof addEventListener === 'undefined') {
+  if (isSSR() || typeof addEventListener === 'undefined') {
     return () => {} // Return no-op unsubscribe function
   }
 
@@ -50,7 +51,7 @@ export function useLocationProperty<S extends Primitive>(fn: () => S, ssrFn?: ()
 }
 
 const currentSearch = (): string => {
-  if (typeof window === 'undefined' || typeof location === 'undefined') {
+  if (isSSR() || typeof location === 'undefined') {
     return ''
   }
   return location.search
@@ -64,7 +65,7 @@ export const useSearch = ({
   useLocationProperty(currentSearch, () => ssrSearch) as Ref<SearchString>
 
 const currentPathname = (): Path => {
-  if (typeof window === 'undefined' || typeof location === 'undefined') {
+  if (isSSR() || typeof location === 'undefined') {
     return '/' as Path
   }
   return location.pathname as Path
@@ -74,7 +75,7 @@ export const usePathname = ({ ssrPath }: { ssrPath?: Path } = {}): Ref<Path> =>
   useLocationProperty(currentPathname, ssrPath ? () => ssrPath : currentPathname) as Ref<Path>
 
 const currentHistoryState = (): null => {
-  if (typeof window === 'undefined' || typeof history === 'undefined') {
+  if (isSSR() || typeof history === 'undefined') {
     return null
   }
   // history.state can be any value, but we need to return a Primitive for type safety
@@ -90,7 +91,7 @@ export const navigate = <S = unknown>(
   { replace = false, state = null }: { replace?: boolean; state?: S | null } = {}
 ): void => {
   // SSR check - don't navigate on server
-  if (typeof window === 'undefined' || typeof history === 'undefined') {
+  if (isSSR() || typeof history === 'undefined') {
     return
   }
   history[replace ? eventReplaceState : eventPushState](state as S, '', to as string)
@@ -112,7 +113,7 @@ const patchKey = Symbol.for('wouter_vue')
 //
 // See https://stackoverflow.com/a/4585031
 if (
-  typeof window !== 'undefined' &&
+  !isSSR() &&
   typeof history !== 'undefined' &&
   typeof (window as unknown as Record<symbol, unknown>)[patchKey] === 'undefined'
 ) {

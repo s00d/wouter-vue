@@ -8,7 +8,7 @@
 [![GitHub stars](https://img.shields.io/github/stars/s00d/wouter-vue?style=for-the-badge)](https://github.com/s00d/wouter-vue)
 [![Donate](https://img.shields.io/badge/Donate-Donationalerts-ff4081?style=for-the-badge)](https://www.donationalerts.com/r/s00d88)
 
-  <b>wouter-vue</b> is a minimal, high-performance router for Vue 3 (~2KB gzipped) that relies on Composition API and provides an intuitive routing experience.
+  <b>wouter-vue</b> is a minimal, high-performance router for Vue 3 (~7.9KB gzipped, 17.5KB uncompressed) that relies on Composition API and provides an intuitive routing experience.
 </div>
 
 ## Table of Contents
@@ -49,7 +49,7 @@ While maintaining compatibility with Vue 3's Composition API and SSR requirement
 
 ## 🚀 Features
 
-- **📦 Minimal bundle size** (~2KB gzipped) - 72% smaller response size vs vue-router
+- **📦 Minimal bundle size** (~7.9KB gzipped, 17.5KB uncompressed) - 72% smaller response size vs vue-router
 - **⚡ Outstanding performance** - 72% higher throughput, handles 83% more requests
 - **🎯 Vue 3 Composition API** - Fully reactive routing with TypeScript support
 - **🔧 Optional `<Router />`** - No top-level router required, works out of the box
@@ -526,7 +526,7 @@ Important: inside `<template>` use the constructor `new RegExp(...)` rather than
 <template>
   <Switch>
     <!-- Parent route with named group `locale`, enables nesting -->
-    <Route :path="new RegExp('^/(?<locale>[a-zA-Z]{2})(?=/|$)')" nest>
+    <Route :path="new RegExp('^/(?<locale>[a-zA-Z]{2})(?=/|$)')" :nest="true">
       <!-- Child route relative to /<locale> base -->
       <Route path="/test" :component="LocaleTestPage" />
     </Route>
@@ -547,7 +547,7 @@ import { Route, Switch, useParams } from 'wouter-vue'
 
 Diagnostics: with `nest` enabled, the parent `Route` creates a nested `Router` whose `base` equals the matched prefix (e.g., `'/ru'`). Inside the nested `Router`, the current location becomes relative to this base (e.g., `'/test'`), so child routes must match that relative path.
 
-Note on boolean shorthand: You can write `nest` (without a value) in templates. The router normalizes it the same as `nest` even inside `<Switch>` (boolean shorthand is recognized in vnode props).
+Note on boolean shorthand: You can write `nest` (without a value) in templates. 
 
 ### Route Parameters
 
@@ -1395,12 +1395,17 @@ wouter-vue processed **nearly double the requests** in the same time frame.
 
 ### Bundle Size Comparison
 
+**Total Library Size:**
+- **Uncompressed:** ~17.5 KB (all modules combined)
+- **Gzipped:** ~7.9 KB (all modules combined)
+
+**Per Request Size:**
 | Metric | wouter-vue | vue-router | Difference |
 |--------|-----------|------------|------------|
 | Avg Response Size | 1,311 bytes | 1,352 bytes | **-3% smaller** |
 | Total Downloaded | 45.40 MB | 25.52 MB | (more requests handled) |
 
-wouter-vue produces **3% smaller responses** on average.
+wouter-vue produces **3% smaller responses** on average, with a total library size of ~7.9KB gzipped.
 
 ### Key Performance Takeaways
 

@@ -16,30 +16,26 @@ export default defineConfig({
   use: {
     baseURL: `http://localhost:${port}`,
     trace: 'on-first-retry',
-    headless: false,
+    // headless: false,
   },
-  webServer: [
+  projects: [
     {
-      command: 'pnpm run build',
-      cwd: path.resolve(__dirname, '..'),
-      reuseExistingServer: false,
-      timeout: 120000,
-      stdout: 'pipe',
-      stderr: 'pipe',
-    },
-    {
-      command: 'node server.js',
-      url: `http://localhost:${port}`,
-      cwd: path.resolve(__dirname, '..'),
-      env: {
-        PORT: String(port),
-        NODE_ENV: 'production',
-      },
-      reuseExistingServer: !process.env.CI,
-      timeout: 30000,
-      stdout: 'pipe',
-      stderr: 'pipe',
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
     },
   ],
+  webServer: {
+    command: 'node server.js',
+    url: `http://localhost:${port}`,
+    cwd: path.resolve(__dirname, '..'),
+    env: {
+      PORT: String(port),
+      NODE_ENV: 'production',
+    },
+    reuseExistingServer: !process.env.CI,
+    timeout: 120000,
+    stdout: 'pipe',
+    stderr: 'pipe',
+  },
 });
 

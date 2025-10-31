@@ -55,6 +55,10 @@
     "./vite-plugin-routes": {
       "types": "./types/vite-plugin-routes.d.ts",
       "default": "./src/vite-plugin-routes.js"
+    },
+    "./ssr": {
+      "types": "./types/ssr.d.ts",
+      "default": "./dist/ssr.js"
     }
   },
   "types": "types/index.d.ts",
@@ -74,6 +78,9 @@
       ],
       "vite-plugin-routes": [
         "types/vite-plugin-routes.d.ts"
+      ],
+      "ssr": [
+        "types/ssr.d.ts"
       ]
     }
   },
@@ -96,12 +103,14 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.2",
+    "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^12.3.0",
     "@types/node": "^24.9.2",
     "@vitejs/plugin-vue": "^6.0.1",
     "@vue/server-renderer": "^3.5.22",
     "@vue/test-utils": "^2.4.6",
     "happy-dom": "^20.0.10",
+    "terser": "^5.44.0",
     "tslib": "^2.8.1",
     "typescript": "5.9.3",
     "vite": "^7.1.12",

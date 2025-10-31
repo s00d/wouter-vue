@@ -12,7 +12,49 @@ export type SetSearchParamsFn = (nextInit: URLSearchParams | Record<string, stri
     replace?: boolean;
     state?: unknown;
 }) => void;
+export type RouterRef = RouterObject | Ref<RouterObject> | ComputedRef<RouterObject> | ((...args: unknown[]) => RouterObject);
+/**
+ * Type guard to check if a value is a Ref-like object.
+ */
+export declare const isRefLike: (value: unknown) => value is Ref<RouterObject> | ComputedRef<RouterObject>;
+/**
+ * Type guard to check if a value is a function that returns RouterObject.
+ */
+export declare const isRouterFunction: (value: unknown) => value is () => RouterObject;
+/**
+ * Normalizes RouterRef to RouterObject by unwrapping refs and calling functions.
+ *
+ * @param router - The router reference (can be object, ref, computed ref, or function)
+ * @returns The unwrapped RouterObject
+ */
+export declare const normalizeRouterRef: (router: RouterRef) => RouterObject;
+/**
+ * Normalizes Vue boolean props (boolean shorthand support).
+ *
+ * Returns `true` if value is empty string (`''`) or `true`, `false` otherwise.
+ * This handles Vue's boolean prop shorthand: `<Component prop />` results in `prop=""` on vnode.
+ *
+ * @param value - The prop value to normalize (can be `''`, `true`, `false`, or `undefined`)
+ * @returns `true` if the prop should be considered enabled, `false` otherwise
+ *
+ * @example
+ * ```typescript
+ * normalizeBooleanProp('')  // true
+ * normalizeBooleanProp(true) // true
+ * normalizeBooleanProp(false) // false
+ * normalizeBooleanProp(undefined) // false
+ * ```
+ */
+export declare const normalizeBooleanProp: (value: unknown) => boolean;
+export declare const defaultRouter: RouterObject;
+export declare const RouterKey: unique symbol;
+export declare const ParamsKey: unique symbol;
 export declare const useRouter: () => RouterObject;
+/**
+ * Parameters context. Used by `useParams()` to get the
+ * matched params from the innermost `Route` component.
+ */
+export declare const Params0: {};
 /**
  * Hook to access route parameters from the current matched route.
  *
@@ -30,6 +72,11 @@ export declare const useRouter: () => RouterObject;
  * ```
  */
 export declare const useParams: () => Ref<RouteParams>;
+/**
+ * Internal version of useLocation to avoid redundant useRouter calls.
+ * Optimized to use type guards for better performance.
+ */
+export declare const useLocationFromRouter: (router: RouterRef) => [ComputedRef<Path>, NavigateFn];
 /**
  * Reactive location hook that returns the current path and a navigate function.
  *
@@ -107,26 +154,8 @@ export declare const matchRoute: (parser: Parser, route: string | RegExp, path: 
  * ```
  */
 export declare const useRoute: (pattern: string | RegExp) => [ComputedRef<boolean>, ComputedRef<RouteParams | null>];
-type RouterProps = {
-    hook?: RouterObject['hook'];
-    searchHook?: RouterObject['searchHook'];
-    base?: Path;
-    parser?: Parser;
-    ssrPath?: Path;
-    ssrSearch?: Path;
-    ssrContext?: SsrContext;
-    hrefs?: HrefsFormatter;
-};
-type SetupContext = {
-    slots: {
-        default?: (() => unknown) | ((params: unknown) => unknown);
-    };
-};
-export declare const Router: {
-    name: string;
-    props: string[];
-    setup(props: RouterProps, { slots }: SetupContext): () => unknown;
-};
+export { Router, Route, Link, Switch, Redirect, } from './components/index';
+export { normalizePath } from './helpers';
 /**
  * Hook to access and manipulate URL search parameters reactively.
  *
@@ -155,60 +184,3 @@ export declare const Router: {
  * ```
  */
 export declare function useSearchParams(): [ComputedRef<URLSearchParams>, SetSearchParamsFn];
-type RouteProps = {
-    path?: string | RegExp;
-    component?: unknown;
-    nest?: unknown;
-    match?: MatchResult;
-};
-export declare const Route: {
-    name: string;
-    props: string[];
-    setup(props: RouteProps, { slots }: SetupContext): () => unknown;
-};
-type LinkProps = {
-    href?: string;
-    to?: string;
-    onClick?: (event: MouseEvent) => void;
-    asChild?: boolean;
-    classFn?: (isActive: boolean) => string;
-    className?: string;
-    replace?: boolean;
-};
-export declare const Link: {
-    name: string;
-    props: {
-        href: StringConstructor;
-        to: StringConstructor;
-        onClick: FunctionConstructor;
-        asChild: BooleanConstructor;
-        classFn: FunctionConstructor;
-        className: StringConstructor;
-        replace: BooleanConstructor;
-    };
-    inheritAttrs: boolean;
-    setup(props: LinkProps, { slots, attrs }: SetupContext & {
-        attrs?: Record<string, unknown>;
-    }): () => import('vue').VNode<import('vue').RendererNode, import('vue').RendererElement, {
-        [key: string]: any;
-    }>;
-};
-type SwitchProps = {
-    location?: Path;
-};
-export declare const Switch: {
-    name: string;
-    props: string[];
-    setup(props: SwitchProps, { slots }: SetupContext): () => unknown;
-};
-type RedirectProps = {
-    to?: Path;
-    href?: Path;
-    replace?: boolean;
-    state?: unknown;
-};
-export declare const Redirect: {
-    name: string;
-    props: string[];
-    setup(props: RedirectProps): () => null;
-};

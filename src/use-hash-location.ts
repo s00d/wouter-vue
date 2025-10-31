@@ -1,4 +1,5 @@
 import { type Ref, ref, watchEffect } from 'vue'
+import { isSSR } from './helpers'
 
 type Path = string
 
@@ -17,7 +18,7 @@ const onHashChange = () => {
 // all listeners are called synchronously
 const subscribeToHashUpdates = (callback: () => void): (() => void) => {
   // SSR check - don't subscribe to events on server
-  if (typeof window === 'undefined' || typeof addEventListener === 'undefined') {
+  if (isSSR() || typeof addEventListener === 'undefined') {
     listeners.v.push(callback)
     return () => {
       listeners.v = listeners.v.filter((i) => i !== callback)
@@ -34,7 +35,7 @@ const subscribeToHashUpdates = (callback: () => void): (() => void) => {
 
 // leading '#' is ignored, leading '/' is optional
 const currentHashLocation = (): Path => {
-  if (typeof window === 'undefined' || typeof location === 'undefined') {
+  if (isSSR() || typeof location === 'undefined') {
     return '/'
   }
   return `/${location.hash.replace(/^#?\/?/, '')}`
@@ -46,7 +47,7 @@ export const navigate = <S = unknown>(
 ): void => {
   // SSR check - don't navigate on server
   if (
-    typeof window === 'undefined' ||
+    isSSR() ||
     typeof location === 'undefined' ||
     typeof history === 'undefined'
   ) {
