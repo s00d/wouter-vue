@@ -11,7 +11,7 @@
             <Route path="/users" :component="UsersPage" />
             <Route path="/users/:id" :component="UserDetailPage" />
             <Route path="/heavy" :component="HeavyPage" />
-            <Route :path="new RegExp('^/(?<locale>[a-zA-Z]{2})(?=/|$)')" nest>
+            <Route path="/:locale([a-zA-Z]{2})" nest>
               <Route path="/test" :component="LocaleTestPage" />
             </Route>
             <Route

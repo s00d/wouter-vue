@@ -117,7 +117,7 @@ export declare const useSearch: () => ComputedRef<string>;
 /**
  * Matches a route pattern against a path and extracts parameters.
  *
- * @param parser - The route parser function (from regexparam or custom)
+ * @param parser - The route parser function (from path-to-regexp adapter or custom)
  * @param route - The route pattern to match (string or RegExp)
  * @param path - The current path to match against
  * @param loose - If `true`, enables loose matching mode for nested routes (extracts base path)

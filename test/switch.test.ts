@@ -1,10 +1,10 @@
 import { it, expect, describe } from "vitest";
 import { mount } from "@vue/test-utils";
-import { h } from "vue";
+import { h, type VNodeChild } from "vue";
 import { Router, Route, Switch } from "../src/index";
 import { memoryLocation } from "../src/memory-location";
 
-const testRouteRender = (initialPath, jsx) => {
+const testRouteRender = (initialPath: string, jsx: () => VNodeChild) => {
   const { hook } = memoryLocation({ path: initialPath });
   return mount(Router, {
     props: { hook },
@@ -26,7 +26,7 @@ it("always renders no more than 1 matched children", () => {
     h(Switch, null, () => [
       h(Route, { path: "/users/home" }, () => h("h1")),
       h(Route, { path: "/users/:id" }, () => h("h2")),
-      h(Route, { path: "/users/:rest*" }, () => h("h3")),
+      h(Route, { path: "/users/*rest" }, () => h("h3")),
     ])
   );
 
@@ -85,7 +85,7 @@ it("supports catch-all routes with wildcard segments", () => {
   const wrapper = testRouteRender("/something-different", () =>
     h(Switch, null, () => [
       h(Route, { path: "/users" }, () => h("h1")),
-      h(Route, { path: "/:anything*" }, () => h("h2")),
+      h(Route, { path: "/*anything" }, () => h("h2")),
     ])
   );
 
@@ -113,7 +113,7 @@ it("renders first matching route only", () => {
     h(Switch, null, () => [
       h(Route, { path: "/users", nest: true }, () => "users page"),
       h(Route, { path: "/users/:id" }, () => "user detail"),
-      h(Route, { path: "/users/:rest*" }, () => "user catch-all"),
+      h(Route, { path: "/users/*rest" }, () => "user catch-all"),
     ])
   );
 

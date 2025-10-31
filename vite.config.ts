@@ -49,7 +49,7 @@ export default defineConfig({
       fileName: (_format, entryName) => `${entryName}.js`,
     },
     rollupOptions: {
-      external: ['vue', 'regexparam', 'mitt', 'fs', 'path'],
+      external: ['vue', 'path-to-regexp', 'mitt', 'fs', 'path'],
       plugins: [removeComments()],
       output: {
         dir: 'dist',

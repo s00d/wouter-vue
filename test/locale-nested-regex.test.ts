@@ -13,7 +13,7 @@ const Child = defineComponent({
 })
 
 describe('nested routing with parent RegExp and child static path', () => {
-  it('matches /:locale(2)/test and exposes named group locale', async () => {
+  it('matches /:locale(2)/test with RegExp pattern and exposes named group locale', async () => {
     const { hook, navigate } = memoryLocation({ path: '/' })
 
     const wrapper = mount(Router, {
@@ -24,6 +24,51 @@ describe('nested routing with parent RegExp and child static path', () => {
             h(
               Route,
               { path: new RegExp('^/(?<locale>[a-zA-Z]{2})(?=/|$)'), nest: true },
+              () => [h(Route, { path: '/test', component: Child })]
+            ),
+            h(Route, null, () => h('div', { id: 'nf' }, 'nf')),
+          ]),
+      },
+    })
+
+    await flushPromises()
+
+    // 1) Should not match at root
+    expect(wrapper.find('#child').exists()).toBe(false)
+    expect(wrapper.find('#nf').exists()).toBe(true)
+
+    // 2) Navigate to valid locale route
+    navigate('/ru/test')
+    await flushPromises()
+    expect(wrapper.find('#child').exists()).toBe(true)
+    expect(wrapper.find('#child').text()).toContain('child:ru')
+
+    // 3) Invalid locale should not match
+    navigate('/ru11/test')
+    await flushPromises()
+    expect(wrapper.find('#child').exists()).toBe(false)
+    expect(wrapper.find('#nf').exists()).toBe(true)
+
+    // 4) Another valid locale
+    navigate('/en/test')
+    await flushPromises()
+    expect(wrapper.find('#child').exists()).toBe(true)
+    expect(wrapper.find('#child').text()).toContain('child:en')
+
+    wrapper.unmount()
+  })
+
+  it('matches /:locale([a-zA-Z]{2})/test with string pattern and exposes locale param', async () => {
+    const { hook, navigate } = memoryLocation({ path: '/' })
+
+    const wrapper = mount(Router, {
+      props: { hook },
+      slots: {
+        default: () =>
+          h(Switch, null, () => [
+            h(
+              Route,
+              { path: '/:locale([a-zA-Z]{2})', nest: true },
               () => [h(Route, { path: '/test', component: Child })]
             ),
             h(Route, null, () => h('div', { id: 'nf' }, 'nf')),
