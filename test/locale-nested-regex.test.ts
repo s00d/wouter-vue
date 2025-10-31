@@ -40,25 +40,18 @@ describe('nested routing with parent RegExp and child static path', () => {
     // 2) Navigate to valid locale route
     navigate('/ru/test')
     await flushPromises()
-    // Debug logs
-    // eslint-disable-next-line no-console
-    console.log('[DEBUG] location=/ru/test, childText=', wrapper.find('#child').text())
     expect(wrapper.find('#child').exists()).toBe(true)
     expect(wrapper.find('#child').text()).toContain('child:ru')
 
     // 3) Invalid locale should not match
     navigate('/ru11/test')
     await flushPromises()
-    // eslint-disable-next-line no-console
-    console.log('[DEBUG] location=/ru11/test, childExists=', wrapper.find('#child').exists())
     expect(wrapper.find('#child').exists()).toBe(false)
     expect(wrapper.find('#nf').exists()).toBe(true)
 
     // 4) Another valid locale
     navigate('/en/test')
     await flushPromises()
-    // eslint-disable-next-line no-console
-    console.log('[DEBUG] location=/en/test, childText=', wrapper.find('#child').text())
     expect(wrapper.find('#child').exists()).toBe(true)
     expect(wrapper.find('#child').text()).toContain('child:en')
 
