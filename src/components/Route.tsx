@@ -1,6 +1,6 @@
 /**
  * Route component for wouter-vue
- * 
+ *
  * Renders content when the current location matches the route pattern.
  */
 
@@ -8,7 +8,15 @@ import type { ComputedRef } from 'vue'
 import { computed, defineAsyncComponent, inject as injectVue, provide as provideVue, h } from 'vue'
 import type { Path } from '../../types/location-hook.d.js'
 import type { MatchResult } from '../index.js'
-import { useLocationFromRouter, useRouter, ParamsKey, Params0, normalizeRouterRef, normalizeBooleanProp, matchRoute } from '../index'
+import {
+  useLocationFromRouter,
+  useRouter,
+  ParamsKey,
+  Params0,
+  normalizeRouterRef,
+  normalizeBooleanProp,
+  matchRoute,
+} from '../index'
 import type { RouterRef } from '../index'
 import { Router } from './Router'
 import type { ComponentSetupContext } from './types'
@@ -31,7 +39,10 @@ export const Route = {
       // but don't prevent rendering
     }
     if (props.component === undefined && !slots.default) {
-      devWarn('Route', 'neither `component` prop nor default slot provided. Route will not render anything.')
+      devWarn(
+        'Route',
+        'neither `component` prop nor default slot provided. Route will not render anything.'
+      )
     }
 
     const router = useRouter()
@@ -49,7 +60,12 @@ export const Route = {
       }
       const routerObj = normalizeRouterRef(router as RouterRef)
       const locationValue = (location as ComputedRef<Path>).value
-      return matchRoute(routerObj.parser, props.path, locationValue, normalizeBooleanProp(props.nest))
+      return matchRoute(
+        routerObj.parser,
+        props.path,
+        locationValue,
+        normalizeBooleanProp(props.nest)
+      )
     })
     const matches = computed(() => Boolean(result.value[0]))
     // Use shallowRef for routeParams as they are primitive values (strings)

@@ -1,6 +1,6 @@
 /**
  * SSR-specific utilities for wouter-vue
- * 
+ *
  * This module provides server-side routing functionality using memory-location
  * instead of browser-specific location hooks. It exports only SSR-relevant code
  * to avoid bundling browser-only dependencies in SSR builds.
@@ -14,7 +14,7 @@ import { memoryLocation } from './memory-location'
 /**
  * Adapter function that converts path-to-regexp API to match the Parser interface.
  * Supports parameter constraints syntax :param(pattern) and converts wildcard '*' to '/*splat' format.
- * 
+ *
  * @param route - Route pattern string
  * @param loose - If true, matches don't need to reach the end (for nested routes)
  * @returns Object with RegExp pattern and array of parameter names
@@ -33,33 +33,33 @@ const parsePattern: Parser = (route: Path, loose?: boolean) => {
     let regexStr = '^'
     const keyNames: string[] = []
     let lastIndex = 0
-    
+
     // Process the route and build regex with constraints
     for (const match of constraintMatches) {
       const fullMatch = match[0]
       const paramName = match[1]
       const pattern = match[2]
       const matchIndex = route.indexOf(fullMatch, lastIndex)
-      
+
       // Add literal text before the parameter
       if (matchIndex > lastIndex) {
         const literal = route.substring(lastIndex, matchIndex)
         regexStr += literal.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
       }
-      
+
       // Add constrained parameter group
       regexStr += `(${pattern})`
       keyNames.push(paramName)
-      
+
       lastIndex = matchIndex + fullMatch.length
     }
-    
+
     // Add remaining literal text
     if (lastIndex < route.length) {
       const literal = route.substring(lastIndex)
       regexStr += literal.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
     }
-    
+
     // Add end anchor or lookahead
     if (!loose) {
       // Strict match - must match exactly
@@ -69,7 +69,7 @@ const parsePattern: Parser = (route: Path, loose?: boolean) => {
       // Use lookahead to ensure delimiter or end, but allow continuation
       regexStr += '(?=/|$)'
     }
-    
+
     const regex = new RegExp(regexStr, 'i')
     return {
       pattern: regex,
@@ -113,25 +113,22 @@ const parsePattern: Parser = (route: Path, loose?: boolean) => {
 /**
  * Creates a default router configuration for SSR environments.
  * Uses memory-location instead of browser location hooks.
- * 
+ *
  * @param ssrPath - Initial path for SSR (default: '/')
  * @param ssrSearch - Initial search string for SSR (default: '')
  * @returns RouterObject configured for SSR
- * 
+ *
  * @example
  * ```typescript
  * import { createSSRRouter } from 'wouter-vue/ssr'
- * 
+ *
  * const router = createSSRRouter('/about', 'page=2')
  * ```
  */
-export function createSSRRouter(
-  ssrPath: string = '/',
-  ssrSearch: string = ''
-): RouterObject {
-  const { hook, searchHook } = memoryLocation({ 
+export function createSSRRouter(ssrPath: string = '/', ssrSearch: string = ''): RouterObject {
+  const { hook, searchHook } = memoryLocation({
     path: ssrPath,
-    searchPath: ssrSearch 
+    searchPath: ssrSearch,
   })
 
   return {
@@ -145,4 +142,3 @@ export function createSSRRouter(
     hrefs: ((x: string) => x) as HrefsFormatter,
   }
 }
-

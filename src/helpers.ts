@@ -10,13 +10,16 @@ import { normalizeRouterRef } from './index'
 
 /**
  * Helper to check if we're in development mode.
- * 
+ *
  * @returns `true` if running in development mode, `false` otherwise
  */
 export function isDev(): boolean {
   try {
     // Check Vite dev mode
-    if (typeof import.meta !== 'undefined' && (import.meta as { env?: { DEV?: boolean } }).env?.DEV) {
+    if (
+      typeof import.meta !== 'undefined' &&
+      (import.meta as { env?: { DEV?: boolean } }).env?.DEV
+    ) {
       return true
     }
     // Check Node.js dev mode
@@ -32,7 +35,7 @@ export function isDev(): boolean {
 /**
  * Normalize path for comparison by removing query params and hash.
  * Used for link active state detection.
- * 
+ *
  * @param path - The path to normalize
  * @returns Normalized path string
  */
@@ -54,7 +57,7 @@ export function normalizePath(path: string): string {
 
 /**
  * Get router value as computed ref for reactive access.
- * 
+ *
  * @param router - Router reference (can be object, ref, computed ref, or function)
  * @returns ComputedRef of RouterObject
  */
@@ -64,7 +67,7 @@ export function useRouterValue(router: RouterRef): ComputedRef<RouterObject> {
 
 /**
  * Resolve slot value (function or direct value).
- * 
+ *
  * @param slot - Slot value (can be function or any value)
  * @returns Resolved slot value
  */
@@ -78,7 +81,7 @@ export function resolveSlot(slot: unknown): unknown {
 
 /**
  * Resolve slot with params for scoped slots.
- * 
+ *
  * @param slot - Slot value (can be function or any value)
  * @param params - Parameters to pass to scoped slot function
  * @returns Resolved slot value
@@ -93,7 +96,7 @@ export function resolveSlotWithParams(slot: unknown, params?: unknown): unknown 
 
 /**
  * Log development warning with component name prefix.
- * 
+ *
  * @param componentName - Name of the component
  * @param message - Warning message
  */
@@ -106,7 +109,7 @@ export function devWarn(componentName: string, message: string): void {
 /**
  * Get router value synchronously (for SSR context access).
  * Handles function, ref, and direct object cases.
- * 
+ *
  * @param router - Router reference (can be object, ref, computed ref, or function)
  * @returns RouterObject value
  */
@@ -122,7 +125,7 @@ export function getRouterValue(router: RouterRef): RouterObject {
 
 /**
  * Parse SSR path to extract path and search string.
- * 
+ *
  * @param ssrPath - SSR path string (may contain ? for search params)
  * @returns Object with path and search separated
  */
@@ -207,13 +210,7 @@ export function validateTargetPathProps(
  * @returns `true` if navigation should be ignored, `false` otherwise
  */
 export function shouldIgnoreNavigationClick(event: MouseEvent): boolean {
-  return (
-    event.ctrlKey ||
-    event.metaKey ||
-    event.altKey ||
-    event.shiftKey ||
-    event.button !== 0
-  )
+  return event.ctrlKey || event.metaKey || event.altKey || event.shiftKey || event.button !== 0
 }
 
 /**
@@ -290,4 +287,3 @@ export class PropsResolver {
     return this.get(key) !== undefined
   }
 }
-

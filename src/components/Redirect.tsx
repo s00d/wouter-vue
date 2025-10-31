@@ -1,6 +1,6 @@
 /**
  * Redirect component for wouter-vue
- * 
+ *
  * Navigates to a new location when rendered.
  */
 
@@ -39,7 +39,7 @@ export const Redirect = {
     // The router is a computed ref, so we need to access its .value
     // Directly access router.value to get the current computed value
     const routerValueObj = getRouterValue(router) as RouterObject & { ssrContext?: SsrContext }
-    
+
     // Use PropsResolver to cleanly access ssrContext from router object
     const routerResolver = new PropsResolver(
       {},
@@ -56,7 +56,10 @@ export const Redirect = {
       try {
         navigateFn(targetPath, { replace: props.replace, state: props.state })
       } catch (error) {
-        devWarn('Redirect', `Error during redirect navigation: ${error instanceof Error ? error.message : String(error)}`)
+        devWarn(
+          'Redirect',
+          `Error during redirect navigation: ${error instanceof Error ? error.message : String(error)}`
+        )
         throw error
       }
     })
@@ -64,4 +67,3 @@ export const Redirect = {
     return () => null
   },
 }
-

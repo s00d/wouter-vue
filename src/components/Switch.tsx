@@ -1,13 +1,19 @@
 /**
  * Switch component for wouter-vue
- * 
+ *
  * Renders the first matching Route child component.
  */
 
 import type { ComputedRef } from 'vue'
 import { Fragment, h, unref } from 'vue'
 import type { Path } from '../../types/location-hook.d.js'
-import { useLocationFromRouter, useRouter, defaultRouter, normalizeBooleanProp, matchRoute } from '../index'
+import {
+  useLocationFromRouter,
+  useRouter,
+  defaultRouter,
+  normalizeBooleanProp,
+  matchRoute,
+} from '../index'
 import type { ComponentSetupContext } from './types'
 import { useRouterValue, devWarn, resolveSlot } from '../helpers'
 
@@ -66,7 +72,7 @@ export const Switch = {
       const useLocation = props.location || originalLocationValue
 
       const slotResult = resolveSlot(slots.default)
-      
+
       // Memoize: only re-flatten if slot result changed
       if (slotResult !== lastSlotResult) {
         lastSlotResult = slotResult
@@ -102,7 +108,9 @@ export const Switch = {
 
         if (elementTyped.type && elementTyped.type !== Fragment) {
           const locationForMatch = unref(useLocation)
-          const isNest = normalizeBooleanProp((elementTyped.props as Record<string, unknown> | undefined)?.nest)
+          const isNest = normalizeBooleanProp(
+            (elementTyped.props as Record<string, unknown> | undefined)?.nest
+          )
           match = matchRoute(parser, path, locationForMatch, isNest)
         }
 
@@ -120,4 +128,3 @@ export const Switch = {
     }
   },
 }
-

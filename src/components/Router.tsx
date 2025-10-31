@@ -1,16 +1,13 @@
 /**
  * Router component for wouter-vue
- * 
+ *
  * Provides routing context to child components.
  */
 
 import { computed, inject as injectVue, provide as provideVue } from 'vue'
 import type { Path } from '../../types/location-hook.d.js'
 import type { HrefsFormatter, Parser, RouterObject, SsrContext } from '../../types/router.d.js'
-import {
-  RouterKey,
-  defaultRouter,
-} from '../index'
+import { RouterKey, defaultRouter } from '../index'
 import type { ComponentSetupContext } from './types'
 import { parseSsrPath, resolveSlot, getRouterValue } from '../helpers'
 import { PropsResolver } from '../helpers'
@@ -54,7 +51,10 @@ export const Router = {
       // Resolve props with fallback to parent or defaults
       const base = resolver.get<Path>('base')
       const parser = resolver.get<Parser>('parser', parentValue.parser)
-      const searchHook = resolver.get<RouterObject['searchHook']>('searchHook', parentValue.searchHook)
+      const searchHook = resolver.get<RouterObject['searchHook']>(
+        'searchHook',
+        parentValue.searchHook
+      )
       const hook = resolver.get<RouterObject['hook']>('hook', parentValue.hook)
 
       // Special handling for base (concatenate if provided)
@@ -66,9 +66,10 @@ export const Router = {
       if (props.hrefs !== undefined) {
         resolvedHrefs = props.hrefs
       } else if (typeof props.hook === 'object' && props.hook && 'hrefs' in props.hook) {
-        resolvedHrefs = ((props.hook as { hrefs?: HrefsFormatter }).hrefs ?? defaultRouter.hrefs)
+        resolvedHrefs = (props.hook as { hrefs?: HrefsFormatter }).hrefs ?? defaultRouter.hrefs
       } else {
-        resolvedHrefs = resolver.get<HrefsFormatter>('hrefs') ?? parentValue.hrefs ?? defaultRouter.hrefs
+        resolvedHrefs =
+          resolver.get<HrefsFormatter>('hrefs') ?? parentValue.hrefs ?? defaultRouter.hrefs
       }
 
       const result = {

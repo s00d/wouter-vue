@@ -1,6 +1,6 @@
 /**
  * Link component for wouter-vue
- * 
+ *
  * Creates a navigation link that updates the URL without a full page reload.
  */
 
@@ -9,7 +9,14 @@ import { computed, h } from 'vue'
 import type { Path } from '../../types/location-hook.d.js'
 import { useLocationFromRouter, useRouter, defaultRouter, normalizeBooleanProp } from '../index'
 import type { ComponentSetupContext } from './types'
-import { normalizePath, useRouterValue, resolveSlot, resolveTargetPath, validateTargetPathProps, shouldIgnoreNavigationClick } from '../helpers'
+import {
+  normalizePath,
+  useRouterValue,
+  resolveSlot,
+  resolveTargetPath,
+  validateTargetPathProps,
+  shouldIgnoreNavigationClick,
+} from '../helpers'
 import { PropsResolver } from '../helpers'
 
 type LinkProps = {
@@ -45,7 +52,7 @@ export const Link = {
 
     // Resolve target path from props (href takes precedence over to)
     const targetPath = resolveTargetPath(props, false)
-    
+
     // Create resolver for props with attrs as fallback (attrs may contain props passed via template)
     const attrsResolver = new PropsResolver(
       props as Record<string, unknown>,
@@ -90,7 +97,7 @@ export const Link = {
 
       // Handle classFn prop for active link styling
       // Check both props and attrs for classFn (template syntax may pass via attrs)
-      const classFnValue = attrsResolver.get<((isActive: boolean) => string)>('classFn')
+      const classFnValue = attrsResolver.get<(isActive: boolean) => string>('classFn')
       let className: string | undefined = undefined
 
       if (typeof classFnValue === 'function') {
@@ -99,7 +106,8 @@ export const Link = {
 
       // Merge static classes from className prop or attrs.class
       const classNameFromAttrs = attrsResolver.get<string>('class')
-      const staticClass = attrsResolver.get<string>('className') || 
+      const staticClass =
+        attrsResolver.get<string>('className') ||
         (typeof classNameFromAttrs === 'string' ? classNameFromAttrs : undefined)
 
       // Combine active class with static class
@@ -125,4 +133,3 @@ export const Link = {
     }
   },
 }
-

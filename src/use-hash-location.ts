@@ -46,11 +46,7 @@ export const navigate = <S = unknown>(
   { state = null, replace = false }: { state?: S | null; replace?: boolean } = {}
 ): void => {
   // SSR check - don't navigate on server
-  if (
-    isSSR() ||
-    typeof location === 'undefined' ||
-    typeof history === 'undefined'
-  ) {
+  if (isSSR() || typeof location === 'undefined' || typeof history === 'undefined') {
     return
   }
 

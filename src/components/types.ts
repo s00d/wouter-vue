@@ -8,4 +8,3 @@ export type ComponentSetupContext = {
   }
   attrs?: Record<string, unknown>
 }
-

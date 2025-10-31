@@ -11,7 +11,10 @@ export type RouteParams = Record<string, string>
 export type MatchResult = [true, RouteParams, string?] | [false, null]
 export type NavigateFn = (path: Path, options?: { replace?: boolean; state?: unknown }) => void
 export type SetSearchParamsFn = (
-  nextInit: URLSearchParams | Record<string, string> | ((params: URLSearchParams) => URLSearchParams),
+  nextInit:
+    | URLSearchParams
+    | Record<string, string>
+    | ((params: URLSearchParams) => URLSearchParams),
   options?: { replace?: boolean; state?: unknown }
 ) => void
 
@@ -19,17 +22,12 @@ import { relativePath, sanitizeSearch } from './paths'
 import { memoryLocation } from './memory-location'
 import { isDev, isSSR } from './helpers'
 import { useBrowserLocation, useSearch as useBrowserSearch } from './use-browser-location'
-import {
-  computed,
-  inject as injectVue,
-  ref,
-  unref,
-} from 'vue'
+import { computed, inject as injectVue, ref, unref } from 'vue'
 
 /**
  * Adapter function that converts path-to-regexp API to match the Parser interface.
  * Supports parameter constraints syntax :param(pattern) and converts wildcard '*' to '/*splat' format.
- * 
+ *
  * @param route - Route pattern string
  * @param loose - If true, matches don't need to reach the end (for nested routes)
  * @returns Object with RegExp pattern and array of parameter names
@@ -48,33 +46,33 @@ const parsePattern: Parser = (route: Path, loose?: boolean) => {
     let regexStr = '^'
     const keyNames: string[] = []
     let lastIndex = 0
-    
+
     // Process the route and build regex with constraints
     for (const match of constraintMatches) {
       const fullMatch = match[0]
       const paramName = match[1]
       const pattern = match[2]
       const matchIndex = route.indexOf(fullMatch, lastIndex)
-      
+
       // Add literal text before the parameter
       if (matchIndex > lastIndex) {
         const literal = route.substring(lastIndex, matchIndex)
         regexStr += literal.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
       }
-      
+
       // Add constrained parameter group
       regexStr += `(${pattern})`
       keyNames.push(paramName)
-      
+
       lastIndex = matchIndex + fullMatch.length
     }
-    
+
     // Add remaining literal text
     if (lastIndex < route.length) {
       const literal = route.substring(lastIndex)
       regexStr += literal.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
     }
-    
+
     // Add end anchor or lookahead
     if (!loose) {
       // Strict match - must match exactly
@@ -84,7 +82,7 @@ const parsePattern: Parser = (route: Path, loose?: boolean) => {
       // Use lookahead to ensure delimiter or end, but allow continuation
       regexStr += '(?=/|$)'
     }
-    
+
     const regex = new RegExp(regexStr, 'i')
     return {
       pattern: regex,
@@ -134,10 +132,10 @@ export type RouterRef =
 /**
  * Type guard to check if a value is a Ref-like object.
  */
-export const isRefLike = (value: unknown): value is Ref<RouterObject> | ComputedRef<RouterObject> => {
-  return value !== null
-    && typeof value === 'object'
-    && 'value' in value
+export const isRefLike = (
+  value: unknown
+): value is Ref<RouterObject> | ComputedRef<RouterObject> => {
+  return value !== null && typeof value === 'object' && 'value' in value
 }
 
 /**
@@ -149,7 +147,7 @@ export const isRouterFunction = (value: unknown): value is () => RouterObject =>
 
 /**
  * Normalizes RouterRef to RouterObject by unwrapping refs and calling functions.
- * 
+ *
  * @param router - The router reference (can be object, ref, computed ref, or function)
  * @returns The unwrapped RouterObject
  */
@@ -165,13 +163,13 @@ export const normalizeRouterRef = (router: RouterRef): RouterObject => {
 
 /**
  * Normalizes Vue boolean props (boolean shorthand support).
- * 
+ *
  * Returns `true` if value is empty string (`''`) or `true`, `false` otherwise.
  * This handles Vue's boolean prop shorthand: `<Component prop />` results in `prop=""` on vnode.
- * 
+ *
  * @param value - The prop value to normalize (can be `''`, `true`, `false`, or `undefined`)
  * @returns `true` if the prop should be considered enabled, `false` otherwise
- * 
+ *
  * @example
  * ```typescript
  * normalizeBooleanProp('')  // true
@@ -190,7 +188,7 @@ export const normalizeBooleanProp = (value: unknown): boolean => {
  *
  * There is a default router present for most of the use cases, however it can be overridden
  * via the <Router /> component.
- * 
+ *
  * Browser-only code (useBrowserLocation, useBrowserSearch) is imported directly.
  * In SSR builds, the bundler should tree-shake it, and memory-location is used instead.
  */
@@ -206,18 +204,18 @@ function getBrowserHooks(): { hook: RouterObject['hook']; searchHook: RouterObje
     return {
       hook: ((router: RouterObject) => {
         // Create memory location with the router's ssrPath or default to '/'
-        const { hook } = memoryLocation({ 
+        const { hook } = memoryLocation({
           path: router.ssrPath || '/',
           searchPath: router.ssrSearch || '',
-          static: true // Static in SSR - no navigation allowed
+          static: true, // Static in SSR - no navigation allowed
         })
         return hook() as [Ref<Path>, NavigateFn]
       }) as RouterObject['hook'],
       searchHook: ((router: RouterObject) => {
-        const { searchHook } = memoryLocation({ 
+        const { searchHook } = memoryLocation({
           path: router.ssrPath || '/',
           searchPath: router.ssrSearch || '',
-          static: true
+          static: true,
         })
         return searchHook() as Ref<string>
       }) as RouterObject['searchHook'],
@@ -226,8 +224,10 @@ function getBrowserHooks(): { hook: RouterObject['hook']; searchHook: RouterObje
 
   // Browser: use browser hooks directly
   return {
-    hook: ((router: RouterObject) => useBrowserLocation({ ssrPath: router.ssrPath })) as RouterObject['hook'],
-    searchHook: ((router: RouterObject) => useBrowserSearch({ ssrSearch: router.ssrSearch })) as RouterObject['searchHook'],
+    hook: ((router: RouterObject) =>
+      useBrowserLocation({ ssrPath: router.ssrPath })) as RouterObject['hook'],
+    searchHook: ((router: RouterObject) =>
+      useBrowserSearch({ ssrSearch: router.ssrSearch })) as RouterObject['searchHook'],
   }
 }
 
@@ -260,12 +260,12 @@ export const Params0 = {}
 
 /**
  * Hook to access route parameters from the current matched route.
- * 
+ *
  * Works inside `<Route>` components and returns parameters from the innermost matched route.
  * Automatically merges parameters from parent nested routes.
- * 
+ *
  * @returns `Ref<RouteParams>` - Object with route parameter keys mapped to string values
- * 
+ *
  * @example
  * ```typescript
  * // For route path="/users/:userId/posts/:postId"
@@ -315,20 +315,20 @@ export const useLocationFromRouter = (router: RouterRef): [ComputedRef<Path>, Na
 
 /**
  * Reactive location hook that returns the current path and a navigate function.
- * 
+ *
  * The location ref automatically updates when the URL changes (through navigation or browser back/forward).
- * 
+ *
  * @returns A tuple of `[location, navigate]` where:
  *   - `location`: `ComputedRef<Path>` - Current pathname (relative to router base if nested)
  *   - `navigate`: `NavigateFn` - Function to programmatically navigate
- * 
+ *
  * @example
  * ```typescript
  * const [location, navigate] = useLocation()
- * 
+ *
  * // Access current path
  * console.log(location.value) // '/current/path'
- * 
+ *
  * // Navigate programmatically
  * navigate('/about')
  * navigate('/users/123', { replace: true })
@@ -342,12 +342,12 @@ export const useLocation = (): [ComputedRef<Path>, NavigateFn] => {
 
 /**
  * Reactive search string hook (query string).
- * 
+ *
  * Returns the current search string (query string) from the URL.
  * Automatically updates when URL search parameters change.
- * 
+ *
  * @returns `ComputedRef<string>` - Raw query string (e.g., `'foo=bar&page=2'`)
- * 
+ *
  * @example
  * ```typescript
  * const search = useSearch()
@@ -379,18 +379,18 @@ export const useSearch = () => {
 
 /**
  * Matches a route pattern against a path and extracts parameters.
- * 
+ *
  * @param parser - The route parser function (from path-to-regexp adapter or custom)
  * @param route - The route pattern to match (string or RegExp)
  * @param path - The current path to match against
  * @param loose - If `true`, enables loose matching mode for nested routes (extracts base path)
  * @returns A tuple: `[true, RouteParams, base?]` on match, `[false, null]` on no match
- * 
+ *
  * @example
  * ```typescript
  * const [matched, params, base] = matchRoute(parsePattern, '/users/:id', '/users/123')
  * // matched: true, params: { id: '123' }, base: undefined
- * 
+ *
  * const [matched, params, base] = matchRoute(parsePattern, '/users/:id', '/users/123/posts', true)
  * // matched: true, params: { id: '123' }, base: '/users/123'
  * ```
@@ -456,19 +456,19 @@ export const matchRoute = (
 
 /**
  * Reactive route matching hook.
- * 
+ *
  * Returns computed refs that automatically update when the location changes.
  * The first ref indicates if the route matches, the second contains the extracted parameters.
- * 
+ *
  * @param pattern - Route pattern to match (string like `/users/:id` or RegExp)
  * @returns A tuple of `[matches, params]` where:
  *   - `matches`: `ComputedRef<boolean>` - `true` if location matches the pattern
  *   - `params`: `ComputedRef<RouteParams | null>` - Extracted route parameters or `null` if no match
- * 
+ *
  * @example
  * ```typescript
  * const [matches, params] = useRoute('/users/:id')
- * 
+ *
  * if (matches.value) {
  *   console.log('User ID:', params.value?.id) // '123'
  * }
@@ -515,24 +515,24 @@ export { normalizePath } from './helpers'
 
 /**
  * Hook to access and manipulate URL search parameters reactively.
- * 
+ *
  * Returns a reactive `URLSearchParams` object and a setter function.
  * The searchParams ref automatically updates when URL search parameters change.
- * 
+ *
  * @returns A tuple of `[searchParams, setSearchParams]` where:
  *   - `searchParams`: `ComputedRef<URLSearchParams>` - Reactive URLSearchParams object
  *   - `setSearchParams`: `SetSearchParamsFn` - Function to update search params
- * 
+ *
  * @example
  * ```typescript
  * const [searchParams, setSearchParams] = useSearchParams()
- * 
+ *
  * // Read params
  * const page = searchParams.value.get('page') // '2'
- * 
+ *
  * // Update params
  * setSearchParams({ page: '3', sort: 'asc' })
- * 
+ *
  * // Functional update
  * setSearchParams(prev => {
  *   prev.set('page', '5')
@@ -547,10 +547,7 @@ export function useSearchParams(): [ComputedRef<URLSearchParams>, SetSearchParam
   const searchParams = computed(() => new URLSearchParams(search.value))
   const navigateFn = navigate as NavigateFn
 
-  const setSearchParams: SetSearchParamsFn = (
-    nextInit,
-    options
-  ) => {
+  const setSearchParams: SetSearchParamsFn = (nextInit, options) => {
     const newParams = new URLSearchParams(
       typeof nextInit === 'function' ? nextInit(searchParams.value) : nextInit
     )
@@ -560,4 +557,3 @@ export function useSearchParams(): [ComputedRef<URLSearchParams>, SetSearchParam
 
   return [searchParams, setSearchParams]
 }
-
