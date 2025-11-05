@@ -22,5 +22,9 @@ const props = defineProps({
 });
 
 // Get base path from Vite's BASE_URL or window location
-const basePath = import.meta.env.BASE_URL || '';
+// Remove trailing slash if present (Router expects base without trailing slash)
+let basePath = import.meta.env.BASE_URL || '';
+if (basePath.endsWith('/')) {
+  basePath = basePath.slice(0, -1);
+}
 </script>
