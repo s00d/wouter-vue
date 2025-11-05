@@ -35,6 +35,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Build wouter-vue package
+        run: pnpm run build
+
       - name: Build static site
         run: cd docs && pnpm run build:docs
 
