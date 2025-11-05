@@ -34,3 +34,6 @@ packages/wouter-preact/README.md
 
 # Auto-generated files
 example/src/generated-routes.js
+
+.r2x
+output.md

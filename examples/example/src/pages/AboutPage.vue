@@ -1,7 +1,30 @@
 <template>
   <div class="page" data-testid="about-page">
-    <h1>About</h1>
+    <h1>{{ data?.pageName || 'About' }}</h1>
     <p class="intro">This is a demo of <strong>wouter-vue</strong> router for Vue 3.</p>
+    
+    <!-- Route Data Display -->
+    <div class="route-data-box" v-if="hasRouteData">
+      <h2>Route Data</h2>
+      <p class="data-description">
+        This page demonstrates hierarchical data passing from <code>&lt;AnimatedSwitch&gt;</code> and <code>&lt;Route&gt;</code> components.
+      </p>
+      <div class="data-item">
+        <strong>Theme:</strong> <span class="data-value">{{ routeData.theme || 'not set' }}</span>
+      </div>
+      <div class="data-item">
+        <strong>Layout:</strong> <span class="data-value">{{ routeData.layout || 'not set' }}</span>
+      </div>
+      <div class="data-item" v-if="routeData.pageName">
+        <strong>Page Name:</strong> <span class="data-value">{{ routeData.pageName }}</span>
+      </div>
+      <div class="data-item" v-if="routeData.version">
+        <strong>Version:</strong> <span class="data-value">{{ routeData.version }}</span>
+      </div>
+      <div class="data-hint">
+        💡 Data is passed reactively from parent routes. Check <code>AppRoutes.vue</code> to see how data flows hierarchically.
+      </div>
+    </div>
     
     <div class="features-box">
       <h2>Features</h2>
@@ -13,6 +36,7 @@
         <li>✅ Active link detection</li>
         <li>✅ Server-Side Rendering (SSR) support</li>
         <li>✅ Tiny bundle size (~2KB gzipped)</li>
+        <li>✅ Hierarchical data passing</li>
       </ul>
     </div>
     
@@ -57,59 +81,43 @@
 
 <script setup>
 import { computed } from 'vue';
-import { Link, useLocation, useSearchParams, useSearch } from 'wouter-vue';
+import { Link, useLocation, useSearchParams, useRouteData } from 'wouter-vue';
+
+// Access route data via props (for :component prop)
+const props = defineProps({
+  data: {
+    type: Object,
+    default: () => ({})
+  },
+  params: {
+    type: Object,
+    default: () => ({})
+    // params contains route parameters extracted from URL path
+    // Example: for route "/users/:id" and URL "/users/123", params = { id: '123' }
+    // For route "/about" (no dynamic params), params = {}
+    // Use useParams() composable for alternative access method
+  }
+});
+
+// Access route data via composable (alternative method)
+const routeData = useRouteData();
 
 const [location] = useLocation();
 const [searchParams] = useSearchParams();
-const search = useSearch();
 
-// Parse query parameters
-// Accessing location.value in computed makes it reactive to location changes
+// Check if route data is available
+const hasRouteData = computed(() => {
+  return Object.keys(routeData.value).length > 0 || (props.data && Object.keys(props.data).length > 0);
+});
+
+// Parse query parameters using useSearchParams
 const queryParams = computed(() => {
   const params = {};
-  
-  // Access location to make computed reactive to location changes
-  location.value;
-  
-  // Primary source: window.location.search (most reliable, reads fresh value each time)
-  if (typeof window !== 'undefined' && window.location && window.location.search) {
-    const urlParams = new URLSearchParams(window.location.search);
-    urlParams.forEach((value, key) => {
-      params[key] = value;
-    });
-    if (Object.keys(params).length > 0) return params;
-  }
-  
-  // Fallback: try searchParams from wouter-vue
   if (searchParams.value && searchParams.value.size > 0) {
     searchParams.value.forEach((value, key) => {
       params[key] = value;
     });
-    return params;
   }
-  
-  // Fallback: try search.value if available
-  if (search.value) {
-    try {
-      // search.value is already sanitized (without ?), URLSearchParams accepts it directly
-      const urlParams = new URLSearchParams(search.value);
-      urlParams.forEach((value, key) => {
-        params[key] = value;
-      });
-      if (Object.keys(params).length > 0) return params;
-    } catch (e) {
-      // If that fails, try with ? prefix
-      try {
-        const urlParams = new URLSearchParams(`?${search.value}`);
-        urlParams.forEach((value, key) => {
-          params[key] = value;
-        });
-      } catch (e2) {
-        // Silent fail
-      }
-    }
-  }
-  
   return params;
 });
 
@@ -127,10 +135,6 @@ const fullPath = computed(() => {
   const searchStr = searchParams.value && searchParams.value.toString();
   if (searchStr) {
     path += `?${searchStr}`;
-  } else if (search.value) {
-    // Fallback to search.value
-    const searchString = search.value.startsWith('?') ? search.value : `?${search.value}`;
-    path += searchString;
   }
   if (hash.value) {
     path += hash.value;
@@ -170,6 +174,7 @@ h2 {
   font-size: 1.3rem;
 }
 
+.route-data-box,
 .features-box,
 .tech-box,
 .url-info-box {
@@ -177,6 +182,57 @@ h2 {
   padding: 1.5rem;
   border-radius: 8px;
   margin-bottom: 1.5rem;
+}
+
+.route-data-box {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.route-data-box h2 {
+  color: white;
+}
+
+.route-data-box .data-description {
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 1rem;
+}
+
+.route-data-box code {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+.route-data-box .data-item {
+  margin: 0.75rem 0;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  backdrop-filter: blur(10px);
+}
+
+.route-data-box .data-item strong {
+  color: rgba(255, 255, 255, 0.95);
+  display: inline-block;
+  min-width: 120px;
+}
+
+.route-data-box .data-value {
+  color: #fbbf24;
+  font-weight: 600;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.route-data-box .data-hint {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.15);
+  border-left: 4px solid #fbbf24;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  line-height: 1.6;
 }
 
 .features-box ul {

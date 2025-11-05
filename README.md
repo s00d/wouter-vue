@@ -19,17 +19,21 @@
 - [Installation](#installation)
 - [Quick Start](#quick-start)
 - [Core Concepts](#core-concepts)
+  - [Composition API First](#composition-api-first)
+  - [Reactive Data Flow](#reactive-data-flow)
 - [API Reference](#api-reference)
   - [Composables](#composables)
   - [Components](#components)
-- [Advanced Features](#advanced-features)
+- [Advanced Guides](#advanced-guides)
+  - [Route Pattern Matching](#route-pattern-matching)
+  - [Hierarchical Data Passing](#hierarchical-data-passing)
+  - [Nested Routing](#nested-routing)
+  - [Custom Location Hooks](#custom-location-hooks)
+- [Cookbook](#cookbook)
 - [Server-Side Rendering (SSR)](#server-side-rendering-ssr)
-- [Code Splitting & Performance](#code-splitting--performance)
-- [TypeScript Support](#typescript-support)
-- [Examples](#examples)
+- [Performance & Best Practices](#performance--best-practices)
 - [Migration Guide](#migration-guide)
 - [Troubleshooting](#troubleshooting)
-- [Performance Comparison](#performance-comparison)
 - [Contributing](#contributing)
 - [License](#license)
 - [Acknowledgements](#acknowledgements)
@@ -45,6 +49,7 @@ This project attempts to bring the same core principles and design philosophy to
 - **Familiar API** - Similar components and patterns for easy migration
 - **Performance focused** - Small bundle size and efficient routing
 - **Path-to-RegExp powered** - Uses [path-to-regexp](https://github.com/pillarjs/path-to-regexp) for robust route matching with full pattern support
+- **Hierarchical data passing** - Pass reactive data down routing tree with automatic merging
 
 While maintaining compatibility with Vue 3's Composition API and SSR requirements, wouter-vue preserves the elegant simplicity that made wouter popular in the React community, adapted for Vue developers who appreciate minimal, performant solutions. Route pattern matching is powered by [path-to-regexp](https://github.com/pillarjs/path-to-regexp), ensuring compatibility with industry-standard routing patterns and full support for advanced route matching features.
 
@@ -57,8 +62,9 @@ While maintaining compatibility with Vue 3's Composition API and SSR requirement
 - **📦 Minimal dependencies** (Vue 3 + path-to-regexp)
 - **🎨 Server-Side Rendering (SSR)** - Full SSR support with Vite
 - **🗂️ Nested routing** - Flexible route parameters and nested structures
-- **🔗 Active links** - Dynamic className support for active states
+- **🔗 Active links** - Scoped slot API for active state styling
 - **💾 TypeScript** - Full type definitions included
+- **📊 Hierarchical & Reactive Data Passing** - Pass data down routing tree with automatic merging
 
 ## 📊 Performance
 
@@ -94,6 +100,7 @@ yarn add wouter-vue
 
 ```vue
 <template>
+  <!-- Router is optional, but recommended for nested routes and SSR -->
   <Router>
     <Link href="/about">About</Link>
     
@@ -118,15 +125,14 @@ import AboutPage from './pages/AboutPage.vue';
 
 ## Core Concepts
 
-### Router Architecture
+### Composition API First
 
-wouter-vue uses a **composition-based** routing approach:
+wouter-vue uses a **composition-based** routing approach that leverages Vue 3's Composition API:
+
 - No global router instance required
 - Each component can access routing through composables
 - `<Router />` component is **optional** - provides context for nested routes and custom configuration
 - Uses Vue's reactivity system for automatic updates
-
-### Composition API Approach
 
 All routing functionality is available through composables that work seamlessly with Vue 3's Composition API:
 
@@ -138,6 +144,37 @@ const [location, navigate] = useLocation();
 const [matches, params] = useRoute('/users/:id');
 </script>
 ```
+
+### Reactive Data Flow
+
+wouter-vue provides fully reactive routing with two main data flows:
+
+**Route Parameters (`useParams`)**
+- Route parameters extracted from URL patterns (e.g., `/users/:id` → `{ id: '123' }`)
+- Automatically merged from parent routes when using nested routing
+- Always returns a reactive `Ref<RouteParams>` that updates when route changes
+
+**Route Data (`useRouteData` / `data` prop)**
+- Arbitrary data passed hierarchically through `<Switch>` → `<Route>` → component
+- Automatically merged with child data overriding parent data
+- Fully reactive - changes propagate automatically through the routing tree
+- Accessible via props (for `:component`) or `useRouteData()` composable
+
+```vue
+<script setup>
+import { useParams, useRouteData } from 'wouter-vue';
+
+// Route parameters from URL
+const params = useParams();
+console.log(params.value.userId); // '123'
+
+// Route data from parent routes
+const routeData = useRouteData();
+console.log(routeData.value.theme); // 'dark'
+</script>
+```
+
+See [Hierarchical Data Passing](#hierarchical-data-passing) for detailed information on passing reactive data through routes.
 
 ## API Reference
 
@@ -195,9 +232,11 @@ if (match.value) {
 
 #### `useParams()`
 
-Returns route parameters from the current matched route. Works inside `<Route>` components.
+Returns route parameters from the current matched route. Works inside `<Route>` components and automatically merges parameters from parent nested routes.
 
-**Returns:** `Ref<RouteParams>` - Object with route parameter keys mapped to string values
+**Returns:** `Ref<RouteParams>` - Always returns a reactive reference to route parameters object
+
+**Important:** This hook always returns a `Ref<RouteParams>`, ensuring full reactivity even when no parent route provides parameters.
 
 ```vue
 <template>
@@ -215,6 +254,33 @@ console.log(params.value.userId);  // '123'
 console.log(params.value.postId);  // '456'
 </script>
 ```
+
+#### `useRouteData()`
+
+Returns reactive data hierarchically merged from parent `<Switch>` and `<Route>` components. Works inside `<Route>` components and automatically merges data from all parent routes.
+
+**Returns:** `Ref<RouteData>` - Reactive reference to route data object
+
+**Data Merging:** Child route data overrides parent route data with the same keys. Data is shallow merged, meaning child properties completely replace parent properties with the same key.
+
+```vue
+<script setup>
+import { computed } from 'vue';
+import { useRouteData } from 'wouter-vue';
+
+const routeData = useRouteData();
+
+// Access data reactively
+const theme = computed(() => routeData.value.theme);
+const layout = computed(() => routeData.value.layout);
+</script>
+```
+
+**Access Methods:**
+- **Via Props:** Components rendered via `:component` receive data as a `data` prop
+- **Via Composable:** Use `useRouteData()` for slot-based rendering or explicit access
+
+See [Hierarchical Data Passing](#hierarchical-data-passing) for detailed examples and usage patterns.
 
 #### `useSearch()`
 
@@ -320,13 +386,14 @@ Renders content when the path matches.
 | `component` | `Component?` | `undefined` | Component to render when matched |
 | `nest` | `boolean?` | `false` | Enable nested routing mode |
 | `match` | `[boolean, RouteParams]?` | `undefined` | Pre-computed match result (internal use) |
+| `data` | `Object?` | `undefined` | Data object to merge with parent route data (reactive) |
 
 **Usage with slots:**
 ```vue
 <template>
   <Route path="/users/:id">
-    <template #default="{ params }">
-      User ID: {{ params.id }}
+    <template #default="{ params, data }">
+      User ID: {{ params.id }}, Theme: {{ data.theme }}
     </template>
   </Route>
 </template>
@@ -335,7 +402,7 @@ Renders content when the path matches.
 **Usage with component prop:**
 ```vue
 <template>
-  <Route path="/about" :component="AboutPage" />
+  <Route path="/about" :component="AboutPage" :data="{ pageName: 'About' }" />
 </template>
 
 <script setup>
@@ -358,15 +425,67 @@ import AboutPage from './pages/AboutPage.vue';
 
 Renders only the first matching route. Useful for exclusive route matching.
 
+**Props:**
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `location` | `Path?` | `undefined` | Override location for routing (optional) |
+| `data` | `Object?` | `undefined` | Data object to pass to child routes (reactive) |
+
+**Usage:**
+
 ```vue
 <template>
-  <Switch>
+  <Switch :data="{ theme: 'dark', layout: 'default' }">
     <Route path="/home">Home</Route>
     <Route path="/about">About</Route>
     <Route>404 Not Found</Route>
   </Switch>
 </template>
 ```
+
+See [Hierarchical Data Passing](#hierarchical-data-passing) for more details on data prop usage.
+
+#### `<AnimatedSwitch>`
+
+Wraps `<Switch>` with Vue `<Transition>` for animated route transitions. Automatically triggers animations when the route changes.
+
+**Props:**
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `name` | `string?` | `'fade'` | Transition name for CSS classes |
+| `mode` | `'out-in' \| 'in-out' \| 'default'?` | `'out-in'` | Transition mode |
+| `location` | `string?` | `undefined` | Override location for routing (optional) |
+| `data` | `Object?` | `undefined` | Data object to pass to child routes (reactive) |
+
+**Usage:**
+
+```vue
+<template>
+  <Router>
+    <AnimatedSwitch name="fade" mode="out-in" :data="{ theme: 'dark', layout: 'default' }">
+      <Route path="/home" :component="HomePage" />
+      <Route path="/about" :component="AboutPage" />
+      <Route :component="NotFoundPage" />
+    </AnimatedSwitch>
+  </Router>
+</template>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>
+```
+
+See [Cookbook - Animated Route Transitions](#animated-route-transitions) for more examples.
 
 #### `<Link>`
 
@@ -379,32 +498,36 @@ Creates a navigation link with active state support.
 | `href` | `string?` | `undefined` | Target path |
 | `to` | `string?` | `undefined` | Alias for `href` |
 | `replace` | `boolean?` | `false` | Replace history entry instead of pushing |
-| `classFn` | `(isActive: boolean) => string?` | `undefined` | Function to compute class name based on active state |
-| `className` | `string?` | `undefined` | Static class name (will be merged with `classFn` result) |
 | `onClick` | `(event: MouseEvent) => void?` | `undefined` | Click handler |
 | `asChild` | `boolean?` | `false` | Render as child element |
 
 **Attributes:**
-- `class?: string` - Static class name (automatically merged with `classFn` result)
+- `class?: string` - Standard Vue class attribute for styling
 
 ```vue
 <template>
   <!-- Simple link -->
   <Link href="/about">About</Link>
   
-  <!-- Active link with dynamic class -->
-  <Link href="/" :classFn="isActive => isActive ? 'active' : ''">
-    Home
+  <!-- Active link with v-slot -->
+  <Link href="/">
+    <template #default="{ isActive }">
+      <span :class="{ active: isActive }">Home</span>
+    </template>
   </Link>
   
   <!-- Active link with static class and dynamic active state -->
-  <Link href="/about" class="nav-link" :classFn="isActive => isActive ? 'active' : ''">
-    About
+  <Link href="/about" class="nav-link">
+    <template #default="{ isActive }">
+      <span :class="{ active: isActive }">About</span>
+    </template>
   </Link>
   
   <!-- Active link with multiple classes -->
-  <Link href="/users" :classFn="isActive => isActive ? 'nav-link active' : 'nav-link'">
-    Users
+  <Link href="/users">
+    <template #default="{ isActive }">
+      <span :class="isActive ? 'nav-link active' : 'nav-link'">Users</span>
+    </template>
   </Link>
   
   <!-- Replace navigation -->
@@ -416,8 +539,6 @@ Creates a navigation link with active state support.
   </Route>
 </template>
 ```
-
-> **Note:** Static classes passed via `class` attribute are automatically merged with the result from `classFn`. For example, if `class="nav-link"` and `classFn` returns `"active"`, the final class will be `"nav-link active"`.
 
 #### `<Redirect>`
 
@@ -483,7 +604,134 @@ if (result.redirect) {
 res.status(200).set({ 'Content-Type': 'text/html' }).end(template.replace(/<!--ssr-outlet-->/, result.html));
 ```
 
-## Advanced Features
+## Advanced Guides
+
+### Route Pattern Matching
+
+wouter-vue uses [**path-to-regexp**](https://github.com/pillarjs/path-to-regexp) for route pattern matching. This means all route patterns support the full path-to-regexp syntax and features.
+
+#### Named Parameters
+
+Use `/:param` syntax to extract dynamic segments from URLs:
+
+```vue
+<template>
+  <Route path="/users/:userId/posts/:postId">
+    <PostPage />
+  </Route>
+</template>
+
+<script setup>
+// Inside PostPage.vue
+import { useParams } from 'wouter-vue';
+
+const params = useParams();
+// params.value.userId = '123'
+// params.value.postId = '456'
+</script>
+```
+
+#### Parameter Constraints
+
+wouter-vue supports parameter constraints using the `:param(pattern)` syntax, similar to Vue Router. This allows you to define precise matching rules for route parameters without using RegExp objects.
+
+**Syntax:**
+- `/:param(pattern)` - Parameter with regex constraint
+- Example: `/:locale([a-zA-Z]{2})` matches exactly 2 letters
+- Example: `/:id(\d+)` matches only digits
+
+```vue
+<template>
+  <Switch>
+    <!-- Using string pattern with constraint syntax -->
+    <Route path="/:locale([a-zA-Z]{2})" nest>
+      <!-- Child route relative to /<locale> base -->
+      <Route path="/test" :component="LocaleTestPage" />
+    </Route>
+
+    <!-- Fallback -->
+    <Route>Not Found</Route>
+  </Switch>
+</template>
+
+<script setup>
+import { Route, Switch, useParams } from 'wouter-vue'
+
+// Inside LocaleTestPage.vue
+// const params = useParams()
+// params.value.locale === 'ru' for /ru/test
+</script>
+```
+
+**Note:** For nested routes with `nest` enabled, the parent `Route` creates a nested `Router` whose `base` equals the matched prefix (e.g., `'/ru'`). Inside the nested `Router`, the current location becomes relative to this base (e.g., `'/test'`), so child routes must match that relative path.
+
+#### Wildcards
+
+Wildcard routes match multiple path segments. Use `/*` for unnamed wildcard or `/*param` for named wildcard parameter.
+
+```vue
+<!-- Unnamed wildcard - automatically converted to /*splat internally -->
+<Route path="/files/*">
+  <template #default="{ params }">
+    <!-- params.splat contains the matched path segments -->
+    File path: {{ params.splat }}
+  </template>
+</Route>
+
+<!-- Named wildcard parameter -->
+<Route path="/files/*path">
+  <template #default="{ params }">
+    File path: {{ params.path }}
+  </template>
+</Route>
+```
+
+**Note:** 
+- In `path-to-regexp`, wildcard syntax is `/*param` (not `/:param*` from old regexparam).
+- When using `/files/*` (unnamed), it's automatically converted to `/files/*splat` and the parameter is accessible as `params.splat`.
+- Wildcard parameter values are strings containing the matched path segments (e.g., `"a/b/c"` for `/files/a/b/c`).
+
+#### RegExp Paths
+
+For more complex patterns that require advanced regex features (lookaheads, alternation, etc.), you can use `RegExp` objects in the `path` prop, including named capture groups.
+
+**Important:** Inside `<template>`, use the constructor `new RegExp(...)` rather than a literal `/.../`, otherwise the Vue SFC parser may fail. Named groups are supported by modern environments; if unavailable, the router falls back to numeric indices for params.
+
+```vue
+<template>
+  <Switch>
+    <!-- Parent route with named group `locale`, enables nesting -->
+    <Route :path="new RegExp('^/(?<locale>[a-zA-Z]{2})(?=/|$)')" :nest="true">
+      <!-- Child route relative to /<locale> base -->
+      <Route path="/test" :component="LocaleTestPage" />
+    </Route>
+
+    <!-- Fallback -->
+    <Route>Not Found</Route>
+  </Switch>
+</template>
+
+<script setup>
+import { Route, Switch, useParams } from 'wouter-vue'
+
+// Inside LocaleTestPage.vue
+// const params = useParams()
+// params.value.locale === 'ru' for /ru/test
+</script>
+```
+
+**When to use RegExp vs string patterns:**
+- Use **string patterns** (`:param(pattern)`) for simple constraints - cleaner and more readable
+- Use **RegExp** for complex patterns that require advanced regex features (lookaheads, alternation, etc.)
+
+**Supported Features:**
+- **Named parameters** - `/:param` matches a single segment
+- **Wildcard parameters** - `/*param` matches multiple segments
+- **Parameter constraints** - `/:param(pattern)` with regex validation
+- **Optional segments** - `/users{/:id}/delete` for optional parts
+- **Custom delimiters** - Configurable via parser options
+
+For more details on pattern syntax, see the [path-to-regexp documentation](https://github.com/pillarjs/path-to-regexp).
 
 ### Nested Routing
 
@@ -519,265 +767,173 @@ const params = useParams();
 
 The `nest` prop enables nested routing mode, where child routes match relative to the parent route path.
 
-### Route Pattern Matching (Path-to-RegExp)
+### Hierarchical Data Passing
 
-wouter-vue uses [**path-to-regexp**](https://github.com/pillarjs/path-to-regexp) for route pattern matching. This means all route patterns support the full path-to-regexp syntax and features.
+wouter-vue provides a powerful mechanism for passing data hierarchically through your routing tree. Data flows from `<Switch>` or `<AnimatedSwitch>` down to `<Route>` components and finally to your page components, with automatic merging and full reactivity.
 
-**Supported Features:**
-- **Named parameters** - `/:param` matches a single segment
-- **Wildcard parameters** - `/*param` matches multiple segments
-- **Parameter constraints** - `/:param(pattern)` with regex validation
-- **Optional segments** - `/users{/:id}/delete` for optional parts
-- **Custom delimiters** - Configurable via parser options
+#### Basic Usage
 
-**Example:**
-```vue
-<template>
-  <Switch>
-    <Route path="/users/:id" :component="UserPage" />
-    <Route path="/files/*path" :component="FileBrowser" />
-    <Route path="/:locale([a-zA-Z]{2})" nest>
-      <Route path="/about" :component="AboutPage" />
-    </Route>
-  </Switch>
-</template>
-```
-
-For more details on pattern syntax, see the [path-to-regexp documentation](https://github.com/pillarjs/path-to-regexp).
-
-### Route Patterns with Constraints
-
-wouter-vue supports parameter constraints using the `:param(pattern)` syntax, similar to Vue Router. This allows you to define precise matching rules for route parameters without using RegExp objects.
+You can pass data to routes using the `data` prop on `<Switch>`, `<AnimatedSwitch>`, or `<Route>` components. The `data` prop accepts plain objects, `ref`, or `computed` refs:
 
 ```vue
-<template>
-  <Switch>
-    <!-- Using string pattern with constraint syntax -->
-    <Route path="/:locale([a-zA-Z]{2})" nest>
-      <!-- Child route relative to /<locale> base -->
-      <Route path="/test" :component="LocaleTestPage" />
-    </Route>
-
-    <!-- Fallback -->
-    <Route>Not Found</Route>
-  </Switch>
-</template>
-
 <script setup>
-import { Route, Switch, useParams } from 'wouter-vue'
+import { ref } from 'vue';
+import { Router, Route, AnimatedSwitch } from 'wouter-vue';
 
-// Inside LocaleTestPage.vue
-// const params = useParams()
-// params.value.locale === 'ru' for /ru/test
+// Option 1: Plain object (static)
+const staticData = { theme: 'dark', layout: 'default' };
+
+// Option 2: Reactive ref (recommended for dynamic data)
+const routeData = ref({ theme: 'dark', layout: 'default', version: '1.0.0' });
+
+// Option 3: Reactive ref for specific route
+const aboutPageData = ref({ pageName: 'About', layout: 'sidebar' });
 </script>
+
+<template>
+  <AnimatedSwitch :data="routeData">
+    <!-- HomePage will receive merged data from routeData -->
+    <Route path="/" :component="HomePage" />
+    
+    <!-- AboutPage will receive merged data: routeData + aboutPageData -->
+    <Route path="/about" :component="AboutPage" :data="aboutPageData" />
+    
+    <!-- UsersPage will receive only routeData -->
+    <Route path="/users" :component="UsersPage" />
+  </AnimatedSwitch>
+</template>
 ```
 
-**Parameter Constraints Syntax:**
-- `/:param(pattern)` - Parameter with regex constraint
-- Example: `/:locale([a-zA-Z]{2})` matches exactly 2 letters
-- Example: `/:id(\d+)` matches only digits
+**Note:** When using `ref`, changes to the ref value will automatically propagate to all child routes, making it perfect for dynamic data that changes over time.
 
-**Note:** For nested routes with `nest` enabled, the parent `Route` creates a nested `Router` whose `base` equals the matched prefix (e.g., `'/ru'`). Inside the nested `Router`, the current location becomes relative to this base (e.g., `'/test'`), so child routes must match that relative path.
+#### Reactive Data Flow
 
-### RegExp routes and named groups
-
-You can also use `RegExp` objects in the `path` for more complex matching patterns, including named capture groups.
-
-**Important:** Inside `<template>`, use the constructor `new RegExp(...)` rather than a literal `/.../`, otherwise the Vue SFC parser may fail. Named groups are supported by modern environments; if unavailable, the router falls back to numeric indices for params.
+Data passing is fully reactive. When you pass reactive data (from `ref` or `computed`), changes automatically propagate to all child components:
 
 ```vue
-<template>
-  <Switch>
-    <!-- Parent route with named group `locale`, enables nesting -->
-    <Route :path="new RegExp('^/(?<locale>[a-zA-Z]{2})(?=/|$)')" :nest="true">
-      <!-- Child route relative to /<locale> base -->
-      <Route path="/test" :component="LocaleTestPage" />
-    </Route>
-
-    <!-- Fallback -->
-    <Route>Not Found</Route>
-  </Switch>
-</template>
-
 <script setup>
-import { Route, Switch, useParams } from 'wouter-vue'
+import { ref } from 'vue';
+import { Router, Route, AnimatedSwitch } from 'wouter-vue';
 
-// Inside LocaleTestPage.vue
-// const params = useParams()
-// params.value.locale === 'ru' for /ru/test
-</script>
-```
+// Create reactive state
+const globalData = ref({ theme: 'light', user: null });
 
-**When to use RegExp vs string patterns:**
-- Use **string patterns** (`:param(pattern)`) for simple constraints - cleaner and more readable
-- Use **RegExp** for complex patterns that require advanced regex features (lookaheads, alternation, etc.)
-
-Note on boolean shorthand: You can write `nest` (without a value) in templates. 
-
-### Route Parameters
-
-Extract dynamic segments from URLs:
-
-```vue
-<template>
-  <Route path="/users/:userId/posts/:postId">
-    <PostPage />
-  </Route>
-</template>
-
-<script setup>
-// Inside PostPage.vue
-import { useParams } from 'wouter-vue';
-
-const params = useParams();
-// params.value.userId = '123'
-// params.value.postId = '456'
-</script>
-```
-
-**Wildcard routes:**
-
-Wildcard routes match multiple path segments. Use `/*` for unnamed wildcard or `/*param` for named wildcard parameter.
-
-```vue
-<!-- Unnamed wildcard - automatically converted to /*splat internally -->
-<Route path="/files/*">
-  <template #default="{ params }">
-    <!-- params.splat contains the matched path segments -->
-    File path: {{ params.splat }}
-  </template>
-</Route>
-
-<!-- Named wildcard parameter -->
-<Route path="/files/*path">
-  <template #default="{ params }">
-    File path: {{ params.path }}
-  </template>
-</Route>
-```
-
-**Note:** 
-- In `path-to-regexp`, wildcard syntax is `/*param` (not `/:param*` from old regexparam).
-- When using `/files/*` (unnamed), it's automatically converted to `/files/*splat` and the parameter is accessible as `params.splat`.
-- Wildcard parameter values are strings containing the matched path segments (e.g., `"a/b/c"` for `/files/a/b/c`).
-
-**See also:** wouter-vue uses [path-to-regexp](https://github.com/pillarjs/path-to-regexp) for all route pattern matching. Refer to the [path-to-regexp documentation](https://github.com/pillarjs/path-to-regexp) for complete pattern syntax and features.
-
-#### Parameter Constraints
-
-You can use parameter constraints with the `:param(pattern)` syntax for simple validation:
-
-```vue
-<template>
-  <!-- match /users/123/details, where 123 are digits only -->
-  <Route path="/users/:id(\\d+)/details">
-    <template #default="{ params }">
-      User ID: {{ params.id }}
-    </template>
-  </Route>
-</template>
-```
-
-#### RegExp params with named groups
-
-For more complex patterns, you can use RegExp objects with named capture groups:
-
-```vue
-<template>
-  <!-- match /users/123/details, where 123 are digits only -->
-  <Route :path="new RegExp('^/users/(?<id>\\d+)/details$')">
-    <template #default="{ params }">
-      User ID: {{ params.id }}
-    </template>
-  </Route>
-</template>
-```
-
-**Note:** If named groups are not available in the environment, the router will return parameters with numeric keys (`'0'`, `'1'`), which can be read manually if needed.
-
-### Active Links
-
-Create navigation links with active state styling using the `classFn` prop:
-
-```vue
-<template>
-  <nav>
-    <Link 
-      href="/" 
-      :classFn="isActive => isActive ? 'nav-link active' : 'nav-link'"
-    >
-      Home
-    </Link>
-    <Link 
-      href="/about"
-      :classFn="isActive => isActive ? 'nav-link active' : 'nav-link'"
-    >
-      About
-    </Link>
-  </nav>
-</template>
-
-<style scoped>
-.nav-link {
-  padding: 0.5rem 1rem;
-  text-decoration: none;
-  color: #666;
+function login() {
+  globalData.value.user = { name: 'Alice' };
 }
+</script>
 
-.nav-link.active {
-  color: #4f46e5;
-  font-weight: bold;
-  border-bottom: 2px solid #4f46e5;
-}
-</style>
-```
-
-**Important:** Use `classFn` prop instead of `:class` for active link styling. Vue's built-in `:class` directive interferes with function-based class computation, so `classFn` is the recommended approach.
-
-### Programmatic Navigation
-
-Navigate programmatically in response to user actions:
-
-```vue
-<script setup>
-import { useLocation } from 'wouter-vue';
-
-const [, navigate] = useLocation();
-
-function handleLogin() {
-  // Navigate after login
-  navigate('/dashboard');
+<template>
+  <button @click="login">Login</button>
   
-  // Or replace history entry
-  navigate('/dashboard', { replace: true });
-}
-
-function goBack() {
-  // Navigate back
-  navigate(-1);
-}
-</script>
+  <!-- Pass reactive data to Switch -->
+  <AnimatedSwitch :data="globalData">
+    <!-- HomePage will receive updated data when login() is called -->
+    <Route path="/" :component="HomePage" :data="{ title: 'Home' }" />
+    
+    <!-- AboutPage will also receive updated data -->
+    <Route path="/about" :component="AboutPage" />
+  </AnimatedSwitch>
+</template>
 ```
 
-### Route Guards
+#### Accessing Data in Components
 
-Implement authentication and authorization checks:
+**Via Props (for `:component` prop):**
+
+Components rendered via `:component` receive data as a prop:
 
 ```vue
 <script setup>
-import { useLocation, useRoute } from 'wouter-vue';
-import { watch } from 'vue';
+import { computed } from 'vue';
 
-const [location, navigate] = useLocation();
-const isAuthenticated = ref(false);
+const props = defineProps({
+  data: Object,
+  params: Object, // params continue to work as usual
+});
 
-watch(() => location.value, (newPath) => {
-  if (newPath.startsWith('/admin') && !isAuthenticated.value) {
-    navigate('/login');
-  }
+// Data is reactive - changes from parent will trigger re-renders
+const welcomeMessage = computed(() => {
+  // Before login: 'Welcome, Guest!'
+  // After login: 'Welcome, Alice!'
+  return `Welcome, ${props.data?.user?.name || 'Guest'}!`;
 });
 </script>
+
+<template>
+  <h1>{{ data.title }}</h1>
+  <p>{{ welcomeMessage }}</p>
+</template>
 ```
+
+**Via `useRouteData()` Composable:**
+
+For slot-based rendering or when you need more explicit access, use the `useRouteData()` composable:
+
+```vue
+<script setup>
+import { computed, watch } from 'vue';
+import { useRouteData } from 'wouter-vue';
+
+const routeData = useRouteData();
+
+// Access data reactively
+const theme = computed(() => routeData.value.theme);
+const layout = computed(() => routeData.value.layout);
+
+// Watch for changes
+watch(routeData, (newData) => {
+  console.log('Route data changed:', newData);
+}, { deep: true });
+</script>
+
+<template>
+  <div :class="`theme-${theme}`">
+    <p>Current theme: {{ theme }}</p>
+    <p>Layout: {{ layout }}</p>
+  </div>
+</template>
+```
+
+#### Data Merging Behavior
+
+Data is merged hierarchically with child properties overriding parent properties:
+
+- Data from `<Switch>` or `<AnimatedSwitch>` becomes the base for all child routes
+- Data from `<Route>` merges with parent data, with child properties taking precedence
+- Merging is shallow - child properties completely replace parent properties with the same key
+
+```vue
+<template>
+  <Switch :data="{ theme: 'dark', layout: 'default', debug: false }">
+    <!-- Result: { theme: 'dark', layout: 'sidebar', debug: false, pageName: 'Home' } -->
+    <!-- 'layout' is overridden, 'debug' is inherited -->
+    <Route path="/" :component="HomePage" :data="{ layout: 'sidebar', pageName: 'Home' }" />
+  </Switch>
+</template>
+```
+
+#### Nested Routes
+
+Data inheritance works seamlessly with nested routes:
+
+```vue
+<template>
+  <Switch :data="{ theme: 'dark' }">
+    <Route path="/users/:id" nest :data="{ userContext: true }">
+      <!-- Child routes inherit both theme and userContext -->
+      <Route path="/profile" :component="ProfilePage" :data="{ pageName: 'Profile' }" />
+      <!-- ProfilePage receives: { theme: 'dark', userContext: true, pageName: 'Profile' } -->
+    </Route>
+  </Switch>
+</template>
+```
+
+#### Performance Considerations
+
+- Data merging uses `computed()` for optimal performance - recalculation only occurs when source data changes
+- Shallow merging avoids deep reactivity overhead
+- Data passed via props is automatically tracked by Vue's reactivity system
 
 ### Custom Location Hooks
 
@@ -811,6 +967,512 @@ const { hook, navigate } = memoryLocation({ path: '/test' });
 
 // Use in Router component or for testing
 ```
+
+### Active Links
+
+Create navigation links with active state styling using the `v-slot` API:
+
+#### Using v-slot (Recommended)
+
+The `v-slot` API provides a more idiomatic Vue approach:
+
+```vue
+<template>
+  <nav>
+    <Link href="/" v-slot="{ isActive }">
+      <a :class="{ 'nav-link': true, active: isActive }">Home</a>
+    </Link>
+    <Link href="/about" v-slot="{ isActive }">
+      <a :class="{ 'nav-link': true, active: isActive }">About</a>
+    </Link>
+  </nav>
+</template>
+
+<style scoped>
+.nav-link {
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  color: #666;
+}
+
+.nav-link.active {
+  color: #4f46e5;
+  font-weight: bold;
+  border-bottom: 2px solid #4f46e5;
+}
+</style>
+```
+
+### Programmatic Navigation
+
+Navigate programmatically in response to user actions:
+
+```vue
+<script setup>
+import { useLocation } from 'wouter-vue';
+
+const [, navigate] = useLocation();
+
+function handleLogin() {
+  // Navigate after login
+  navigate('/dashboard');
+  
+  // Or replace history entry
+  navigate('/dashboard', { replace: true });
+}
+
+function goBack() {
+  // Navigate back
+  navigate(-1);
+}
+</script>
+```
+
+#### Performance Considerations
+
+- Data merging uses `computed()` for optimal performance - recalculation only occurs when source data changes
+- Shallow merging avoids deep reactivity overhead
+- Data passed via props is automatically tracked by Vue's reactivity system
+
+### Custom Location Hooks
+
+#### Hash-based Routing
+
+Use hash-based routing instead of history API:
+
+```vue
+<template>
+  <Router :hook="hashHook">
+    <Route path="/">Home</Route>
+    <Route path="/about">About</Route>
+  </Router>
+</template>
+
+<script setup>
+import { useHashLocation } from 'wouter-vue/use-hash-location';
+
+const hashHook = useHashLocation();
+</script>
+```
+
+#### Memory Location (Testing)
+
+Use in-memory location for testing:
+
+```js
+import { memoryLocation } from 'wouter-vue/memory-location';
+
+const { hook, navigate } = memoryLocation({ path: '/test' });
+
+// Use in Router component or for testing
+```
+
+## Cookbook
+
+This section contains practical examples and recipes for common tasks with wouter-vue.
+
+### Route Guards
+
+Implement route protection with authentication checks:
+
+```vue
+<template>
+  <Router>
+    <Switch>
+      <Route path="/login">
+        <LoginPage />
+      </Route>
+      
+      <Route path="/admin">
+        <AdminPage v-if="isAuthenticated" />
+        <Redirect to="/login" v-else />
+      </Route>
+      
+      <Route path="/">
+        <HomePage />
+      </Route>
+    </Switch>
+  </Router>
+</template>
+
+<script setup>
+import { ref, watch } from 'vue'
+import { useLocation, Redirect } from 'wouter-vue'
+
+const [location, navigate] = useLocation()
+const isAuthenticated = ref(false)
+
+// Global authentication check on route change
+watch(() => location.value, (newPath) => {
+  if (newPath.startsWith('/admin') && !isAuthenticated.value) {
+    navigate('/login')
+  }
+})
+
+function handleLogin() {
+  isAuthenticated.value = true
+  navigate('/admin')
+}
+</script>
+```
+
+**Alternative approach with a wrapper component:**
+
+```vue
+<template>
+  <Route path="/admin">
+    <ProtectedRoute>
+      <AdminPage />
+    </ProtectedRoute>
+  </Route>
+</template>
+
+<script setup>
+// ProtectedRoute.vue
+import { useParams } from 'wouter-vue'
+import { Redirect } from 'wouter-vue'
+
+const props = defineProps<{ requiredRole?: string }>()
+const isAuthenticated = computed(() => /* your logic */)
+
+// Inside ProtectedRoute.vue
+if (!isAuthenticated.value) {
+  return () => h(Redirect, { to: '/login' })
+}
+</script>
+```
+
+### Animated Route Transitions
+
+#### Using AnimatedSwitch (Recommended)
+
+The `AnimatedSwitch` component simplifies creating animated route transitions by automatically wrapping `Switch` in Vue `<Transition>`:
+
+```vue
+<template>
+  <Router>
+    <Suspense>
+      <!-- Use AnimatedSwitch instead of Switch -->
+      <AnimatedSwitch name="fade" mode="out-in">
+        <Route path="/" :component="HomePage" />
+        <Route path="/about" :component="AboutPage" />
+        <Route path="/contact" :component="ContactPage" />
+      </AnimatedSwitch>
+
+      <template #fallback>
+        <LoadingSpinner />
+      </template>
+    </Suspense>
+  </Router>
+</template>
+
+<script setup>
+import { Router, Route, AnimatedSwitch } from 'wouter-vue'
+import HomePage from './pages/HomePage.vue'
+import AboutPage from './pages/AboutPage.vue'
+import ContactPage from './pages/ContactPage.vue'
+</script>
+
+<style scoped>
+/* Fade animation */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>
+```
+
+**AnimatedSwitch Props:**
+- `name` - transition name for CSS classes (default: `'fade'`)
+- `mode` - transition mode: `'out-in'`, `'in-out'` or `'default'` (default: `'out-in'`)
+- `location` - optional location override for routing
+
+#### Alternative Manual Transition Approach
+
+If you need more control, you can manually wrap `Switch` in `<Transition>`:
+
+```vue
+<template>
+  <Router>
+    <Transition name="fade" mode="out-in">
+      <Switch :key="location">
+        <Route path="/">
+          <HomePage />
+        </Route>
+        <Route path="/about">
+          <AboutPage />
+        </Route>
+      </Switch>
+    </Transition>
+  </Router>
+</template>
+
+<script setup>
+import { useLocation } from 'wouter-vue'
+
+const [location] = useLocation()
+</script>
+```
+
+**Example with slide transitions:**
+
+```vue
+<template>
+  <Router>
+    <div class="router-view">
+      <AnimatedSwitch :name="transitionName" mode="out-in">
+        <Route path="/page1">
+          <Page1 />
+        </Route>
+        <Route path="/page2">
+          <Page2 />
+        </Route>
+      </AnimatedSwitch>
+    </div>
+  </Router>
+</template>
+
+<script setup>
+import { ref, computed, watch } from 'vue'
+import { useLocation, AnimatedSwitch, Route } from 'wouter-vue'
+
+const [location] = useLocation()
+const previousLocation = ref(location.value)
+
+const transitionName = computed(() => {
+  const routes = ['/page1', '/page2']
+  const currentIndex = routes.indexOf(location.value)
+  const prevIndex = routes.indexOf(previousLocation.value)
+  
+  return currentIndex > prevIndex ? 'slide-left' : 'slide-right'
+})
+
+watch(() => location.value, (newLoc) => {
+  previousLocation.value = newLoc
+})
+</script>
+
+<style scoped>
+.router-view {
+  position: relative;
+  overflow: hidden;
+}
+
+.slide-left-enter-active,
+.slide-left-leave-active,
+.slide-right-enter-active,
+.slide-right-leave-active {
+  transition: transform 0.3s ease;
+}
+
+.slide-left-enter-from {
+  transform: translateX(100%);
+}
+
+.slide-left-leave-to {
+  transform: translateX(-100%);
+}
+
+.slide-right-enter-from {
+  transform: translateX(-100%);
+}
+
+.slide-right-leave-to {
+  transform: translateX(100%);
+}
+</style>
+```
+
+### Breadcrumbs
+
+Creating navigation breadcrumbs to display the current path:
+
+```vue
+<template>
+  <nav class="breadcrumbs">
+    <Link href="/">Home</Link>
+    <template v-for="(crumb, index) in crumbs" :key="index">
+      <span class="separator">/</span>
+      <Link :href="crumb.path">{{ crumb.name }}</Link>
+    </template>
+  </nav>
+</template>
+
+<script setup>
+import { computed } from 'vue'
+import { useLocation, Link } from 'wouter-vue'
+
+const [location] = useLocation()
+
+const crumbs = computed(() => {
+  const path = location.value
+  if (path === '/') return []
+  
+  const segments = path.split('/').filter(Boolean)
+  const crumbs = []
+  
+  let currentPath = ''
+  for (const segment of segments) {
+    currentPath += `/${segment}`
+    crumbs.push({
+      name: segment.charAt(0).toUpperCase() + segment.slice(1),
+      path: currentPath,
+    })
+  }
+  
+  return crumbs
+})
+</script>
+
+<style scoped>
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.separator {
+  color: #999;
+}
+</style>
+```
+
+**Advanced version with route metadata:**
+
+```vue
+<script setup>
+import { computed } from 'vue'
+import { useLocation, useRoute, Link } from 'wouter-vue'
+
+const [location] = useLocation()
+
+// Define metadata for your routes
+const routeMeta = {
+  '/': { title: 'Home' },
+  '/users': { title: 'Users' },
+  '/users/:id': { title: 'User Details' },
+  '/settings': { title: 'Settings' },
+}
+
+const crumbs = computed(() => {
+  const path = location.value
+  const segments = path.split('/').filter(Boolean)
+  const crumbs = [{ name: 'Home', path: '/' }]
+  
+  let currentPath = ''
+  for (const segment of segments) {
+    currentPath += `/${segment}`
+    
+    // Try to find exact match or pattern
+    let title = segment
+    for (const [pattern, meta] of Object.entries(routeMeta)) {
+      const regex = new RegExp('^' + pattern.replace(/:[^/]+/g, '[^/]+') + '$')
+      if (regex.test(currentPath)) {
+        title = meta.title
+        break
+      }
+    }
+    
+    crumbs.push({
+      name: title,
+      path: currentPath,
+    })
+  }
+  
+  return crumbs
+})
+</script>
+```
+
+### Dynamic Page Titles with useRouteData
+
+Set page titles dynamically using route data. This approach allows you to define titles directly in your route configuration and automatically update `document.title` when routes change.
+
+**Step 1: Define titles in route data**
+
+In your route configuration (`AppRoutes.vue` or similar):
+
+```vue
+<template>
+  <AnimatedSwitch name="fade" mode="out-in">
+    <Route path="/" :component="HomePage" :data="{ title: 'Home' }" />
+    <Route path="/about" :component="AboutPage" :data="{ title: 'About Us' }" />
+    <Route path="/users/:id" :component="UserDetailPage" :data="{ title: 'User Details' }" />
+  </AnimatedSwitch>
+</template>
+```
+
+**Step 2: Watch route data in App.vue**
+
+In your main `App.vue` component:
+
+```vue
+<template>
+  <Router>
+    <Navigation />
+    <main>
+      <AppRoutes />
+    </main>
+  </Router>
+</template>
+
+<script setup>
+import { watch } from 'vue';
+import { Router } from 'wouter-vue';
+import { useRouteData } from 'wouter-vue';
+import Navigation from './components/Navigation.vue';
+import AppRoutes from './components/AppRoutes.vue';
+
+const routeData = useRouteData();
+
+// Watch for route data changes and update document title
+watch(
+  () => routeData.value?.title,
+  (newTitle) => {
+    if (newTitle) {
+      document.title = `${newTitle} - My App`;
+    } else {
+      document.title = 'My App';
+    }
+  },
+  { immediate: true } // Update title immediately on mount
+);
+</script>
+```
+
+**Reactive titles with dynamic data:**
+
+For dynamic titles based on route parameters:
+
+```vue
+<script setup>
+import { computed, watch } from 'vue';
+import { useRouteData, useParams } from 'wouter-vue';
+
+const routeData = useRouteData();
+const params = useParams();
+
+// Create computed title that includes route params
+const pageTitle = computed(() => {
+  const baseTitle = routeData.value?.title || 'My App';
+  if (params.value.id) {
+    return `${baseTitle} - User ${params.value.id}`;
+  }
+  return baseTitle;
+});
+
+watch(pageTitle, (newTitle) => {
+  document.title = newTitle;
+}, { immediate: true });
+</script>
+```
+
+This approach provides a clean, declarative way to manage page titles that automatically updates when navigating between routes.
 
 ## Server-Side Rendering (SSR)
 
@@ -1043,7 +1705,7 @@ export default defineConfig({
 }
 ```
 
-## Code Splitting & Performance
+## Performance & Best Practices
 
 ### Async Component Loading
 
@@ -1096,7 +1758,94 @@ Use Vue's `<Suspense>` component to handle loading states:
 </template>
 ```
 
-### Performance Best Practices
+### ⚡ Performance and Best Practices
+
+wouter-vue's architecture is designed for maximum speed and minimal size. The key component for performance is `<Switch>`, which renders only the first matching route. To keep your application fast, it's important to understand how it works.
+
+`<Switch>` sequentially checks each child `<Route>` component from top to bottom and immediately stops after the first match. This means performance directly depends on two factors:
+
+1. **The number of child routes inside `<Switch>`**
+2. **The order of these routes**
+
+#### Best Practice #1: Prioritize Routes
+
+Always place the most frequently visited routes at the top of the list, and the least frequent ones (including the 404 page) at the bottom.
+
+```vue
+<template>
+  <Switch>
+    <!-- ✅ Good: most frequent routes at the top -->
+    <Route path="/" :component="HomePage" />
+    <Route path="/dashboard" :component="DashboardPage" />
+    
+    <!-- Less frequent -->
+    <Route path="/settings" :component="SettingsPage" />
+    
+    <!-- ❌ Bad: 404 route should be last -->
+    <Route :component="NotFoundPage" /> 
+  </Switch>
+</template>
+```
+
+#### Best Practice #2: Avoid Large v-for Loops (ANTIPATTERN)
+
+The most common source of performance issues is rendering a large list of routes through `v-for` inside `<Switch>`.
+
+```vue
+<template>
+  <!-- ☠️ ANTIPATTERN: DON'T DO THIS! -->
+  <!-- This creates 1000 child elements, matching will be slow -->
+  <Switch>
+    <Route v-for="item in bigList" :key="item.id" :path="`/items/${item.id}`" ... />
+  </Switch>
+</template>
+```
+
+On every URL change, `Switch` will be forced to iterate through up to 1000 elements. This is inefficient.
+
+#### Best Practice #3: Consolidate Routes with Parameters
+
+Instead of a large loop, use a single route with a dynamic parameter. This is the most efficient optimization approach.
+
+**Solution: Dispatcher Component**
+
+Replace the loop in `App.vue` with a single route:
+
+```vue
+<template>
+  <!-- ✅ OPTIMAL: one route instead of a thousand -->
+  <Switch>
+    <!-- ...other routes... -->
+    <Route path="/items/:id" :component="ItemDispatcher" />
+  </Switch>
+</template>
+```
+
+Create a dispatcher component (`ItemDispatcher.vue`) that will load the needed page:
+
+```vue
+<template>
+  <component :is="activeComponent" />
+</template>
+
+<script setup>
+import { computed, defineAsyncComponent } from 'vue';
+import { useParams } from 'wouter-vue';
+
+const params = useParams();
+
+const activeComponent = computed(() => {
+  const itemId = params.value.id;
+  // Lazy load component based on ID,
+  // preserving code-splitting.
+  return defineAsyncComponent(() => import(`./pages/items/ItemPage${itemId}.vue`));
+});
+</script>
+```
+
+This approach reduces the number of checks inside `<Switch>` from N to 1, ensuring nearly instant route matching regardless of list size, while preserving lazy loading and keeping the bundle size small.
+
+#### Additional Performance Tips
 
 1. **Use code splitting** - Lazy load route components
 2. **Minimize route matching** - Use `<Switch>` for exclusive routes
@@ -1549,6 +2298,56 @@ wouter-vue produces **3% smaller responses** on average, with a total library si
 - You need maximum ecosystem compatibility
 - Team familiarity is important
 - You require extensive third-party integrations
+
+## Caveats / Limitations
+
+wouter-vue is designed to be minimal and performant. As such, it intentionally omits some features that are available in more full-featured routers like vue-router. Understanding these limitations helps you make an informed decision:
+
+### What wouter-vue does NOT include:
+
+1. **Automatic Scroll Management**
+   - No automatic scroll restoration on navigation
+   - No scroll-to-top behavior
+   - You need to implement custom scroll handling if needed
+
+2. **Advanced Navigation Guards**
+   - No `beforeRouteEnter`, `beforeRouteLeave`, or `beforeRouteUpdate` hooks
+   - Basic route protection can be implemented using `watch` on `useLocation()` (see [Cookbook - Route Guards](#route-guards))
+   - For complex authorization logic, you may need wrapper components
+
+3. **Named Routes**
+   - Routes are defined by paths, not names
+   - Navigation must use path strings directly
+   - This is intentional to keep the API simple and bundle size small
+
+4. **Built-in Layout Components**
+   - No automatic layout nesting
+   - Layout components must be composed manually using `<Route>` nesting or wrapper components
+
+5. **Route Meta Fields**
+   - No built-in support for route metadata
+   - You can implement custom metadata using external configuration objects (see [Cookbook - Breadcrumbs](#breadcrumbs))
+
+6. **Dynamic Route Registration**
+   - Routes are defined statically in components
+   - No runtime route registration API
+   - All routes must be known at build time
+
+### Why these limitations?
+
+These features were intentionally excluded to:
+- Keep the bundle size minimal (< 4KB gzipped)
+- Maintain high performance (no extra overhead)
+- Provide a simpler, more predictable API
+- Allow developers to compose solutions that fit their specific needs
+
+### When you might need more:
+
+If you find yourself needing many of these features, vue-router might be a better fit for your project. wouter-vue is ideal when you value:
+- **Minimalism** over feature completeness
+- **Performance** over convenience
+- **Flexibility** over convention
+- **Small bundle size** over built-in utilities
 
 ## Contributing
 

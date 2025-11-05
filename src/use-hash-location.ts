@@ -1,5 +1,5 @@
 import { type Ref, ref, watchEffect } from 'vue'
-import { isSSR } from './helpers'
+import { isSSR } from './helpers/ssr-helpers'
 
 type Path = string
 

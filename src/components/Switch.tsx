@@ -4,20 +4,22 @@
  * Renders the first matching Route child component.
  */
 
-import type { ComputedRef } from 'vue'
-import { Fragment, h, unref } from 'vue'
-import type { Path } from '../../types/location-hook.d.js'
+import type { ComputedRef, VNodeChild } from 'vue'
+import { Fragment, h, unref, computed, provide as provideVue } from 'vue'
+import type { Path } from '../../types/location-hook'
 import {
   useLocationFromRouter,
   useRouter,
   defaultRouter,
   normalizeBooleanProp,
   matchRoute,
+  RouteDataKey,
+  type RouteDataInput,
 } from '../index'
 import type { ComponentSetupContext } from './types'
-import { useRouterValue, devWarn, resolveSlot } from '../helpers'
-
-type VNodeChild = unknown
+import { useRouterValue } from '../helpers/router-helpers'
+import { devWarn } from '../helpers/dev-helpers'
+import { resolveSlot } from '../helpers/vue-helpers'
 
 type VNodeElement = {
   type?: unknown
@@ -25,13 +27,16 @@ type VNodeElement = {
   children?: VNodeChild[]
 }
 
-const flattenChildren = (children: VNodeChild): VNodeChild[] => {
+const flattenChildren = (children: VNodeChild | null | undefined): VNodeChild[] => {
+  if (!children) {
+    return []
+  }
   if (Array.isArray(children)) {
     return children.flatMap((c: VNodeChild) => {
       if (c && typeof c === 'object' && 'type' in c && (c as VNodeElement).type === Fragment) {
         const element = c as VNodeElement
         const fragmentChildren = element.props?.children ?? element.children
-        return flattenChildren(fragmentChildren ?? [])
+        return flattenChildren(fragmentChildren as VNodeChild | null | undefined)
       }
       return c
     })
@@ -42,16 +47,20 @@ const flattenChildren = (children: VNodeChild): VNodeChild[] => {
 
 type SwitchProps = {
   location?: Path
+  data?: RouteDataInput
 }
 
 export const Switch = {
   name: 'Switch',
-  props: ['location'],
+  props: ['location', 'data'],
   setup(props: SwitchProps, { slots }: ComponentSetupContext): () => unknown {
     // Dev mode validation
     if (!slots.default) {
       devWarn('Switch', 'no default slot provided. Switch will not render anything.')
     }
+
+    // Provide reactive data context for children
+    provideVue(RouteDataKey, computed(() => unref(props.data) || {}))
 
     const router = useRouter()
     // Optimized: use type guard helper
@@ -61,7 +70,7 @@ export const Switch = {
     // Memoize flattened children to avoid re-flattening on each render
     // Note: children are reactive through slots, so we compute in render function
     // but cache the result when slots.default hasn't changed
-    let lastSlotResult: unknown = undefined
+    let lastSlotResult: unknown
     let lastFlattenedChildren: VNodeChild[] | null = null
 
     return () => {
@@ -76,7 +85,7 @@ export const Switch = {
       // Memoize: only re-flatten if slot result changed
       if (slotResult !== lastSlotResult) {
         lastSlotResult = slotResult
-        lastFlattenedChildren = flattenChildren(slotResult)
+        lastFlattenedChildren = flattenChildren(slotResult as VNodeChild)
       }
       const children = lastFlattenedChildren ?? []
       if (!children || children.length === 0) return null
@@ -90,11 +99,12 @@ export const Switch = {
         // Handle catch-all routes (no path prop)
         if (!path) {
           if (elementTyped.type && elementTyped.type !== Fragment) {
-            return elementTyped.children
+            const children = elementTyped.children
+            return children && Array.isArray(children) && children.length > 0
               ? h(
                   elementTyped.type as Parameters<typeof h>[0],
                   { ...elementTyped.props, match: [true, null] } as Record<string, unknown>,
-                  elementTyped.children as Parameters<typeof h>[2]
+                  children as Parameters<typeof h>[2]
                 )
               : h(
                   elementTyped.type as Parameters<typeof h>[0],

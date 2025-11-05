@@ -1,0 +1,7708 @@
+{
+  "documents": [
+    {
+      "id": "/api/components/animated-switch",
+      "path": "/api/components/animated-switch",
+      "title": "AnimatedSwitch",
+      "content": "AnimatedSwitch Wraps  with Vue  for animated route transitions.  Description  automatically triggers animations when routes change, providing smooth transitions between pages.  Props | Prop | Type | Default | Description | |------|------|---------|-------------| |  |  |  | Transition name for CSS classes | |  |  |  | Transition mode | |  |  |  | Override location for routing (optional) | |  |  |  | Base data object to pass to child routes (reactive) |  Usage Basic fade transition: Slide transition: With route data:  Transition Modes -  (default): Current route exits first, then new route enters - : New route enters first, then current route exits - : Both routes transition simultaneously  Notes - Uses Vue's  component under the hood - See Animated Route Transitions for more examples - See Hierarchical Data Passing for data prop details"
+    },
+    {
+      "id": "/api/components/link",
+      "path": "/api/components/link",
+      "title": "Link",
+      "content": "Link Creates a navigation link with active state support.  Description The  component creates a navigation link that updates the URL without a full page reload. It supports active state detection through scoped slots.  Props | Prop | Type | Default | Description | |------|------|---------|-------------| |  |  |  | Target path | |  |  |  | Alias for  | |  |  |  | Replace history entry instead of pushing | |  |  |  | Click handler | |  |  |  | Render as child element |  Usage Simple link: Active link with scoped slot: Link with replace: Relative link (for nested routes): Multiple classes:  Active State Detection The  value is  when: - The link's path exactly matches the current location - The link's path is a prefix of the current location (for nested routes)  Notes -  and  are aliases - use whichever you prefer - Active state is computed reactively and updates automatically - See Nested Routing for relative link examples"
+    },
+    {
+      "id": "/api/components/redirect",
+      "path": "/api/components/redirect",
+      "title": "Redirect",
+      "content": "Redirect Redirects to another path. In SSR mode, it automatically sets  to allow the server to send HTTP redirects.  Description The  component immediately redirects to the specified path when rendered. It's useful for: - Legacy route redirects - Authentication redirects - Default route redirects  Props | Prop | Type | Default | Description | |------|------|---------|-------------| |  |  |  | Target path to redirect to | |  |  |  | Alias for  | |  |  |  | Replace history entry instead of pushing |  Usage Simple redirect: Redirect with replace: SSR redirect: In SSR mode,  automatically sets the redirect status: On the server, this will trigger an HTTP redirect response.  Notes - Redirect happens immediately when the component renders - In SSR, redirects are handled automatically by the SSR context - See Server-Side Rendering for SSR details"
+    },
+    {
+      "id": "/api/components/route",
+      "path": "/api/components/route",
+      "title": "Route",
+      "content": "Route Match and render components based on URL patterns.  Description The  component matches the current location against a pattern and renders its content when matched. It supports both slot-based and component-based rendering.  Props | Prop | Type | Default | Description | |------|------|---------|-------------| |  |  |  | Route pattern to match (optional for catch-all) | |  |  |  | Vue component to render when matched | |  |  |  | Enable nested routing | |  |  |  | Data object to pass to component/slot (reactive) |  Usage Slot-based rendering: Component prop: With route data: Accessing params and data in slots: Nested routes: Catch-all route (404):  Accessing Props in Components When using , the component receives  and  as props:  Notes - Route patterns use path-to-regexp - See Route Pattern Matching for pattern examples - See Hierarchical Data Passing for data prop details - See Nested Routing for nested routing examples"
+    },
+    {
+      "id": "/api/components/router",
+      "path": "/api/components/router",
+      "title": "Router",
+      "content": "Router Optional router component that provides routing context for nested routes and SSR support.  Description The  component is optional - wouter-vue works without it for simple cases. However, it's recommended for: - Nested routing - Server-Side Rendering (SSR) - Custom location hooks - Advanced routing scenarios  Props | Prop | Type | Default | Description | |------|------|---------|-------------| |  |  |  | Custom location hook (optional) | |  |  |  | Initial path for SSR (optional) | |  |  |  | Initial search string for SSR (optional) |  Usage Basic usage: With SSR: With custom location hook:  Notes - Without , routes still work but nested routing may not function correctly - For SSR, always wrap your app with  and pass  and  props - See Custom Location Hooks for more information"
+    },
+    {
+      "id": "/api/components/switch",
+      "path": "/api/components/switch",
+      "title": "Switch",
+      "content": "Switch Render only the first matching route. Essential for performance optimization.  Description The  component checks routes sequentially and renders only the first matching route. This is crucial for performance when you have many routes, as it stops checking after the first match.  Props | Prop | Type | Default | Description | |------|------|---------|-------------| |  |  |  | Override location for routing (optional) | |  |  |  | Base data object to pass to child routes (reactive) |  Usage  Performance Best Practices ✅ Good: Prioritize frequent routes ❌ Bad: Avoid large v-for loops ✅ Good: Use dynamic parameters instead See Performance & Best Practices for detailed optimization strategies.  Data Passing Data passed to  is inherited by all child routes: See Hierarchical Data Passing for more details."
+    },
+    {
+      "id": "/api/composables/use-location",
+      "path": "/api/composables/use-location",
+      "title": "useLocation",
+      "content": "useLocation Get the current location and navigate programmatically.  Description Returns a tuple  where: -  is a reactive  containing the current pathname -  is a function to programmatically change the location  Returns  Example  Navigate Options The  function accepts an optional second parameter: -  - If , replaces current history entry instead of adding a new one (default: )"
+    },
+    {
+      "id": "/api/composables/use-params",
+      "path": "/api/composables/use-params",
+      "title": "useParams",
+      "content": "useParams Get route parameters from the current route.  Description Returns a reactive  containing all route parameters extracted from the current location. Parameters are automatically merged from parent routes when using nested routing.  Returns Where  is:  Important Note  always returns a reactive . Even if no route parameters are present, it returns , ensuring consistent reactivity behavior.  Example  Nested Routes When using nested routes, parameters are automatically merged:  Access via Props Route parameters are also available as props when using  prop:"
+    },
+    {
+      "id": "/api/composables/use-route-data",
+      "path": "/api/composables/use-route-data",
+      "title": "useRouteData",
+      "content": "useRouteData Access hierarchical route data passed from parent routes.  Description Returns a reactive  containing all route data merged hierarchically from parent  and  components.  Returns Where  is:  Data Merging Behavior Route data is merged hierarchically with child data overriding parent data:  Example  Access via Props Route data is also available as props when using  prop:  Reactive Updates Route data is fully reactive. Changes in parent routes automatically propagate to child components: See Hierarchical Data Passing for detailed information."
+    },
+    {
+      "id": "/api/composables/use-route",
+      "path": "/api/composables/use-route",
+      "title": "useRoute",
+      "content": "useRoute Check if the current location matches a route pattern.  Description Returns a tuple  where: -  is a reactive  indicating if the route matches -  is a reactive  containing extracted route parameters  Parameters -  - Route pattern to match against  Returns  Example  Notes - The pattern matching uses path-to-regexp - Supports all standard route patterns (named params, constraints, wildcards, etc.) - See Route Pattern Matching for detailed pattern examples"
+    },
+    {
+      "id": "/api/composables/use-router",
+      "path": "/api/composables/use-router",
+      "title": "useRouter",
+      "content": "useRouter Get the router instance for advanced operations.  Description Returns the router instance, which provides access to advanced routing operations like custom location hooks, programmatic navigation, and router configuration.  Returns  Example  Advanced Usage Most use cases are covered by other composables like  and . Use  when you need: - Custom location hooks - Direct access to router internals - Advanced subscription patterns  See Also - useLocation - For basic navigation - Custom Location Hooks - For custom routing behavior"
+    },
+    {
+      "id": "/api/composables/use-search-params",
+      "path": "/api/composables/use-search-params",
+      "title": "useSearchParams",
+      "content": "useSearchParams Get and manipulate URL search parameters.  Description Returns a tuple  where: -  is a reactive  containing parsed query parameters -  is a function to update search parameters  Returns  Example  setSearchParams Behavior - Setting a value:  - adds or updates the parameter - Removing a value:  - removes the parameter - Multiple parameters:  - updates multiple at once  Notes -  is the standard browser API - Changes to search params update the URL without page reload - All updates are reactive and trigger component updates"
+    },
+    {
+      "id": "/api/composables/use-search",
+      "path": "/api/composables/use-search",
+      "title": "useSearch",
+      "content": "useSearch Get the current URL search string (query string).  Description Returns a reactive  containing the current URL search string (everything after  in the URL).  Returns  Example  Parse Search Params To parse the search string into an object, use  instead:"
+    },
+    {
+      "id": "/contributing",
+      "path": "/contributing",
+      "title": "Contributing",
+      "content": "Contributing Contributions are welcome! Here's how to get started.  Development Setup  Code Style - Use Biome for formatting and linting - Follow Vue 3 Composition API patterns - Write tests for new features - Update documentation  Pull Request Process 1. Fork the repository 2. Create a feature branch 3. Make your changes 4. Add tests 5. Update documentation 6. Submit a pull request  Code of Conduct Be respectful and constructive in all interactions.  License Contributions are licensed under the MIT License."
+    },
+    {
+      "id": "/cookbook/animated-transitions",
+      "path": "/cookbook/animated-transitions",
+      "title": "Animated Route Transitions",
+      "content": "Animated Route Transitions Add smooth animations when navigating between routes.  Using AnimatedSwitch The  component simplifies animated transitions:  Transition Modes -  (default) - Current route exits first, then new route enters -  - New route enters first, then current route exits -  - Both routes transition simultaneously  Slide Transition  Manual Transition For more control, wrap  manually:  Notes -  uses Vue's  component - CSS transition classes follow Vue's naming convention - Use  to prevent layout shifts - See AnimatedSwitch API for details"
+    },
+    {
+      "id": "/cookbook/breadcrumbs",
+      "path": "/cookbook/breadcrumbs",
+      "title": "Breadcrumbs",
+      "content": "Breadcrumbs Create breadcrumb navigation using route parameters and data.  Basic Breadcrumbs  Using Route Data Pass breadcrumb information through route data:  Notes - Combine route parameters and data for flexible breadcrumbs - Use  to access hierarchical breadcrumb data - See Hierarchical Data Passing for more details"
+    },
+    {
+      "id": "/cookbook/dynamic-page-titles",
+      "path": "/cookbook/dynamic-page-titles",
+      "title": "Dynamic Page Titles",
+      "content": "Dynamic Page Titles Update  dynamically based on route data.  Using Route Data Define titles in route data:  Watch Route Data In , watch  to update :  With Dynamic Parameters Combine route data with parameters:  Notes - Use  with  for initial title update - Combine route data and parameters for dynamic titles - See Hierarchical Data Passing for more details"
+    },
+    {
+      "id": "/cookbook/route-guards",
+      "path": "/cookbook/route-guards",
+      "title": "Route Guards",
+      "content": "Route Guards Implement route protection using Vue's reactivity system and watchers.  Global Route Guard Watch location changes and redirect based on authentication:  Protected Route Component Create a reusable wrapper component: ProtectedRoute.vue:  Alternative with Conditional Rendering  Notes - Use  to monitor location changes - Use  component for programmatic redirects - Combine with  for route-specific permissions - See Hierarchical Data Passing for passing permissions through routes"
+    },
+    {
+      "id": "/core-concepts",
+      "path": "/core-concepts",
+      "title": "Core Concepts",
+      "content": "Core Concepts  Composition API First wouter-vue uses a composition-based routing approach that leverages Vue 3's Composition API: - No global router instance required - Each component can access routing through composables -  component is optional - provides context for nested routes and custom configuration - Uses Vue's reactivity system for automatic updates All routing functionality is available through composables that work seamlessly with Vue 3's Composition API:  Reactive Data Flow wouter-vue provides fully reactive routing with two main data flows: Route Parameters () - Route parameters extracted from URL patterns (e.g.,  → ) - Automatically merged from parent routes when using nested routing - Always returns a reactive  that updates when route changes Route Data ( /  prop) - Arbitrary data passed hierarchically through  →  → component - Automatically merged with child data overriding parent data - Fully reactive - changes propagate automatically through the routing tree - Accessible via props (for ) or  composable See Hierarchical Data Passing for detailed information on passing reactive data through routes."
+    },
+    {
+      "id": "/getting-started",
+      "path": "/getting-started",
+      "title": "Getting Started",
+      "content": "Getting Started Get up and running with wouter-vue in just a few minutes.  Quick Start That's it! You now have a working router with navigation and route matching.  What's Next? - Installation - Learn how to install wouter-vue - Core Concepts - Understand the fundamental concepts - API Reference - Explore the API - Examples - See real-world examples"
+    },
+    {
+      "id": "/guides/custom-location-hooks",
+      "path": "/guides/custom-location-hooks",
+      "title": "Custom Location Hooks",
+      "content": "Custom Location Hooks wouter-vue supports custom location hooks for different routing behaviors.  Hash-based Routing Use hash-based routing (e.g., ) instead of browser history: Example URLs: -  -   Memory Location (Testing) Use memory location for testing - routes don't affect browser history: Use cases: - Unit testing - Component testing - Storybook stories - Isolated routing scenarios  Creating Custom Hooks You can create custom location hooks by implementing the  interface: Example:  Notes - Default location hook is  (browser history API) - Hash location is useful for static hosting without server configuration - Memory location is perfect for testing environments"
+    },
+    {
+      "id": "/guides/hierarchical-data",
+      "path": "/guides/hierarchical-data",
+      "title": "Hierarchical Data Passing",
+      "content": "Hierarchical Data Passing wouter-vue provides a powerful mechanism for passing reactive data hierarchically through your routing tree.  The Problem How do you pass common data (theme, layout, permissions) to a group of pages without prop drilling?  The Solution Use the  prop on , , and  components to pass data down the routing tree.  Basic Usage Pass data from Switch: Override data in Route:  Reactive Data Flow Data is fully reactive. Changes in parent routes automatically propagate to child components: When  is called, all child components automatically receive updated data.  Accessing Data  Via Props (for )  Via  Composable  Data Merging Behavior Data is merged hierarchically with child properties overriding parent properties: - Data from  or  becomes the base for all child routes - Data from  merges with parent data, with child properties taking precedence - Merging is shallow - child properties completely replace parent properties with the same key  Nested Routes Data inheritance works seamlessly with nested routes:  Performance Considerations - Data merging is efficient - uses Vue's  for automatic reactivity - No performance impact for routes without data - Shallow merging keeps overhead minimal  Use Cases - Theme management - Pass theme to all pages - Layout configuration - Different layouts per route - Permissions - User permissions inherited by nested routes - Page metadata - Titles, descriptions, breadcrumbs - Feature flags - Enable/disable features per route See Dynamic Page Titles for a practical example."
+    },
+    {
+      "id": "/guides/nested-routing",
+      "path": "/guides/nested-routing",
+      "title": "Nested Routing",
+      "content": "Nested Routing Nested routes allow you to create hierarchical route structures with automatic parameter merging.  Basic Nested Routes Enable nested routing with the  prop: How it works: - Parent route matches  (e.g., ) - Child routes are relative to the parent match ( → ) - Parameters are automatically merged from parent to child  Accessing Parameters In child components: Via props:  Relative Links Use  prefix for relative links in nested routes:  Complex Nesting You can nest multiple levels: URL:  Params:   Notes - The  prop enables nested routing mode - Child routes are relative to the parent match - Parameters are automatically merged from parent to child - Use  prefix for relative links in nested routes"
+    },
+    {
+      "id": "/guides/route-patterns",
+      "path": "/guides/route-patterns",
+      "title": "Route Pattern Matching",
+      "content": "Route Pattern Matching wouter-vue uses path-to-regexp for route pattern matching, providing full support for advanced routing patterns.  Named Parameters Named parameters extract values from the URL into : Examples: -  matches  →  -  matches  →   Parameter Constraints Add constraints to validate parameter values: Syntax:  where  is a regex string. Common patterns: -  - digits only -  - lowercase letters -  - exactly 2 letters -  - exactly 4 digits  Wildcards Wildcard routes match multiple path segments: Notes: - Unnamed wildcard () is converted to  internally - Wildcard values are strings containing matched segments (e.g.,  for )  RegExp Paths For complex patterns requiring advanced regex features (lookaheads, alternation, etc.), use  objects: Important: Inside , use  constructor rather than literal , otherwise the Vue SFC parser may fail. When to use: - String patterns () - for simple constraints (cleaner, more readable) - RegExp - for complex patterns requiring advanced regex features  Pattern Features Supported features: - Named parameters -  matches a single segment - Wildcard parameters -  matches multiple segments - Parameter constraints -  with regex validation - Optional segments -  for optional parts - Custom delimiters - Configurable via parser options For more details, see the path-to-regexp documentation."
+    },
+    {
+      "id": "/",
+      "path": "/",
+      "title": "Wouter for Vue 3",
+      "content": "<div class=\"text-center mb-12\">  Wouter for Vue 3 wouter-vue is a minimal, high-performance router for Vue 3 (7.9KB gzipped, 17.5KB uncompressed) that relies on Composition API and provides an intuitive routing experience. </div>  Features - 📦 Minimal bundle size (7.9KB gzipped, 17.5KB uncompressed) - 72% smaller response size vs vue-router - ⚡ Outstanding performance - 72% higher throughput, handles 83% more requests - 🎯 Vue 3 Composition API - Fully reactive routing with TypeScript support - 🔧 Optional  - No top-level router required, works out of the box - 📦 Minimal dependencies (Vue 3 + path-to-regexp) - 🎨 Server-Side Rendering (SSR) - Full SSR support with Vite - 🗂️ Nested routing - Flexible route parameters and nested structures - 🔗 Active links - Scoped slot API for active state styling - 💾 TypeScript - Full type definitions included - 📊 Hierarchical & Reactive Data Passing - Pass data down routing tree with automatic merging  Performance Based on load testing with Artillery.io (3,300 virtual users, 200 routes, 6-minute duration): | Metric | wouter-vue | vue-router | Advantage | |--------|-----------|------------|-----------| | Throughput | 117 req/s | 68 req/s | +72% faster | | Total Requests | 36,300 | 19,800 | +83% more requests | | Latency (mean) | 0.9 ms | 0.6 ms | Comparable | | Latency (p50) | 1 ms | 1 ms | Same performance | Key Takeaway: wouter-vue processes 72% more requests per second (117 vs 68 req/s) with identical median latency (1ms) compared to vue-router, while handling nearly double the total requests (36,300 vs 19,800) in the same timeframe, making it ideal for high-traffic applications.  Quick Start  Installation Requirements: Vue 3.5.22 or higher  Next Steps - Getting Started - Learn the basics - API Reference - Explore all APIs - Guides - Advanced patterns and techniques - Cookbook - Practical examples and recipes  About wouter-vue is inspired by the original wouter router for React and Preact. The original wouter's minimalist philosophy, hook-based architecture, and elegant simplicity resonated strongly, leading to the creation of this Vue 3 adaptation. This project attempts to bring the same core principles and design philosophy to Vue's ecosystem: - Minimalist approach - Keep it tiny with minimal dependencies - Composition API first - Leverage Vue's reactivity system instead of React hooks - Optional Router - No mandatory top-level component - Familiar API - Similar components and patterns for easy migration - Performance focused - Small bundle size and efficient routing - Path-to-RegExp powered - Uses path-to-regexp for robust route matching with full pattern support - Hierarchical data passing - Pass reactive data down routing tree with automatic merging"
+    },
+    {
+      "id": "/installation",
+      "path": "/installation",
+      "title": "Installation",
+      "content": "Installation  Package Managers Choose your preferred package manager:  Requirements - Vue 3.5.22 or higher  What's Included wouter-vue comes with everything you need: - Core routing components (, , , , etc.) - Composition API hooks (, , , etc.) - Full TypeScript support - SSR utilities - Memory location for testing  Next Steps - Getting Started - Create your first route - Core Concepts - Learn the fundamentals"
+    },
+    {
+      "id": "/migration",
+      "path": "/migration",
+      "title": "Migration Guide",
+      "content": "Migration Guide Guide for migrating from vue-router to wouter-vue.  Key Differences | vue-router | wouter-vue | |------------|-----------| |  |  | |  |  | |  |  | |  |  | |  |  | | Route config array | Declarative  components |  Step-by-Step Migration  1. Install wouter-vue  2. Replace Router Before: After:  3. Replace Navigation Before: After:  4. Replace Route Matching Before: After:  Common Patterns See API Reference for full API documentation."
+    },
+    {
+      "id": "/performance",
+      "path": "/performance",
+      "title": "Performance & Best Practices",
+      "content": "Performance & Best Practices wouter-vue is designed for maximum performance. Follow these best practices.  Route Prioritization Always place most frequent routes first in :  Avoid Large v-for Loops ❌ Don't: ✅ Do: Use dynamic parameters instead of many routes.  Use Dispatcher Pattern Create a dispatcher component for dynamic routes: This reduces  checks from N to 1.  Performance Comparison Based on load testing (3,300 users, 200 routes): | Metric | wouter-vue | vue-router | |--------|-----------|------------| | Throughput | 117 req/s | 68 req/s | | Total Requests | 36,300 | 19,800 | | Latency (p50) | 1 ms | 1 ms | wouter-vue handles 72% more requests per second with identical latency.  Notes - Prioritize routes by frequency - Use dynamic parameters instead of loops - See Switch documentation for details"
+    },
+    {
+      "id": "/server-side-rendering",
+      "path": "/server-side-rendering",
+      "title": "Server-Side Rendering (SSR)",
+      "content": "Server-Side Rendering (SSR) wouter-vue supports full SSR with Vite.  Basic Setup entry-server.js: App.vue:  Vite Configuration  Redirect Handling  automatically sets SSR redirects:  Notes - Always wrap app with  for SSR - Pass  and  props to  - See full example for complete SSR setup"
+    },
+    {
+      "id": "/troubleshooting",
+      "path": "/troubleshooting",
+      "title": "Troubleshooting",
+      "content": "Troubleshooting Common issues and their solutions.  Routes Not Matching Problem: Routes don't match even though the URL looks correct. Solution: Check route pattern syntax: - Use  for named parameters - Use  for wildcards - Ensure  wraps routes correctly  Nested Routes Not Working Problem: Child routes don't match in nested structures. Solution: Ensure  prop is set:  SSR Issues Problem: Routes don't work on server. Solution: Always wrap with  and pass :  Data Not Reactive Problem: Route data doesn't update when parent changes. Solution: Ensure you're using  or :  Query Parameters Not Working Problem: Query parameters are empty on client-side hydration. Solution: This is fixed in latest version. Ensure you're using  correctly:  Need Help? - Check API Reference - See Examples - Open an issue on GitHub"
+    },
+    {
+      "id": "/typescript",
+      "path": "/typescript",
+      "title": "TypeScript",
+      "content": "TypeScript wouter-vue includes full TypeScript definitions.  Type Definitions All types are exported from :  Component Props Components accept typed props:  Composables Composables return typed values:  Type Checking Enable strict type checking in :  Notes - All types are included in the package - No  needed - Full IDE autocomplete support"
+    }
+  ],
+  "index": {
+    "documentCount": 31,
+    "nextId": 31,
+    "documentIds": {
+      "0": "/api/components/animated-switch",
+      "1": "/api/components/link",
+      "2": "/api/components/redirect",
+      "3": "/api/components/route",
+      "4": "/api/components/router",
+      "5": "/api/components/switch",
+      "6": "/api/composables/use-location",
+      "7": "/api/composables/use-params",
+      "8": "/api/composables/use-route-data",
+      "9": "/api/composables/use-route",
+      "10": "/api/composables/use-router",
+      "11": "/api/composables/use-search-params",
+      "12": "/api/composables/use-search",
+      "13": "/contributing",
+      "14": "/cookbook/animated-transitions",
+      "15": "/cookbook/breadcrumbs",
+      "16": "/cookbook/dynamic-page-titles",
+      "17": "/cookbook/route-guards",
+      "18": "/core-concepts",
+      "19": "/getting-started",
+      "20": "/guides/custom-location-hooks",
+      "21": "/guides/hierarchical-data",
+      "22": "/guides/nested-routing",
+      "23": "/guides/route-patterns",
+      "24": "/",
+      "25": "/installation",
+      "26": "/migration",
+      "27": "/performance",
+      "28": "/server-side-rendering",
+      "29": "/troubleshooting",
+      "30": "/typescript"
+    },
+    "fieldIds": {
+      "title": 0,
+      "content": 1
+    },
+    "fieldLength": {
+      "0": [
+        1,
+        76
+      ],
+      "1": [
+        1,
+        85
+      ],
+      "2": [
+        1,
+        68
+      ],
+      "3": [
+        1,
+        81
+      ],
+      "4": [
+        1,
+        74
+      ],
+      "5": [
+        1,
+        79
+      ],
+      "6": [
+        1,
+        40
+      ],
+      "7": [
+        1,
+        54
+      ],
+      "8": [
+        1,
+        53
+      ],
+      "9": [
+        1,
+        47
+      ],
+      "10": [
+        1,
+        51
+      ],
+      "11": [
+        1,
+        49
+      ],
+      "12": [
+        1,
+        28
+      ],
+      "13": [
+        1,
+        67
+      ],
+      "14": [
+        3,
+        57
+      ],
+      "15": [
+        1,
+        30
+      ],
+      "16": [
+        3,
+        37
+      ],
+      "17": [
+        2,
+        51
+      ],
+      "18": [
+        2,
+        102
+      ],
+      "19": [
+        2,
+        48
+      ],
+      "20": [
+        3,
+        62
+      ],
+      "21": [
+        3,
+        136
+      ],
+      "22": [
+        2,
+        64
+      ],
+      "23": [
+        3,
+        115
+      ],
+      "24": [
+        4,
+        259
+      ],
+      "25": [
+        1,
+        52
+      ],
+      "26": [
+        2,
+        38
+      ],
+      "27": [
+        3,
+        94
+      ],
+      "28": [
+        5,
+        35
+      ],
+      "29": [
+        1,
+        85
+      ],
+      "30": [
+        1,
+        38
+      ]
+    },
+    "averageFieldLength": [
+      1.7741935483870968,
+      69.51612903225806
+    ],
+    "storedFields": {
+      "0": {
+        "path": "/api/components/animated-switch",
+        "title": "AnimatedSwitch",
+        "content": "AnimatedSwitch Wraps  with Vue  for animated route transitions.  Description  automatically triggers animations when routes change, providing smooth transitions between pages.  Props | Prop | Type | Default | Description | |------|------|---------|-------------| |  |  |  | Transition name for CSS classes | |  |  |  | Transition mode | |  |  |  | Override location for routing (optional) | |  |  |  | Base data object to pass to child routes (reactive) |  Usage Basic fade transition: Slide transition: With route data:  Transition Modes -  (default): Current route exits first, then new route enters - : New route enters first, then current route exits - : Both routes transition simultaneously  Notes - Uses Vue's  component under the hood - See Animated Route Transitions for more examples - See Hierarchical Data Passing for data prop details"
+      },
+      "1": {
+        "path": "/api/components/link",
+        "title": "Link",
+        "content": "Link Creates a navigation link with active state support.  Description The  component creates a navigation link that updates the URL without a full page reload. It supports active state detection through scoped slots.  Props | Prop | Type | Default | Description | |------|------|---------|-------------| |  |  |  | Target path | |  |  |  | Alias for  | |  |  |  | Replace history entry instead of pushing | |  |  |  | Click handler | |  |  |  | Render as child element |  Usage Simple link: Active link with scoped slot: Link with replace: Relative link (for nested routes): Multiple classes:  Active State Detection The  value is  when: - The link's path exactly matches the current location - The link's path is a prefix of the current location (for nested routes)  Notes -  and  are aliases - use whichever you prefer - Active state is computed reactively and updates automatically - See Nested Routing for relative link examples"
+      },
+      "2": {
+        "path": "/api/components/redirect",
+        "title": "Redirect",
+        "content": "Redirect Redirects to another path. In SSR mode, it automatically sets  to allow the server to send HTTP redirects.  Description The  component immediately redirects to the specified path when rendered. It's useful for: - Legacy route redirects - Authentication redirects - Default route redirects  Props | Prop | Type | Default | Description | |------|------|---------|-------------| |  |  |  | Target path to redirect to | |  |  |  | Alias for  | |  |  |  | Replace history entry instead of pushing |  Usage Simple redirect: Redirect with replace: SSR redirect: In SSR mode,  automatically sets the redirect status: On the server, this will trigger an HTTP redirect response.  Notes - Redirect happens immediately when the component renders - In SSR, redirects are handled automatically by the SSR context - See Server-Side Rendering for SSR details"
+      },
+      "3": {
+        "path": "/api/components/route",
+        "title": "Route",
+        "content": "Route Match and render components based on URL patterns.  Description The  component matches the current location against a pattern and renders its content when matched. It supports both slot-based and component-based rendering.  Props | Prop | Type | Default | Description | |------|------|---------|-------------| |  |  |  | Route pattern to match (optional for catch-all) | |  |  |  | Vue component to render when matched | |  |  |  | Enable nested routing | |  |  |  | Data object to pass to component/slot (reactive) |  Usage Slot-based rendering: Component prop: With route data: Accessing params and data in slots: Nested routes: Catch-all route (404):  Accessing Props in Components When using , the component receives  and  as props:  Notes - Route patterns use path-to-regexp - See Route Pattern Matching for pattern examples - See Hierarchical Data Passing for data prop details - See Nested Routing for nested routing examples"
+      },
+      "4": {
+        "path": "/api/components/router",
+        "title": "Router",
+        "content": "Router Optional router component that provides routing context for nested routes and SSR support.  Description The  component is optional - wouter-vue works without it for simple cases. However, it's recommended for: - Nested routing - Server-Side Rendering (SSR) - Custom location hooks - Advanced routing scenarios  Props | Prop | Type | Default | Description | |------|------|---------|-------------| |  |  |  | Custom location hook (optional) | |  |  |  | Initial path for SSR (optional) | |  |  |  | Initial search string for SSR (optional) |  Usage Basic usage: With SSR: With custom location hook:  Notes - Without , routes still work but nested routing may not function correctly - For SSR, always wrap your app with  and pass  and  props - See Custom Location Hooks for more information"
+      },
+      "5": {
+        "path": "/api/components/switch",
+        "title": "Switch",
+        "content": "Switch Render only the first matching route. Essential for performance optimization.  Description The  component checks routes sequentially and renders only the first matching route. This is crucial for performance when you have many routes, as it stops checking after the first match.  Props | Prop | Type | Default | Description | |------|------|---------|-------------| |  |  |  | Override location for routing (optional) | |  |  |  | Base data object to pass to child routes (reactive) |  Usage  Performance Best Practices ✅ Good: Prioritize frequent routes ❌ Bad: Avoid large v-for loops ✅ Good: Use dynamic parameters instead See Performance & Best Practices for detailed optimization strategies.  Data Passing Data passed to  is inherited by all child routes: See Hierarchical Data Passing for more details."
+      },
+      "6": {
+        "path": "/api/composables/use-location",
+        "title": "useLocation",
+        "content": "useLocation Get the current location and navigate programmatically.  Description Returns a tuple  where: -  is a reactive  containing the current pathname -  is a function to programmatically change the location  Returns  Example  Navigate Options The  function accepts an optional second parameter: -  - If , replaces current history entry instead of adding a new one (default: )"
+      },
+      "7": {
+        "path": "/api/composables/use-params",
+        "title": "useParams",
+        "content": "useParams Get route parameters from the current route.  Description Returns a reactive  containing all route parameters extracted from the current location. Parameters are automatically merged from parent routes when using nested routing.  Returns Where  is:  Important Note  always returns a reactive . Even if no route parameters are present, it returns , ensuring consistent reactivity behavior.  Example  Nested Routes When using nested routes, parameters are automatically merged:  Access via Props Route parameters are also available as props when using  prop:"
+      },
+      "8": {
+        "path": "/api/composables/use-route-data",
+        "title": "useRouteData",
+        "content": "useRouteData Access hierarchical route data passed from parent routes.  Description Returns a reactive  containing all route data merged hierarchically from parent  and  components.  Returns Where  is:  Data Merging Behavior Route data is merged hierarchically with child data overriding parent data:  Example  Access via Props Route data is also available as props when using  prop:  Reactive Updates Route data is fully reactive. Changes in parent routes automatically propagate to child components: See Hierarchical Data Passing for detailed information."
+      },
+      "9": {
+        "path": "/api/composables/use-route",
+        "title": "useRoute",
+        "content": "useRoute Check if the current location matches a route pattern.  Description Returns a tuple  where: -  is a reactive  indicating if the route matches -  is a reactive  containing extracted route parameters  Parameters -  - Route pattern to match against  Returns  Example  Notes - The pattern matching uses path-to-regexp - Supports all standard route patterns (named params, constraints, wildcards, etc.) - See Route Pattern Matching for detailed pattern examples"
+      },
+      "10": {
+        "path": "/api/composables/use-router",
+        "title": "useRouter",
+        "content": "useRouter Get the router instance for advanced operations.  Description Returns the router instance, which provides access to advanced routing operations like custom location hooks, programmatic navigation, and router configuration.  Returns  Example  Advanced Usage Most use cases are covered by other composables like  and . Use  when you need: - Custom location hooks - Direct access to router internals - Advanced subscription patterns  See Also - useLocation - For basic navigation - Custom Location Hooks - For custom routing behavior"
+      },
+      "11": {
+        "path": "/api/composables/use-search-params",
+        "title": "useSearchParams",
+        "content": "useSearchParams Get and manipulate URL search parameters.  Description Returns a tuple  where: -  is a reactive  containing parsed query parameters -  is a function to update search parameters  Returns  Example  setSearchParams Behavior - Setting a value:  - adds or updates the parameter - Removing a value:  - removes the parameter - Multiple parameters:  - updates multiple at once  Notes -  is the standard browser API - Changes to search params update the URL without page reload - All updates are reactive and trigger component updates"
+      },
+      "12": {
+        "path": "/api/composables/use-search",
+        "title": "useSearch",
+        "content": "useSearch Get the current URL search string (query string).  Description Returns a reactive  containing the current URL search string (everything after  in the URL).  Returns  Example  Parse Search Params To parse the search string into an object, use  instead:"
+      },
+      "13": {
+        "path": "/contributing",
+        "title": "Contributing",
+        "content": "Contributing Contributions are welcome! Here's how to get started.  Development Setup  Code Style - Use Biome for formatting and linting - Follow Vue 3 Composition API patterns - Write tests for new features - Update documentation  Pull Request Process 1. Fork the repository 2. Create a feature branch 3. Make your changes 4. Add tests 5. Update documentation 6. Submit a pull request  Code of Conduct Be respectful and constructive in all interactions.  License Contributions are licensed under the MIT License."
+      },
+      "14": {
+        "path": "/cookbook/animated-transitions",
+        "title": "Animated Route Transitions",
+        "content": "Animated Route Transitions Add smooth animations when navigating between routes.  Using AnimatedSwitch The  component simplifies animated transitions:  Transition Modes -  (default) - Current route exits first, then new route enters -  - New route enters first, then current route exits -  - Both routes transition simultaneously  Slide Transition  Manual Transition For more control, wrap  manually:  Notes -  uses Vue's  component - CSS transition classes follow Vue's naming convention - Use  to prevent layout shifts - See AnimatedSwitch API for details"
+      },
+      "15": {
+        "path": "/cookbook/breadcrumbs",
+        "title": "Breadcrumbs",
+        "content": "Breadcrumbs Create breadcrumb navigation using route parameters and data.  Basic Breadcrumbs  Using Route Data Pass breadcrumb information through route data:  Notes - Combine route parameters and data for flexible breadcrumbs - Use  to access hierarchical breadcrumb data - See Hierarchical Data Passing for more details"
+      },
+      "16": {
+        "path": "/cookbook/dynamic-page-titles",
+        "title": "Dynamic Page Titles",
+        "content": "Dynamic Page Titles Update  dynamically based on route data.  Using Route Data Define titles in route data:  Watch Route Data In , watch  to update :  With Dynamic Parameters Combine route data with parameters:  Notes - Use  with  for initial title update - Combine route data and parameters for dynamic titles - See Hierarchical Data Passing for more details"
+      },
+      "17": {
+        "path": "/cookbook/route-guards",
+        "title": "Route Guards",
+        "content": "Route Guards Implement route protection using Vue's reactivity system and watchers.  Global Route Guard Watch location changes and redirect based on authentication:  Protected Route Component Create a reusable wrapper component: ProtectedRoute.vue:  Alternative with Conditional Rendering  Notes - Use  to monitor location changes - Use  component for programmatic redirects - Combine with  for route-specific permissions - See Hierarchical Data Passing for passing permissions through routes"
+      },
+      "18": {
+        "path": "/core-concepts",
+        "title": "Core Concepts",
+        "content": "Core Concepts  Composition API First wouter-vue uses a composition-based routing approach that leverages Vue 3's Composition API: - No global router instance required - Each component can access routing through composables -  component is optional - provides context for nested routes and custom configuration - Uses Vue's reactivity system for automatic updates All routing functionality is available through composables that work seamlessly with Vue 3's Composition API:  Reactive Data Flow wouter-vue provides fully reactive routing with two main data flows: Route Parameters () - Route parameters extracted from URL patterns (e.g.,  → ) - Automatically merged from parent routes when using nested routing - Always returns a reactive  that updates when route changes Route Data ( /  prop) - Arbitrary data passed hierarchically through  →  → component - Automatically merged with child data overriding parent data - Fully reactive - changes propagate automatically through the routing tree - Accessible via props (for ) or  composable See Hierarchical Data Passing for detailed information on passing reactive data through routes."
+      },
+      "19": {
+        "path": "/getting-started",
+        "title": "Getting Started",
+        "content": "Getting Started Get up and running with wouter-vue in just a few minutes.  Quick Start That's it! You now have a working router with navigation and route matching.  What's Next? - Installation - Learn how to install wouter-vue - Core Concepts - Understand the fundamental concepts - API Reference - Explore the API - Examples - See real-world examples"
+      },
+      "20": {
+        "path": "/guides/custom-location-hooks",
+        "title": "Custom Location Hooks",
+        "content": "Custom Location Hooks wouter-vue supports custom location hooks for different routing behaviors.  Hash-based Routing Use hash-based routing (e.g., ) instead of browser history: Example URLs: -  -   Memory Location (Testing) Use memory location for testing - routes don't affect browser history: Use cases: - Unit testing - Component testing - Storybook stories - Isolated routing scenarios  Creating Custom Hooks You can create custom location hooks by implementing the  interface: Example:  Notes - Default location hook is  (browser history API) - Hash location is useful for static hosting without server configuration - Memory location is perfect for testing environments"
+      },
+      "21": {
+        "path": "/guides/hierarchical-data",
+        "title": "Hierarchical Data Passing",
+        "content": "Hierarchical Data Passing wouter-vue provides a powerful mechanism for passing reactive data hierarchically through your routing tree.  The Problem How do you pass common data (theme, layout, permissions) to a group of pages without prop drilling?  The Solution Use the  prop on , , and  components to pass data down the routing tree.  Basic Usage Pass data from Switch: Override data in Route:  Reactive Data Flow Data is fully reactive. Changes in parent routes automatically propagate to child components: When  is called, all child components automatically receive updated data.  Accessing Data  Via Props (for )  Via  Composable  Data Merging Behavior Data is merged hierarchically with child properties overriding parent properties: - Data from  or  becomes the base for all child routes - Data from  merges with parent data, with child properties taking precedence - Merging is shallow - child properties completely replace parent properties with the same key  Nested Routes Data inheritance works seamlessly with nested routes:  Performance Considerations - Data merging is efficient - uses Vue's  for automatic reactivity - No performance impact for routes without data - Shallow merging keeps overhead minimal  Use Cases - Theme management - Pass theme to all pages - Layout configuration - Different layouts per route - Permissions - User permissions inherited by nested routes - Page metadata - Titles, descriptions, breadcrumbs - Feature flags - Enable/disable features per route See Dynamic Page Titles for a practical example."
+      },
+      "22": {
+        "path": "/guides/nested-routing",
+        "title": "Nested Routing",
+        "content": "Nested Routing Nested routes allow you to create hierarchical route structures with automatic parameter merging.  Basic Nested Routes Enable nested routing with the  prop: How it works: - Parent route matches  (e.g., ) - Child routes are relative to the parent match ( → ) - Parameters are automatically merged from parent to child  Accessing Parameters In child components: Via props:  Relative Links Use  prefix for relative links in nested routes:  Complex Nesting You can nest multiple levels: URL:  Params:   Notes - The  prop enables nested routing mode - Child routes are relative to the parent match - Parameters are automatically merged from parent to child - Use  prefix for relative links in nested routes"
+      },
+      "23": {
+        "path": "/guides/route-patterns",
+        "title": "Route Pattern Matching",
+        "content": "Route Pattern Matching wouter-vue uses path-to-regexp for route pattern matching, providing full support for advanced routing patterns.  Named Parameters Named parameters extract values from the URL into : Examples: -  matches  →  -  matches  →   Parameter Constraints Add constraints to validate parameter values: Syntax:  where  is a regex string. Common patterns: -  - digits only -  - lowercase letters -  - exactly 2 letters -  - exactly 4 digits  Wildcards Wildcard routes match multiple path segments: Notes: - Unnamed wildcard () is converted to  internally - Wildcard values are strings containing matched segments (e.g.,  for )  RegExp Paths For complex patterns requiring advanced regex features (lookaheads, alternation, etc.), use  objects: Important: Inside , use  constructor rather than literal , otherwise the Vue SFC parser may fail. When to use: - String patterns () - for simple constraints (cleaner, more readable) - RegExp - for complex patterns requiring advanced regex features  Pattern Features Supported features: - Named parameters -  matches a single segment - Wildcard parameters -  matches multiple segments - Parameter constraints -  with regex validation - Optional segments -  for optional parts - Custom delimiters - Configurable via parser options For more details, see the path-to-regexp documentation."
+      },
+      "24": {
+        "path": "/",
+        "title": "Wouter for Vue 3",
+        "content": "<div class=\"text-center mb-12\">  Wouter for Vue 3 wouter-vue is a minimal, high-performance router for Vue 3 (7.9KB gzipped, 17.5KB uncompressed) that relies on Composition API and provides an intuitive routing experience. </div>  Features - 📦 Minimal bundle size (7.9KB gzipped, 17.5KB uncompressed) - 72% smaller response size vs vue-router - ⚡ Outstanding performance - 72% higher throughput, handles 83% more requests - 🎯 Vue 3 Composition API - Fully reactive routing with TypeScript support - 🔧 Optional  - No top-level router required, works out of the box - 📦 Minimal dependencies (Vue 3 + path-to-regexp) - 🎨 Server-Side Rendering (SSR) - Full SSR support with Vite - 🗂️ Nested routing - Flexible route parameters and nested structures - 🔗 Active links - Scoped slot API for active state styling - 💾 TypeScript - Full type definitions included - 📊 Hierarchical & Reactive Data Passing - Pass data down routing tree with automatic merging  Performance Based on load testing with Artillery.io (3,300 virtual users, 200 routes, 6-minute duration): | Metric | wouter-vue | vue-router | Advantage | |--------|-----------|------------|-----------| | Throughput | 117 req/s | 68 req/s | +72% faster | | Total Requests | 36,300 | 19,800 | +83% more requests | | Latency (mean) | 0.9 ms | 0.6 ms | Comparable | | Latency (p50) | 1 ms | 1 ms | Same performance | Key Takeaway: wouter-vue processes 72% more requests per second (117 vs 68 req/s) with identical median latency (1ms) compared to vue-router, while handling nearly double the total requests (36,300 vs 19,800) in the same timeframe, making it ideal for high-traffic applications.  Quick Start  Installation Requirements: Vue 3.5.22 or higher  Next Steps - Getting Started - Learn the basics - API Reference - Explore all APIs - Guides - Advanced patterns and techniques - Cookbook - Practical examples and recipes  About wouter-vue is inspired by the original wouter router for React and Preact. The original wouter's minimalist philosophy, hook-based architecture, and elegant simplicity resonated strongly, leading to the creation of this Vue 3 adaptation. This project attempts to bring the same core principles and design philosophy to Vue's ecosystem: - Minimalist approach - Keep it tiny with minimal dependencies - Composition API first - Leverage Vue's reactivity system instead of React hooks - Optional Router - No mandatory top-level component - Familiar API - Similar components and patterns for easy migration - Performance focused - Small bundle size and efficient routing - Path-to-RegExp powered - Uses path-to-regexp for robust route matching with full pattern support - Hierarchical data passing - Pass reactive data down routing tree with automatic merging"
+      },
+      "25": {
+        "path": "/installation",
+        "title": "Installation",
+        "content": "Installation  Package Managers Choose your preferred package manager:  Requirements - Vue 3.5.22 or higher  What's Included wouter-vue comes with everything you need: - Core routing components (, , , , etc.) - Composition API hooks (, , , etc.) - Full TypeScript support - SSR utilities - Memory location for testing  Next Steps - Getting Started - Create your first route - Core Concepts - Learn the fundamentals"
+      },
+      "26": {
+        "path": "/migration",
+        "title": "Migration Guide",
+        "content": "Migration Guide Guide for migrating from vue-router to wouter-vue.  Key Differences | vue-router | wouter-vue | |------------|-----------| |  |  | |  |  | |  |  | |  |  | |  |  | | Route config array | Declarative  components |  Step-by-Step Migration  1. Install wouter-vue  2. Replace Router Before: After:  3. Replace Navigation Before: After:  4. Replace Route Matching Before: After:  Common Patterns See API Reference for full API documentation."
+      },
+      "27": {
+        "path": "/performance",
+        "title": "Performance & Best Practices",
+        "content": "Performance & Best Practices wouter-vue is designed for maximum performance. Follow these best practices.  Route Prioritization Always place most frequent routes first in :  Avoid Large v-for Loops ❌ Don't: ✅ Do: Use dynamic parameters instead of many routes.  Use Dispatcher Pattern Create a dispatcher component for dynamic routes: This reduces  checks from N to 1.  Performance Comparison Based on load testing (3,300 users, 200 routes): | Metric | wouter-vue | vue-router | |--------|-----------|------------| | Throughput | 117 req/s | 68 req/s | | Total Requests | 36,300 | 19,800 | | Latency (p50) | 1 ms | 1 ms | wouter-vue handles 72% more requests per second with identical latency.  Notes - Prioritize routes by frequency - Use dynamic parameters instead of loops - See Switch documentation for details"
+      },
+      "28": {
+        "path": "/server-side-rendering",
+        "title": "Server-Side Rendering (SSR)",
+        "content": "Server-Side Rendering (SSR) wouter-vue supports full SSR with Vite.  Basic Setup entry-server.js: App.vue:  Vite Configuration  Redirect Handling  automatically sets SSR redirects:  Notes - Always wrap app with  for SSR - Pass  and  props to  - See full example for complete SSR setup"
+      },
+      "29": {
+        "path": "/troubleshooting",
+        "title": "Troubleshooting",
+        "content": "Troubleshooting Common issues and their solutions.  Routes Not Matching Problem: Routes don't match even though the URL looks correct. Solution: Check route pattern syntax: - Use  for named parameters - Use  for wildcards - Ensure  wraps routes correctly  Nested Routes Not Working Problem: Child routes don't match in nested structures. Solution: Ensure  prop is set:  SSR Issues Problem: Routes don't work on server. Solution: Always wrap with  and pass :  Data Not Reactive Problem: Route data doesn't update when parent changes. Solution: Ensure you're using  or :  Query Parameters Not Working Problem: Query parameters are empty on client-side hydration. Solution: This is fixed in latest version. Ensure you're using  correctly:  Need Help? - Check API Reference - See Examples - Open an issue on GitHub"
+      },
+      "30": {
+        "path": "/typescript",
+        "title": "TypeScript",
+        "content": "TypeScript wouter-vue includes full TypeScript definitions.  Type Definitions All types are exported from :  Component Props Components accept typed props:  Composables Composables return typed values:  Type Checking Enable strict type checking in :  Notes - All types are included in the package - No  needed - Full IDE autocomplete support"
+      }
+    },
+    "dirtCount": 0,
+    "index": [
+      [
+        "js",
+        {
+          "1": {
+            "28": 1
+          }
+        }
+      ],
+      [
+        "just",
+        {
+          "1": {
+            "19": 1
+          }
+        }
+      ],
+      [
+        "9",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "9kb",
+        {
+          "1": {
+            "24": 2
+          }
+        }
+      ],
+      [
+        "0",
+        {
+          "1": {
+            "24": 2
+          }
+        }
+      ],
+      [
+        "800",
+        {
+          "1": {
+            "24": 2,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "83",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "🎨",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "🎯",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "+83",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "+72",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "+",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "📊",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "💾",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "🔗",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "🗂️",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "🔧",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "📦",
+        {
+          "1": {
+            "24": 2
+          }
+        }
+      ],
+      [
+        "⚡",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "<",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "<div",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "72",
+        {
+          "1": {
+            "24": 3,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "7",
+        {
+          "1": {
+            "24": 2
+          }
+        }
+      ],
+      [
+        ">",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "keep",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "keeps",
+        {
+          "1": {
+            "21": 1
+          }
+        }
+      ],
+      [
+        "key",
+        {
+          "1": {
+            "21": 1,
+            "24": 1,
+            "26": 1
+          }
+        }
+      ],
+      [
+        "quick",
+        {
+          "1": {
+            "19": 1,
+            "24": 1
+          }
+        }
+      ],
+      [
+        "query",
+        {
+          "1": {
+            "11": 1,
+            "12": 1,
+            "29": 2
+          }
+        }
+      ],
+      [
+        "→",
+        {
+          "1": {
+            "18": 3,
+            "22": 1,
+            "23": 2
+          }
+        }
+      ],
+      [
+        "68",
+        {
+          "1": {
+            "24": 2,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "6",
+        {
+          "1": {
+            "13": 1,
+            "24": 2
+          }
+        }
+      ],
+      [
+        "5kb",
+        {
+          "1": {
+            "24": 2
+          }
+        }
+      ],
+      [
+        "5",
+        {
+          "1": {
+            "13": 1,
+            "24": 1,
+            "25": 1
+          }
+        }
+      ],
+      [
+        "4",
+        {
+          "1": {
+            "13": 1,
+            "23": 1,
+            "26": 1
+          }
+        }
+      ],
+      [
+        "404",
+        {
+          "1": {
+            "3": 1
+          }
+        }
+      ],
+      [
+        "22",
+        {
+          "1": {
+            "24": 1,
+            "25": 1
+          }
+        }
+      ],
+      [
+        "200",
+        {
+          "1": {
+            "24": 1,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "2",
+        {
+          "1": {
+            "13": 1,
+            "23": 1,
+            "26": 1
+          }
+        }
+      ],
+      [
+        "1ms",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "19",
+        {
+          "1": {
+            "24": 2,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "117",
+        {
+          "1": {
+            "24": 2,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "17",
+        {
+          "1": {
+            "24": 2
+          }
+        }
+      ],
+      [
+        "12",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "1",
+        {
+          "1": {
+            "13": 1,
+            "24": 2,
+            "26": 1,
+            "27": 3
+          }
+        }
+      ],
+      [
+        "36",
+        {
+          "1": {
+            "24": 2,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "300",
+        {
+          "1": {
+            "24": 3,
+            "27": 2
+          }
+        }
+      ],
+      [
+        "3",
+        {
+          "0": {
+            "24": 1
+          },
+          "1": {
+            "13": 2,
+            "18": 2,
+            "24": 7,
+            "25": 1,
+            "26": 1,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "github",
+        {
+          "1": {
+            "29": 1
+          }
+        }
+      ],
+      [
+        "guide",
+        {
+          "0": {
+            "26": 1
+          },
+          "1": {
+            "26": 2
+          }
+        }
+      ],
+      [
+        "guides",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "guard",
+        {
+          "1": {
+            "17": 1
+          }
+        }
+      ],
+      [
+        "guards",
+        {
+          "0": {
+            "17": 1
+          },
+          "1": {
+            "17": 1
+          }
+        }
+      ],
+      [
+        "gzipped",
+        {
+          "1": {
+            "24": 2
+          }
+        }
+      ],
+      [
+        "group",
+        {
+          "1": {
+            "21": 1
+          }
+        }
+      ],
+      [
+        "g",
+        {
+          "1": {
+            "18": 1,
+            "20": 1,
+            "22": 1,
+            "23": 1
+          }
+        }
+      ],
+      [
+        "global",
+        {
+          "1": {
+            "17": 1,
+            "18": 1
+          }
+        }
+      ],
+      [
+        "getting",
+        {
+          "0": {
+            "19": 1
+          },
+          "1": {
+            "19": 1,
+            "24": 1,
+            "25": 1
+          }
+        }
+      ],
+      [
+        "get",
+        {
+          "1": {
+            "6": 1,
+            "7": 1,
+            "10": 1,
+            "11": 1,
+            "12": 1,
+            "13": 1,
+            "19": 1
+          }
+        }
+      ],
+      [
+        "good",
+        {
+          "1": {
+            "5": 2
+          }
+        }
+      ],
+      [
+        "❌",
+        {
+          "1": {
+            "5": 1,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "✅",
+        {
+          "1": {
+            "5": 2,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "your",
+        {
+          "1": {
+            "4": 1,
+            "13": 1,
+            "21": 1,
+            "25": 2
+          }
+        }
+      ],
+      [
+        "you",
+        {
+          "1": {
+            "1": 1,
+            "5": 1,
+            "10": 1,
+            "19": 1,
+            "20": 1,
+            "21": 1,
+            "22": 2,
+            "25": 1,
+            "29": 2
+          }
+        }
+      ],
+      [
+        "version",
+        {
+          "1": {
+            "29": 1
+          }
+        }
+      ],
+      [
+        "virtual",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "vite",
+        {
+          "1": {
+            "24": 1,
+            "28": 2
+          }
+        }
+      ],
+      [
+        "via",
+        {
+          "1": {
+            "7": 1,
+            "8": 1,
+            "18": 1,
+            "21": 2,
+            "22": 1,
+            "23": 1
+          }
+        }
+      ],
+      [
+        "vs",
+        {
+          "1": {
+            "24": 3
+          }
+        }
+      ],
+      [
+        "validation",
+        {
+          "1": {
+            "23": 1
+          }
+        }
+      ],
+      [
+        "validate",
+        {
+          "1": {
+            "23": 1
+          }
+        }
+      ],
+      [
+        "values",
+        {
+          "1": {
+            "23": 3,
+            "30": 1
+          }
+        }
+      ],
+      [
+        "value",
+        {
+          "1": {
+            "1": 1,
+            "11": 2
+          }
+        }
+      ],
+      [
+        "v",
+        {
+          "1": {
+            "5": 1,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "vue",
+        {
+          "0": {
+            "24": 1
+          },
+          "1": {
+            "0": 2,
+            "3": 1,
+            "4": 1,
+            "13": 1,
+            "14": 2,
+            "17": 2,
+            "18": 5,
+            "19": 2,
+            "20": 1,
+            "21": 2,
+            "23": 2,
+            "24": 15,
+            "25": 2,
+            "26": 5,
+            "27": 4,
+            "28": 2,
+            "30": 1
+          }
+        }
+      ],
+      [
+        "ms",
+        {
+          "1": {
+            "24": 4,
+            "27": 2
+          }
+        }
+      ],
+      [
+        "mb",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "median",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "mean",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "metric",
+        {
+          "1": {
+            "24": 1,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "metadata",
+        {
+          "1": {
+            "21": 1
+          }
+        }
+      ],
+      [
+        "mechanism",
+        {
+          "1": {
+            "21": 1
+          }
+        }
+      ],
+      [
+        "memory",
+        {
+          "1": {
+            "20": 3,
+            "25": 1
+          }
+        }
+      ],
+      [
+        "merges",
+        {
+          "1": {
+            "21": 1
+          }
+        }
+      ],
+      [
+        "merged",
+        {
+          "1": {
+            "7": 2,
+            "8": 2,
+            "18": 2,
+            "21": 1,
+            "22": 2
+          }
+        }
+      ],
+      [
+        "merging",
+        {
+          "1": {
+            "8": 1,
+            "21": 4,
+            "22": 1,
+            "24": 2
+          }
+        }
+      ],
+      [
+        "migrating",
+        {
+          "1": {
+            "26": 1
+          }
+        }
+      ],
+      [
+        "migration",
+        {
+          "0": {
+            "26": 1
+          },
+          "1": {
+            "24": 1,
+            "26": 2
+          }
+        }
+      ],
+      [
+        "minute",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "minutes",
+        {
+          "1": {
+            "19": 1
+          }
+        }
+      ],
+      [
+        "minimalist",
+        {
+          "1": {
+            "24": 2
+          }
+        }
+      ],
+      [
+        "minimal",
+        {
+          "1": {
+            "21": 1,
+            "24": 4
+          }
+        }
+      ],
+      [
+        "mit",
+        {
+          "1": {
+            "13": 1
+          }
+        }
+      ],
+      [
+        "maximum",
+        {
+          "1": {
+            "27": 1
+          }
+        }
+      ],
+      [
+        "making",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "make",
+        {
+          "1": {
+            "13": 1
+          }
+        }
+      ],
+      [
+        "main",
+        {
+          "1": {
+            "18": 1
+          }
+        }
+      ],
+      [
+        "manager",
+        {
+          "1": {
+            "25": 1
+          }
+        }
+      ],
+      [
+        "managers",
+        {
+          "1": {
+            "25": 1
+          }
+        }
+      ],
+      [
+        "management",
+        {
+          "1": {
+            "21": 1
+          }
+        }
+      ],
+      [
+        "mandatory",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "manually",
+        {
+          "1": {
+            "14": 1
+          }
+        }
+      ],
+      [
+        "manual",
+        {
+          "1": {
+            "14": 1
+          }
+        }
+      ],
+      [
+        "manipulate",
+        {
+          "1": {
+            "11": 1
+          }
+        }
+      ],
+      [
+        "many",
+        {
+          "1": {
+            "5": 1,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "may",
+        {
+          "1": {
+            "4": 1,
+            "23": 1
+          }
+        }
+      ],
+      [
+        "matching",
+        {
+          "0": {
+            "23": 1
+          },
+          "1": {
+            "3": 1,
+            "5": 2,
+            "9": 2,
+            "19": 1,
+            "23": 2,
+            "24": 1,
+            "26": 1,
+            "29": 1
+          }
+        }
+      ],
+      [
+        "matched",
+        {
+          "1": {
+            "3": 2,
+            "23": 1
+          }
+        }
+      ],
+      [
+        "matches",
+        {
+          "1": {
+            "1": 1,
+            "3": 1,
+            "9": 2,
+            "22": 1,
+            "23": 4
+          }
+        }
+      ],
+      [
+        "match",
+        {
+          "1": {
+            "3": 2,
+            "5": 1,
+            "9": 1,
+            "22": 2,
+            "23": 1,
+            "29": 2
+          }
+        }
+      ],
+      [
+        "multiple",
+        {
+          "1": {
+            "1": 1,
+            "11": 2,
+            "22": 1,
+            "23": 2
+          }
+        }
+      ],
+      [
+        "monitor",
+        {
+          "1": {
+            "17": 1
+          }
+        }
+      ],
+      [
+        "most",
+        {
+          "1": {
+            "10": 1,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "more",
+        {
+          "1": {
+            "0": 1,
+            "4": 1,
+            "5": 1,
+            "14": 1,
+            "15": 1,
+            "16": 1,
+            "23": 2,
+            "24": 3,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "modes",
+        {
+          "1": {
+            "0": 1,
+            "14": 1
+          }
+        }
+      ],
+      [
+        "mode",
+        {
+          "1": {
+            "0": 1,
+            "2": 2,
+            "22": 1
+          }
+        }
+      ],
+      [
+        "ide",
+        {
+          "1": {
+            "30": 1
+          }
+        }
+      ],
+      [
+        "ideal",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "identical",
+        {
+          "1": {
+            "24": 1,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "io",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "impact",
+        {
+          "1": {
+            "21": 1
+          }
+        }
+      ],
+      [
+        "implementing",
+        {
+          "1": {
+            "20": 1
+          }
+        }
+      ],
+      [
+        "implement",
+        {
+          "1": {
+            "17": 1
+          }
+        }
+      ],
+      [
+        "important",
+        {
+          "1": {
+            "7": 1,
+            "23": 1
+          }
+        }
+      ],
+      [
+        "immediately",
+        {
+          "1": {
+            "2": 2
+          }
+        }
+      ],
+      [
+        "if",
+        {
+          "1": {
+            "6": 1,
+            "7": 1,
+            "9": 2
+          }
+        }
+      ],
+      [
+        "includes",
+        {
+          "1": {
+            "30": 1
+          }
+        }
+      ],
+      [
+        "included",
+        {
+          "1": {
+            "24": 1,
+            "25": 1,
+            "30": 1
+          }
+        }
+      ],
+      [
+        "inspired",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "inside",
+        {
+          "1": {
+            "23": 1
+          }
+        }
+      ],
+      [
+        "install",
+        {
+          "1": {
+            "19": 1,
+            "26": 1
+          }
+        }
+      ],
+      [
+        "installation",
+        {
+          "0": {
+            "25": 1
+          },
+          "1": {
+            "19": 1,
+            "24": 1,
+            "25": 1
+          }
+        }
+      ],
+      [
+        "instance",
+        {
+          "1": {
+            "10": 2,
+            "18": 1
+          }
+        }
+      ],
+      [
+        "instead",
+        {
+          "1": {
+            "1": 1,
+            "2": 1,
+            "5": 1,
+            "6": 1,
+            "12": 1,
+            "20": 1,
+            "24": 1,
+            "27": 2
+          }
+        }
+      ],
+      [
+        "inheritance",
+        {
+          "1": {
+            "21": 1
+          }
+        }
+      ],
+      [
+        "inherited",
+        {
+          "1": {
+            "5": 1,
+            "21": 1
+          }
+        }
+      ],
+      [
+        "intuitive",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "internally",
+        {
+          "1": {
+            "23": 1
+          }
+        }
+      ],
+      [
+        "internals",
+        {
+          "1": {
+            "10": 1
+          }
+        }
+      ],
+      [
+        "interface",
+        {
+          "1": {
+            "20": 1
+          }
+        }
+      ],
+      [
+        "interactions",
+        {
+          "1": {
+            "13": 1
+          }
+        }
+      ],
+      [
+        "into",
+        {
+          "1": {
+            "12": 1,
+            "23": 1
+          }
+        }
+      ],
+      [
+        "indicating",
+        {
+          "1": {
+            "9": 1
+          }
+        }
+      ],
+      [
+        "information",
+        {
+          "1": {
+            "4": 1,
+            "8": 1,
+            "15": 1,
+            "18": 1
+          }
+        }
+      ],
+      [
+        "initial",
+        {
+          "1": {
+            "4": 2,
+            "16": 1
+          }
+        }
+      ],
+      [
+        "in",
+        {
+          "1": {
+            "2": 3,
+            "3": 2,
+            "8": 1,
+            "12": 1,
+            "13": 1,
+            "16": 2,
+            "19": 1,
+            "21": 2,
+            "22": 3,
+            "24": 1,
+            "27": 1,
+            "29": 2,
+            "30": 2
+          }
+        }
+      ],
+      [
+        "issue",
+        {
+          "1": {
+            "29": 1
+          }
+        }
+      ],
+      [
+        "issues",
+        {
+          "1": {
+            "29": 2
+          }
+        }
+      ],
+      [
+        "isolated",
+        {
+          "1": {
+            "20": 1
+          }
+        }
+      ],
+      [
+        "is",
+        {
+          "1": {
+            "1": 3,
+            "4": 1,
+            "5": 2,
+            "6": 2,
+            "7": 1,
+            "8": 4,
+            "9": 2,
+            "11": 3,
+            "18": 2,
+            "20": 3,
+            "21": 5,
+            "23": 2,
+            "24": 2,
+            "27": 1,
+            "29": 2
+          }
+        }
+      ],
+      [
+        "its",
+        {
+          "1": {
+            "3": 1
+          }
+        }
+      ],
+      [
+        "it",
+        {
+          "1": {
+            "1": 1,
+            "2": 2,
+            "3": 1,
+            "4": 2,
+            "5": 1,
+            "7": 1,
+            "19": 1,
+            "22": 1,
+            "24": 2
+          }
+        }
+      ],
+      [
+        "leading",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "learn",
+        {
+          "1": {
+            "19": 1,
+            "24": 1,
+            "25": 1
+          }
+        }
+      ],
+      [
+        "letters",
+        {
+          "1": {
+            "23": 2
+          }
+        }
+      ],
+      [
+        "leverage",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "leverages",
+        {
+          "1": {
+            "18": 1
+          }
+        }
+      ],
+      [
+        "level",
+        {
+          "1": {
+            "24": 2
+          }
+        }
+      ],
+      [
+        "levels",
+        {
+          "1": {
+            "22": 1
+          }
+        }
+      ],
+      [
+        "legacy",
+        {
+          "1": {
+            "2": 1
+          }
+        }
+      ],
+      [
+        "latest",
+        {
+          "1": {
+            "29": 1
+          }
+        }
+      ],
+      [
+        "latency",
+        {
+          "1": {
+            "24": 3,
+            "27": 2
+          }
+        }
+      ],
+      [
+        "layouts",
+        {
+          "1": {
+            "21": 1
+          }
+        }
+      ],
+      [
+        "layout",
+        {
+          "1": {
+            "14": 1,
+            "21": 2
+          }
+        }
+      ],
+      [
+        "large",
+        {
+          "1": {
+            "5": 1,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "literal",
+        {
+          "1": {
+            "23": 1
+          }
+        }
+      ],
+      [
+        "licensed",
+        {
+          "1": {
+            "13": 1
+          }
+        }
+      ],
+      [
+        "license",
+        {
+          "1": {
+            "13": 2
+          }
+        }
+      ],
+      [
+        "linting",
+        {
+          "1": {
+            "13": 1
+          }
+        }
+      ],
+      [
+        "links",
+        {
+          "1": {
+            "22": 3,
+            "24": 1
+          }
+        }
+      ],
+      [
+        "link",
+        {
+          "0": {
+            "1": 1
+          },
+          "1": {
+            "1": 10
+          }
+        }
+      ],
+      [
+        "like",
+        {
+          "1": {
+            "10": 2
+          }
+        }
+      ],
+      [
+        "load",
+        {
+          "1": {
+            "24": 1,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "looks",
+        {
+          "1": {
+            "29": 1
+          }
+        }
+      ],
+      [
+        "lookaheads",
+        {
+          "1": {
+            "23": 1
+          }
+        }
+      ],
+      [
+        "loops",
+        {
+          "1": {
+            "5": 1,
+            "27": 2
+          }
+        }
+      ],
+      [
+        "lowercase",
+        {
+          "1": {
+            "23": 1
+          }
+        }
+      ],
+      [
+        "location",
+        {
+          "0": {
+            "20": 1
+          },
+          "1": {
+            "0": 1,
+            "1": 2,
+            "3": 1,
+            "4": 4,
+            "5": 1,
+            "6": 2,
+            "7": 1,
+            "9": 1,
+            "10": 3,
+            "17": 2,
+            "20": 8,
+            "25": 1
+          }
+        }
+      ],
+      [
+        "help",
+        {
+          "1": {
+            "29": 1
+          }
+        }
+      ],
+      [
+        "here",
+        {
+          "1": {
+            "13": 1
+          }
+        }
+      ],
+      [
+        "hydration",
+        {
+          "1": {
+            "29": 1
+          }
+        }
+      ],
+      [
+        "hosting",
+        {
+          "1": {
+            "20": 1
+          }
+        }
+      ],
+      [
+        "how",
+        {
+          "1": {
+            "13": 1,
+            "19": 1,
+            "21": 1,
+            "22": 1
+          }
+        }
+      ],
+      [
+        "however",
+        {
+          "1": {
+            "4": 1
+          }
+        }
+      ],
+      [
+        "hook",
+        {
+          "1": {
+            "4": 2,
+            "20": 1,
+            "24": 1
+          }
+        }
+      ],
+      [
+        "hooks",
+        {
+          "0": {
+            "20": 1
+          },
+          "1": {
+            "4": 2,
+            "10": 3,
+            "20": 4,
+            "24": 1,
+            "25": 1
+          }
+        }
+      ],
+      [
+        "hood",
+        {
+          "1": {
+            "0": 1
+          }
+        }
+      ],
+      [
+        "handling",
+        {
+          "1": {
+            "24": 1,
+            "28": 1
+          }
+        }
+      ],
+      [
+        "handles",
+        {
+          "1": {
+            "24": 1,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "handled",
+        {
+          "1": {
+            "2": 1
+          }
+        }
+      ],
+      [
+        "handler",
+        {
+          "1": {
+            "1": 1
+          }
+        }
+      ],
+      [
+        "hash",
+        {
+          "1": {
+            "20": 3
+          }
+        }
+      ],
+      [
+        "have",
+        {
+          "1": {
+            "5": 1,
+            "19": 1
+          }
+        }
+      ],
+      [
+        "happens",
+        {
+          "1": {
+            "2": 1
+          }
+        }
+      ],
+      [
+        "http",
+        {
+          "1": {
+            "2": 2
+          }
+        }
+      ],
+      [
+        "higher",
+        {
+          "1": {
+            "24": 2,
+            "25": 1
+          }
+        }
+      ],
+      [
+        "high",
+        {
+          "1": {
+            "24": 2
+          }
+        }
+      ],
+      [
+        "history",
+        {
+          "1": {
+            "1": 1,
+            "2": 1,
+            "6": 1,
+            "20": 3
+          }
+        }
+      ],
+      [
+        "hierarchically",
+        {
+          "1": {
+            "8": 2,
+            "18": 1,
+            "21": 2
+          }
+        }
+      ],
+      [
+        "hierarchical",
+        {
+          "0": {
+            "21": 1
+          },
+          "1": {
+            "0": 1,
+            "3": 1,
+            "5": 1,
+            "8": 2,
+            "15": 2,
+            "16": 1,
+            "17": 1,
+            "18": 1,
+            "21": 1,
+            "22": 1,
+            "24": 2
+          }
+        }
+      ],
+      [
+        "utilities",
+        {
+          "1": {
+            "25": 1
+          }
+        }
+      ],
+      [
+        "uncompressed",
+        {
+          "1": {
+            "24": 2
+          }
+        }
+      ],
+      [
+        "unnamed",
+        {
+          "1": {
+            "23": 1
+          }
+        }
+      ],
+      [
+        "unit",
+        {
+          "1": {
+            "20": 1
+          }
+        }
+      ],
+      [
+        "understand",
+        {
+          "1": {
+            "19": 1
+          }
+        }
+      ],
+      [
+        "under",
+        {
+          "1": {
+            "0": 1,
+            "13": 1
+          }
+        }
+      ],
+      [
+        "up",
+        {
+          "1": {
+            "19": 1
+          }
+        }
+      ],
+      [
+        "updated",
+        {
+          "1": {
+            "21": 1
+          }
+        }
+      ],
+      [
+        "update",
+        {
+          "1": {
+            "11": 2,
+            "13": 2,
+            "16": 3,
+            "29": 1
+          }
+        }
+      ],
+      [
+        "updates",
+        {
+          "1": {
+            "1": 2,
+            "8": 1,
+            "11": 4,
+            "18": 2
+          }
+        }
+      ],
+      [
+        "urls",
+        {
+          "1": {
+            "20": 1
+          }
+        }
+      ],
+      [
+        "url",
+        {
+          "1": {
+            "1": 1,
+            "3": 1,
+            "11": 2,
+            "12": 3,
+            "18": 1,
+            "22": 1,
+            "23": 1,
+            "29": 1
+          }
+        }
+      ],
+      [
+        "using",
+        {
+          "1": {
+            "3": 1,
+            "7": 3,
+            "8": 1,
+            "14": 1,
+            "15": 2,
+            "16": 1,
+            "17": 1,
+            "18": 1,
+            "29": 2
+          }
+        }
+      ],
+      [
+        "users",
+        {
+          "1": {
+            "24": 1,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "user",
+        {
+          "1": {
+            "21": 1
+          }
+        }
+      ],
+      [
+        "userouter",
+        {
+          "0": {
+            "10": 1
+          },
+          "1": {
+            "10": 1
+          }
+        }
+      ],
+      [
+        "useroute",
+        {
+          "0": {
+            "9": 1
+          },
+          "1": {
+            "9": 1
+          }
+        }
+      ],
+      [
+        "useroutedata",
+        {
+          "0": {
+            "8": 1
+          },
+          "1": {
+            "8": 1
+          }
+        }
+      ],
+      [
+        "useparams",
+        {
+          "0": {
+            "7": 1
+          },
+          "1": {
+            "7": 1
+          }
+        }
+      ],
+      [
+        "uselocation",
+        {
+          "0": {
+            "6": 1
+          },
+          "1": {
+            "6": 1,
+            "10": 1
+          }
+        }
+      ],
+      [
+        "useful",
+        {
+          "1": {
+            "2": 1,
+            "20": 1
+          }
+        }
+      ],
+      [
+        "use",
+        {
+          "1": {
+            "1": 1,
+            "3": 1,
+            "5": 1,
+            "10": 2,
+            "12": 1,
+            "13": 1,
+            "14": 1,
+            "15": 1,
+            "16": 1,
+            "17": 2,
+            "20": 3,
+            "21": 2,
+            "22": 2,
+            "23": 3,
+            "27": 3,
+            "29": 2
+          }
+        }
+      ],
+      [
+        "usesearch",
+        {
+          "0": {
+            "12": 1
+          },
+          "1": {
+            "12": 1
+          }
+        }
+      ],
+      [
+        "usesearchparams",
+        {
+          "0": {
+            "11": 1
+          },
+          "1": {
+            "11": 1
+          }
+        }
+      ],
+      [
+        "uses",
+        {
+          "1": {
+            "0": 1,
+            "9": 1,
+            "14": 1,
+            "18": 2,
+            "21": 1,
+            "23": 1,
+            "24": 1
+          }
+        }
+      ],
+      [
+        "usage",
+        {
+          "1": {
+            "0": 1,
+            "1": 1,
+            "2": 1,
+            "3": 1,
+            "4": 2,
+            "5": 1,
+            "10": 1,
+            "21": 1
+          }
+        }
+      ],
+      [
+        "empty",
+        {
+          "1": {
+            "29": 1
+          }
+        }
+      ],
+      [
+        "easy",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "each",
+        {
+          "1": {
+            "18": 1
+          }
+        }
+      ],
+      [
+        "ecosystem",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "elegant",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "element",
+        {
+          "1": {
+            "1": 1
+          }
+        }
+      ],
+      [
+        "efficient",
+        {
+          "1": {
+            "21": 1,
+            "24": 1
+          }
+        }
+      ],
+      [
+        "e",
+        {
+          "1": {
+            "18": 1,
+            "20": 1,
+            "22": 1,
+            "23": 1
+          }
+        }
+      ],
+      [
+        "everything",
+        {
+          "1": {
+            "12": 1,
+            "25": 1
+          }
+        }
+      ],
+      [
+        "even",
+        {
+          "1": {
+            "7": 1,
+            "29": 1
+          }
+        }
+      ],
+      [
+        "etc",
+        {
+          "1": {
+            "9": 1,
+            "23": 1,
+            "25": 2
+          }
+        }
+      ],
+      [
+        "essential",
+        {
+          "1": {
+            "5": 1
+          }
+        }
+      ],
+      [
+        "ensure",
+        {
+          "1": {
+            "29": 4
+          }
+        }
+      ],
+      [
+        "ensuring",
+        {
+          "1": {
+            "7": 1
+          }
+        }
+      ],
+      [
+        "environments",
+        {
+          "1": {
+            "20": 1
+          }
+        }
+      ],
+      [
+        "enables",
+        {
+          "1": {
+            "22": 1
+          }
+        }
+      ],
+      [
+        "enable",
+        {
+          "1": {
+            "3": 1,
+            "21": 1,
+            "22": 1,
+            "30": 1
+          }
+        }
+      ],
+      [
+        "entry",
+        {
+          "1": {
+            "1": 1,
+            "2": 1,
+            "6": 1,
+            "28": 1
+          }
+        }
+      ],
+      [
+        "enters",
+        {
+          "1": {
+            "0": 2,
+            "14": 2
+          }
+        }
+      ],
+      [
+        "exported",
+        {
+          "1": {
+            "30": 1
+          }
+        }
+      ],
+      [
+        "experience",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "explore",
+        {
+          "1": {
+            "19": 1,
+            "24": 1
+          }
+        }
+      ],
+      [
+        "extract",
+        {
+          "1": {
+            "23": 1
+          }
+        }
+      ],
+      [
+        "extracted",
+        {
+          "1": {
+            "7": 1,
+            "9": 1,
+            "18": 1
+          }
+        }
+      ],
+      [
+        "example",
+        {
+          "1": {
+            "6": 1,
+            "7": 1,
+            "8": 1,
+            "9": 1,
+            "10": 1,
+            "11": 1,
+            "12": 1,
+            "20": 2,
+            "21": 1,
+            "28": 1
+          }
+        }
+      ],
+      [
+        "examples",
+        {
+          "1": {
+            "0": 1,
+            "1": 1,
+            "3": 2,
+            "9": 1,
+            "19": 2,
+            "23": 1,
+            "24": 1,
+            "29": 1
+          }
+        }
+      ],
+      [
+        "exactly",
+        {
+          "1": {
+            "1": 1,
+            "23": 2
+          }
+        }
+      ],
+      [
+        "exits",
+        {
+          "1": {
+            "0": 2,
+            "14": 2
+          }
+        }
+      ],
+      [
+        "n",
+        {
+          "1": {
+            "27": 1
+          }
+        }
+      ],
+      [
+        "now",
+        {
+          "1": {
+            "19": 1
+          }
+        }
+      ],
+      [
+        "no",
+        {
+          "1": {
+            "7": 1,
+            "18": 1,
+            "21": 1,
+            "24": 2,
+            "30": 1
+          }
+        }
+      ],
+      [
+        "note",
+        {
+          "1": {
+            "7": 1
+          }
+        }
+      ],
+      [
+        "notes",
+        {
+          "1": {
+            "0": 1,
+            "1": 1,
+            "2": 1,
+            "3": 1,
+            "4": 1,
+            "9": 1,
+            "11": 1,
+            "14": 1,
+            "15": 1,
+            "16": 1,
+            "17": 1,
+            "20": 1,
+            "22": 1,
+            "23": 1,
+            "27": 1,
+            "28": 1,
+            "30": 1
+          }
+        }
+      ],
+      [
+        "not",
+        {
+          "1": {
+            "4": 1,
+            "29": 4
+          }
+        }
+      ],
+      [
+        "nearly",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "nest",
+        {
+          "1": {
+            "22": 1
+          }
+        }
+      ],
+      [
+        "nesting",
+        {
+          "1": {
+            "22": 1
+          }
+        }
+      ],
+      [
+        "nested",
+        {
+          "0": {
+            "22": 1
+          },
+          "1": {
+            "1": 3,
+            "3": 4,
+            "4": 3,
+            "7": 3,
+            "18": 2,
+            "21": 3,
+            "22": 7,
+            "24": 2,
+            "29": 2
+          }
+        }
+      ],
+      [
+        "next",
+        {
+          "1": {
+            "19": 1,
+            "24": 1,
+            "25": 1
+          }
+        }
+      ],
+      [
+        "needed",
+        {
+          "1": {
+            "30": 1
+          }
+        }
+      ],
+      [
+        "need",
+        {
+          "1": {
+            "10": 1,
+            "25": 1,
+            "29": 1
+          }
+        }
+      ],
+      [
+        "new",
+        {
+          "1": {
+            "0": 2,
+            "6": 1,
+            "13": 1,
+            "14": 2
+          }
+        }
+      ],
+      [
+        "naming",
+        {
+          "1": {
+            "14": 1
+          }
+        }
+      ],
+      [
+        "named",
+        {
+          "1": {
+            "9": 1,
+            "23": 3,
+            "29": 1
+          }
+        }
+      ],
+      [
+        "name",
+        {
+          "1": {
+            "0": 1
+          }
+        }
+      ],
+      [
+        "navigating",
+        {
+          "1": {
+            "14": 1
+          }
+        }
+      ],
+      [
+        "navigation",
+        {
+          "1": {
+            "1": 2,
+            "10": 2,
+            "15": 1,
+            "19": 1,
+            "26": 1
+          }
+        }
+      ],
+      [
+        "navigate",
+        {
+          "1": {
+            "6": 2
+          }
+        }
+      ],
+      [
+        "small",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "smaller",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "smooth",
+        {
+          "1": {
+            "0": 1,
+            "14": 1
+          }
+        }
+      ],
+      [
+        "sfc",
+        {
+          "1": {
+            "23": 1
+          }
+        }
+      ],
+      [
+        "syntax",
+        {
+          "1": {
+            "23": 1,
+            "29": 1
+          }
+        }
+      ],
+      [
+        "system",
+        {
+          "1": {
+            "17": 1,
+            "18": 1,
+            "24": 1
+          }
+        }
+      ],
+      [
+        "same",
+        {
+          "1": {
+            "21": 1,
+            "24": 3
+          }
+        }
+      ],
+      [
+        "shallow",
+        {
+          "1": {
+            "21": 2
+          }
+        }
+      ],
+      [
+        "shifts",
+        {
+          "1": {
+            "14": 1
+          }
+        }
+      ],
+      [
+        "solutions",
+        {
+          "1": {
+            "29": 1
+          }
+        }
+      ],
+      [
+        "solution",
+        {
+          "1": {
+            "21": 1,
+            "29": 5
+          }
+        }
+      ],
+      [
+        "specific",
+        {
+          "1": {
+            "17": 1
+          }
+        }
+      ],
+      [
+        "specified",
+        {
+          "1": {
+            "2": 1
+          }
+        }
+      ],
+      [
+        "submit",
+        {
+          "1": {
+            "13": 1
+          }
+        }
+      ],
+      [
+        "subscription",
+        {
+          "1": {
+            "10": 1
+          }
+        }
+      ],
+      [
+        "supported",
+        {
+          "1": {
+            "23": 1
+          }
+        }
+      ],
+      [
+        "supports",
+        {
+          "1": {
+            "1": 1,
+            "3": 1,
+            "9": 1,
+            "20": 1,
+            "28": 1
+          }
+        }
+      ],
+      [
+        "support",
+        {
+          "1": {
+            "1": 1,
+            "4": 1,
+            "23": 1,
+            "24": 3,
+            "25": 1,
+            "30": 1
+          }
+        }
+      ],
+      [
+        "switch",
+        {
+          "0": {
+            "5": 1
+          },
+          "1": {
+            "5": 1,
+            "21": 1,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "step",
+        {
+          "1": {
+            "26": 2
+          }
+        }
+      ],
+      [
+        "steps",
+        {
+          "1": {
+            "24": 1,
+            "25": 1
+          }
+        }
+      ],
+      [
+        "styling",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "style",
+        {
+          "1": {
+            "13": 1
+          }
+        }
+      ],
+      [
+        "stories",
+        {
+          "1": {
+            "20": 1
+          }
+        }
+      ],
+      [
+        "storybook",
+        {
+          "1": {
+            "20": 1
+          }
+        }
+      ],
+      [
+        "stops",
+        {
+          "1": {
+            "5": 1
+          }
+        }
+      ],
+      [
+        "start",
+        {
+          "1": {
+            "19": 1,
+            "24": 1
+          }
+        }
+      ],
+      [
+        "started",
+        {
+          "0": {
+            "19": 1
+          },
+          "1": {
+            "13": 1,
+            "19": 1,
+            "24": 1,
+            "25": 1
+          }
+        }
+      ],
+      [
+        "standard",
+        {
+          "1": {
+            "9": 1,
+            "11": 1
+          }
+        }
+      ],
+      [
+        "static",
+        {
+          "1": {
+            "20": 1
+          }
+        }
+      ],
+      [
+        "status",
+        {
+          "1": {
+            "2": 1
+          }
+        }
+      ],
+      [
+        "state",
+        {
+          "1": {
+            "1": 4,
+            "24": 1
+          }
+        }
+      ],
+      [
+        "strict",
+        {
+          "1": {
+            "30": 1
+          }
+        }
+      ],
+      [
+        "strings",
+        {
+          "1": {
+            "23": 1
+          }
+        }
+      ],
+      [
+        "string",
+        {
+          "1": {
+            "4": 1,
+            "12": 4,
+            "23": 2
+          }
+        }
+      ],
+      [
+        "strongly",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "structures",
+        {
+          "1": {
+            "22": 1,
+            "24": 1,
+            "29": 1
+          }
+        }
+      ],
+      [
+        "strategies",
+        {
+          "1": {
+            "5": 1
+          }
+        }
+      ],
+      [
+        "still",
+        {
+          "1": {
+            "4": 1
+          }
+        }
+      ],
+      [
+        "scenarios",
+        {
+          "1": {
+            "4": 1,
+            "20": 1
+          }
+        }
+      ],
+      [
+        "scoped",
+        {
+          "1": {
+            "1": 2,
+            "24": 1
+          }
+        }
+      ],
+      [
+        "size",
+        {
+          "1": {
+            "24": 3
+          }
+        }
+      ],
+      [
+        "single",
+        {
+          "1": {
+            "23": 1
+          }
+        }
+      ],
+      [
+        "side",
+        {
+          "0": {
+            "28": 1
+          },
+          "1": {
+            "2": 1,
+            "4": 1,
+            "24": 1,
+            "28": 1,
+            "29": 1
+          }
+        }
+      ],
+      [
+        "similar",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "simplicity",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "simplifies",
+        {
+          "1": {
+            "14": 1
+          }
+        }
+      ],
+      [
+        "simple",
+        {
+          "1": {
+            "1": 1,
+            "2": 1,
+            "4": 1,
+            "23": 1
+          }
+        }
+      ],
+      [
+        "simultaneously",
+        {
+          "1": {
+            "0": 1,
+            "14": 1
+          }
+        }
+      ],
+      [
+        "segment",
+        {
+          "1": {
+            "23": 1
+          }
+        }
+      ],
+      [
+        "segments",
+        {
+          "1": {
+            "23": 4
+          }
+        }
+      ],
+      [
+        "seamlessly",
+        {
+          "1": {
+            "18": 1,
+            "21": 1
+          }
+        }
+      ],
+      [
+        "search",
+        {
+          "1": {
+            "4": 1,
+            "11": 3,
+            "12": 4
+          }
+        }
+      ],
+      [
+        "set",
+        {
+          "1": {
+            "29": 1
+          }
+        }
+      ],
+      [
+        "setup",
+        {
+          "1": {
+            "13": 1,
+            "28": 2
+          }
+        }
+      ],
+      [
+        "setting",
+        {
+          "1": {
+            "11": 1
+          }
+        }
+      ],
+      [
+        "setsearchparams",
+        {
+          "1": {
+            "11": 1
+          }
+        }
+      ],
+      [
+        "sets",
+        {
+          "1": {
+            "2": 2,
+            "28": 1
+          }
+        }
+      ],
+      [
+        "second",
+        {
+          "1": {
+            "6": 1,
+            "24": 1,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "sequentially",
+        {
+          "1": {
+            "5": 1
+          }
+        }
+      ],
+      [
+        "send",
+        {
+          "1": {
+            "2": 1
+          }
+        }
+      ],
+      [
+        "server",
+        {
+          "0": {
+            "28": 1
+          },
+          "1": {
+            "2": 3,
+            "4": 1,
+            "20": 1,
+            "24": 1,
+            "28": 2,
+            "29": 1
+          }
+        }
+      ],
+      [
+        "see",
+        {
+          "1": {
+            "0": 2,
+            "1": 1,
+            "2": 1,
+            "3": 3,
+            "4": 1,
+            "5": 2,
+            "8": 1,
+            "9": 1,
+            "10": 1,
+            "14": 1,
+            "15": 1,
+            "16": 1,
+            "17": 1,
+            "18": 1,
+            "19": 1,
+            "21": 1,
+            "23": 1,
+            "26": 1,
+            "27": 1,
+            "28": 1,
+            "29": 1
+          }
+        }
+      ],
+      [
+        "ssr",
+        {
+          "0": {
+            "28": 1
+          },
+          "1": {
+            "2": 6,
+            "4": 6,
+            "24": 2,
+            "25": 1,
+            "28": 5,
+            "29": 1
+          }
+        }
+      ],
+      [
+        "slot",
+        {
+          "1": {
+            "1": 1,
+            "3": 3,
+            "24": 1
+          }
+        }
+      ],
+      [
+        "slots",
+        {
+          "1": {
+            "1": 1,
+            "3": 1
+          }
+        }
+      ],
+      [
+        "slide",
+        {
+          "1": {
+            "0": 1,
+            "14": 1
+          }
+        }
+      ],
+      [
+        "s",
+        {
+          "1": {
+            "0": 1,
+            "1": 2,
+            "2": 1,
+            "4": 1,
+            "13": 1,
+            "14": 2,
+            "17": 1,
+            "18": 3,
+            "19": 2,
+            "21": 1,
+            "24": 6,
+            "25": 1,
+            "27": 2
+          }
+        }
+      ],
+      [
+        "fixed",
+        {
+          "1": {
+            "29": 1
+          }
+        }
+      ],
+      [
+        "first",
+        {
+          "1": {
+            "0": 2,
+            "5": 3,
+            "14": 2,
+            "18": 1,
+            "24": 1,
+            "25": 1,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "familiar",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "faster",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "fail",
+        {
+          "1": {
+            "23": 1
+          }
+        }
+      ],
+      [
+        "fade",
+        {
+          "1": {
+            "0": 1
+          }
+        }
+      ],
+      [
+        "few",
+        {
+          "1": {
+            "19": 1
+          }
+        }
+      ],
+      [
+        "feature",
+        {
+          "1": {
+            "13": 1,
+            "21": 1
+          }
+        }
+      ],
+      [
+        "features",
+        {
+          "1": {
+            "13": 1,
+            "21": 1,
+            "23": 4,
+            "24": 1
+          }
+        }
+      ],
+      [
+        "flags",
+        {
+          "1": {
+            "21": 1
+          }
+        }
+      ],
+      [
+        "flows",
+        {
+          "1": {
+            "18": 1
+          }
+        }
+      ],
+      [
+        "flow",
+        {
+          "1": {
+            "18": 1,
+            "21": 1
+          }
+        }
+      ],
+      [
+        "flexible",
+        {
+          "1": {
+            "15": 1,
+            "24": 1
+          }
+        }
+      ],
+      [
+        "focused",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "follow",
+        {
+          "1": {
+            "13": 1,
+            "14": 1,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "fork",
+        {
+          "1": {
+            "13": 1
+          }
+        }
+      ],
+      [
+        "formatting",
+        {
+          "1": {
+            "13": 1
+          }
+        }
+      ],
+      [
+        "for",
+        {
+          "0": {
+            "24": 1
+          },
+          "1": {
+            "0": 5,
+            "1": 4,
+            "2": 3,
+            "3": 4,
+            "4": 7,
+            "5": 6,
+            "8": 1,
+            "9": 1,
+            "10": 3,
+            "13": 2,
+            "14": 2,
+            "15": 2,
+            "16": 3,
+            "17": 3,
+            "18": 4,
+            "20": 4,
+            "21": 6,
+            "22": 2,
+            "23": 8,
+            "24": 7,
+            "25": 1,
+            "26": 2,
+            "27": 4,
+            "28": 2,
+            "29": 2
+          }
+        }
+      ],
+      [
+        "frequency",
+        {
+          "1": {
+            "27": 1
+          }
+        }
+      ],
+      [
+        "frequent",
+        {
+          "1": {
+            "5": 1,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "from",
+        {
+          "1": {
+            "7": 3,
+            "8": 2,
+            "18": 2,
+            "21": 3,
+            "22": 2,
+            "23": 1,
+            "26": 1,
+            "27": 1,
+            "30": 1
+          }
+        }
+      ],
+      [
+        "fundamentals",
+        {
+          "1": {
+            "25": 1
+          }
+        }
+      ],
+      [
+        "fundamental",
+        {
+          "1": {
+            "19": 1
+          }
+        }
+      ],
+      [
+        "functionality",
+        {
+          "1": {
+            "18": 1
+          }
+        }
+      ],
+      [
+        "function",
+        {
+          "1": {
+            "4": 1,
+            "6": 2,
+            "11": 1
+          }
+        }
+      ],
+      [
+        "fully",
+        {
+          "1": {
+            "8": 1,
+            "18": 2,
+            "21": 1,
+            "24": 1
+          }
+        }
+      ],
+      [
+        "full",
+        {
+          "1": {
+            "1": 1,
+            "23": 1,
+            "24": 3,
+            "25": 1,
+            "26": 1,
+            "28": 2,
+            "30": 2
+          }
+        }
+      ],
+      [
+        "robust",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "routing",
+        {
+          "0": {
+            "22": 1
+          },
+          "1": {
+            "0": 1,
+            "1": 1,
+            "3": 3,
+            "4": 4,
+            "5": 1,
+            "7": 1,
+            "10": 2,
+            "18": 6,
+            "20": 4,
+            "21": 2,
+            "22": 3,
+            "23": 1,
+            "24": 6,
+            "25": 1
+          }
+        }
+      ],
+      [
+        "router",
+        {
+          "0": {
+            "4": 1
+          },
+          "1": {
+            "4": 2,
+            "10": 4,
+            "18": 1,
+            "19": 1,
+            "24": 7,
+            "26": 3,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "routes",
+        {
+          "1": {
+            "0": 3,
+            "1": 2,
+            "3": 1,
+            "4": 2,
+            "5": 5,
+            "7": 3,
+            "8": 2,
+            "14": 2,
+            "17": 1,
+            "18": 3,
+            "20": 1,
+            "21": 6,
+            "22": 6,
+            "23": 1,
+            "24": 1,
+            "27": 5,
+            "29": 6
+          }
+        }
+      ],
+      [
+        "route",
+        {
+          "0": {
+            "3": 1,
+            "14": 1,
+            "17": 1,
+            "23": 1
+          },
+          "1": {
+            "0": 7,
+            "2": 2,
+            "3": 6,
+            "5": 2,
+            "7": 5,
+            "8": 5,
+            "9": 6,
+            "14": 5,
+            "15": 4,
+            "16": 6,
+            "17": 5,
+            "18": 4,
+            "19": 1,
+            "21": 3,
+            "22": 2,
+            "23": 2,
+            "24": 2,
+            "25": 1,
+            "26": 2,
+            "27": 1,
+            "29": 2
+          }
+        }
+      ],
+      [
+        "rather",
+        {
+          "1": {
+            "23": 1
+          }
+        }
+      ],
+      [
+        "running",
+        {
+          "1": {
+            "19": 1
+          }
+        }
+      ],
+      [
+        "return",
+        {
+          "1": {
+            "30": 1
+          }
+        }
+      ],
+      [
+        "returns",
+        {
+          "1": {
+            "6": 2,
+            "7": 4,
+            "8": 2,
+            "9": 2,
+            "10": 2,
+            "11": 2,
+            "12": 2,
+            "18": 1
+          }
+        }
+      ],
+      [
+        "re",
+        {
+          "1": {
+            "29": 2
+          }
+        }
+      ],
+      [
+        "reduces",
+        {
+          "1": {
+            "27": 1
+          }
+        }
+      ],
+      [
+        "redirects",
+        {
+          "1": {
+            "2": 7,
+            "17": 1,
+            "28": 1
+          }
+        }
+      ],
+      [
+        "redirect",
+        {
+          "0": {
+            "2": 1
+          },
+          "1": {
+            "2": 8,
+            "17": 1,
+            "28": 1
+          }
+        }
+      ],
+      [
+        "resonated",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "respectful",
+        {
+          "1": {
+            "13": 1
+          }
+        }
+      ],
+      [
+        "response",
+        {
+          "1": {
+            "2": 1,
+            "24": 1
+          }
+        }
+      ],
+      [
+        "req",
+        {
+          "1": {
+            "24": 3,
+            "27": 2
+          }
+        }
+      ],
+      [
+        "requirements",
+        {
+          "1": {
+            "24": 1,
+            "25": 1
+          }
+        }
+      ],
+      [
+        "required",
+        {
+          "1": {
+            "18": 1,
+            "24": 1
+          }
+        }
+      ],
+      [
+        "requiring",
+        {
+          "1": {
+            "23": 2
+          }
+        }
+      ],
+      [
+        "requests",
+        {
+          "1": {
+            "24": 5,
+            "27": 2
+          }
+        }
+      ],
+      [
+        "request",
+        {
+          "1": {
+            "13": 2
+          }
+        }
+      ],
+      [
+        "regex",
+        {
+          "1": {
+            "23": 4
+          }
+        }
+      ],
+      [
+        "regexp",
+        {
+          "1": {
+            "3": 1,
+            "9": 1,
+            "23": 4,
+            "24": 3
+          }
+        }
+      ],
+      [
+        "react",
+        {
+          "1": {
+            "24": 2
+          }
+        }
+      ],
+      [
+        "reactivity",
+        {
+          "1": {
+            "7": 1,
+            "17": 1,
+            "18": 1,
+            "21": 1,
+            "24": 1
+          }
+        }
+      ],
+      [
+        "reactively",
+        {
+          "1": {
+            "1": 1
+          }
+        }
+      ],
+      [
+        "reactive",
+        {
+          "1": {
+            "0": 1,
+            "3": 1,
+            "5": 1,
+            "6": 1,
+            "7": 2,
+            "8": 3,
+            "9": 2,
+            "11": 2,
+            "12": 1,
+            "18": 5,
+            "21": 3,
+            "24": 3,
+            "29": 1
+          }
+        }
+      ],
+      [
+        "readable",
+        {
+          "1": {
+            "23": 1
+          }
+        }
+      ],
+      [
+        "real",
+        {
+          "1": {
+            "19": 1
+          }
+        }
+      ],
+      [
+        "reference",
+        {
+          "1": {
+            "19": 1,
+            "24": 1,
+            "26": 1,
+            "29": 1
+          }
+        }
+      ],
+      [
+        "reusable",
+        {
+          "1": {
+            "17": 1
+          }
+        }
+      ],
+      [
+        "repository",
+        {
+          "1": {
+            "13": 1
+          }
+        }
+      ],
+      [
+        "replaces",
+        {
+          "1": {
+            "6": 1
+          }
+        }
+      ],
+      [
+        "replace",
+        {
+          "1": {
+            "1": 2,
+            "2": 2,
+            "21": 1,
+            "26": 3
+          }
+        }
+      ],
+      [
+        "removes",
+        {
+          "1": {
+            "11": 1
+          }
+        }
+      ],
+      [
+        "removing",
+        {
+          "1": {
+            "11": 1
+          }
+        }
+      ],
+      [
+        "recipes",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "receive",
+        {
+          "1": {
+            "21": 1
+          }
+        }
+      ],
+      [
+        "receives",
+        {
+          "1": {
+            "3": 1
+          }
+        }
+      ],
+      [
+        "recommended",
+        {
+          "1": {
+            "4": 1
+          }
+        }
+      ],
+      [
+        "relies",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "relative",
+        {
+          "1": {
+            "1": 2,
+            "22": 5
+          }
+        }
+      ],
+      [
+        "reload",
+        {
+          "1": {
+            "1": 1,
+            "11": 1
+          }
+        }
+      ],
+      [
+        "rendering",
+        {
+          "0": {
+            "28": 1
+          },
+          "1": {
+            "2": 1,
+            "3": 2,
+            "4": 1,
+            "17": 1,
+            "24": 1,
+            "28": 1
+          }
+        }
+      ],
+      [
+        "renders",
+        {
+          "1": {
+            "2": 1,
+            "3": 1,
+            "5": 1
+          }
+        }
+      ],
+      [
+        "rendered",
+        {
+          "1": {
+            "2": 1
+          }
+        }
+      ],
+      [
+        "render",
+        {
+          "1": {
+            "1": 1,
+            "3": 2,
+            "5": 1
+          }
+        }
+      ],
+      [
+        "duration",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "drilling",
+        {
+          "1": {
+            "21": 1
+          }
+        }
+      ],
+      [
+        "doesn",
+        {
+          "1": {
+            "29": 1
+          }
+        }
+      ],
+      [
+        "double",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "down",
+        {
+          "1": {
+            "21": 1,
+            "24": 2
+          }
+        }
+      ],
+      [
+        "do",
+        {
+          "1": {
+            "21": 1,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "don",
+        {
+          "1": {
+            "20": 1,
+            "27": 1,
+            "29": 3
+          }
+        }
+      ],
+      [
+        "documentation",
+        {
+          "1": {
+            "13": 2,
+            "23": 1,
+            "26": 1,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "dispatcher",
+        {
+          "1": {
+            "27": 2
+          }
+        }
+      ],
+      [
+        "disable",
+        {
+          "1": {
+            "21": 1
+          }
+        }
+      ],
+      [
+        "differences",
+        {
+          "1": {
+            "26": 1
+          }
+        }
+      ],
+      [
+        "different",
+        {
+          "1": {
+            "20": 1,
+            "21": 1
+          }
+        }
+      ],
+      [
+        "div>",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "digits",
+        {
+          "1": {
+            "23": 2
+          }
+        }
+      ],
+      [
+        "direct",
+        {
+          "1": {
+            "10": 1
+          }
+        }
+      ],
+      [
+        "dynamically",
+        {
+          "1": {
+            "16": 1
+          }
+        }
+      ],
+      [
+        "dynamic",
+        {
+          "0": {
+            "16": 1
+          },
+          "1": {
+            "5": 1,
+            "16": 3,
+            "21": 1,
+            "27": 3
+          }
+        }
+      ],
+      [
+        "data",
+        {
+          "0": {
+            "21": 1
+          },
+          "1": {
+            "0": 4,
+            "3": 5,
+            "5": 4,
+            "8": 9,
+            "15": 6,
+            "16": 7,
+            "17": 1,
+            "18": 8,
+            "21": 18,
+            "24": 4,
+            "29": 2
+          }
+        }
+      ],
+      [
+        "declarative",
+        {
+          "1": {
+            "26": 1
+          }
+        }
+      ],
+      [
+        "designed",
+        {
+          "1": {
+            "27": 1
+          }
+        }
+      ],
+      [
+        "design",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "descriptions",
+        {
+          "1": {
+            "21": 1
+          }
+        }
+      ],
+      [
+        "description",
+        {
+          "1": {
+            "0": 2,
+            "1": 2,
+            "2": 2,
+            "3": 2,
+            "4": 2,
+            "5": 2,
+            "6": 1,
+            "7": 1,
+            "8": 1,
+            "9": 1,
+            "10": 1,
+            "11": 1,
+            "12": 1
+          }
+        }
+      ],
+      [
+        "dependencies",
+        {
+          "1": {
+            "24": 2
+          }
+        }
+      ],
+      [
+        "delimiters",
+        {
+          "1": {
+            "23": 1
+          }
+        }
+      ],
+      [
+        "definitions",
+        {
+          "1": {
+            "24": 1,
+            "30": 2
+          }
+        }
+      ],
+      [
+        "define",
+        {
+          "1": {
+            "16": 1
+          }
+        }
+      ],
+      [
+        "default",
+        {
+          "1": {
+            "0": 2,
+            "1": 1,
+            "2": 2,
+            "3": 1,
+            "4": 1,
+            "5": 1,
+            "6": 1,
+            "14": 1,
+            "20": 1
+          }
+        }
+      ],
+      [
+        "development",
+        {
+          "1": {
+            "13": 1
+          }
+        }
+      ],
+      [
+        "detailed",
+        {
+          "1": {
+            "5": 1,
+            "8": 1,
+            "9": 1,
+            "18": 1
+          }
+        }
+      ],
+      [
+        "details",
+        {
+          "1": {
+            "0": 1,
+            "2": 1,
+            "3": 1,
+            "5": 1,
+            "14": 1,
+            "15": 1,
+            "16": 1,
+            "23": 1,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "detection",
+        {
+          "1": {
+            "1": 2
+          }
+        }
+      ],
+      [
+        "box",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "both",
+        {
+          "1": {
+            "0": 1,
+            "3": 1,
+            "14": 1
+          }
+        }
+      ],
+      [
+        "bundle",
+        {
+          "1": {
+            "24": 2
+          }
+        }
+      ],
+      [
+        "but",
+        {
+          "1": {
+            "4": 1
+          }
+        }
+      ],
+      [
+        "bring",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "breadcrumb",
+        {
+          "1": {
+            "15": 3
+          }
+        }
+      ],
+      [
+        "breadcrumbs",
+        {
+          "0": {
+            "15": 1
+          },
+          "1": {
+            "15": 3,
+            "21": 1
+          }
+        }
+      ],
+      [
+        "branch",
+        {
+          "1": {
+            "13": 1
+          }
+        }
+      ],
+      [
+        "browser",
+        {
+          "1": {
+            "11": 1,
+            "20": 3
+          }
+        }
+      ],
+      [
+        "biome",
+        {
+          "1": {
+            "13": 1
+          }
+        }
+      ],
+      [
+        "bad",
+        {
+          "1": {
+            "5": 1
+          }
+        }
+      ],
+      [
+        "basics",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "basic",
+        {
+          "1": {
+            "0": 1,
+            "4": 1,
+            "10": 1,
+            "15": 1,
+            "21": 1,
+            "22": 1,
+            "28": 1
+          }
+        }
+      ],
+      [
+        "based",
+        {
+          "1": {
+            "3": 4,
+            "16": 1,
+            "17": 1,
+            "18": 1,
+            "20": 2,
+            "24": 2,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "base",
+        {
+          "1": {
+            "0": 1,
+            "5": 1,
+            "21": 1
+          }
+        }
+      ],
+      [
+        "before",
+        {
+          "1": {
+            "26": 3
+          }
+        }
+      ],
+      [
+        "becomes",
+        {
+          "1": {
+            "21": 1
+          }
+        }
+      ],
+      [
+        "be",
+        {
+          "1": {
+            "13": 1
+          }
+        }
+      ],
+      [
+        "behaviors",
+        {
+          "1": {
+            "20": 1
+          }
+        }
+      ],
+      [
+        "behavior",
+        {
+          "1": {
+            "7": 1,
+            "8": 1,
+            "10": 1,
+            "11": 1,
+            "21": 1
+          }
+        }
+      ],
+      [
+        "best",
+        {
+          "0": {
+            "27": 1
+          },
+          "1": {
+            "5": 2,
+            "27": 2
+          }
+        }
+      ],
+      [
+        "between",
+        {
+          "1": {
+            "0": 1,
+            "14": 1
+          }
+        }
+      ],
+      [
+        "by",
+        {
+          "1": {
+            "2": 1,
+            "5": 1,
+            "10": 1,
+            "20": 1,
+            "21": 1,
+            "24": 1,
+            "26": 1,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "out",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "outstanding",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "overhead",
+        {
+          "1": {
+            "21": 1
+          }
+        }
+      ],
+      [
+        "overriding",
+        {
+          "1": {
+            "8": 1,
+            "18": 1,
+            "21": 1
+          }
+        }
+      ],
+      [
+        "override",
+        {
+          "1": {
+            "0": 1,
+            "5": 1,
+            "21": 1
+          }
+        }
+      ],
+      [
+        "original",
+        {
+          "1": {
+            "24": 2
+          }
+        }
+      ],
+      [
+        "or",
+        {
+          "1": {
+            "11": 1,
+            "18": 1,
+            "21": 1,
+            "24": 1,
+            "25": 1,
+            "29": 1
+          }
+        }
+      ],
+      [
+        "otherwise",
+        {
+          "1": {
+            "23": 1
+          }
+        }
+      ],
+      [
+        "other",
+        {
+          "1": {
+            "10": 1
+          }
+        }
+      ],
+      [
+        "open",
+        {
+          "1": {
+            "29": 1
+          }
+        }
+      ],
+      [
+        "operations",
+        {
+          "1": {
+            "10": 2
+          }
+        }
+      ],
+      [
+        "options",
+        {
+          "1": {
+            "6": 1,
+            "23": 1
+          }
+        }
+      ],
+      [
+        "optional",
+        {
+          "1": {
+            "0": 1,
+            "3": 1,
+            "4": 5,
+            "5": 1,
+            "6": 1,
+            "18": 1,
+            "23": 2,
+            "24": 2
+          }
+        }
+      ],
+      [
+        "optimization",
+        {
+          "1": {
+            "5": 2
+          }
+        }
+      ],
+      [
+        "once",
+        {
+          "1": {
+            "11": 1
+          }
+        }
+      ],
+      [
+        "one",
+        {
+          "1": {
+            "6": 1
+          }
+        }
+      ],
+      [
+        "only",
+        {
+          "1": {
+            "5": 2,
+            "23": 1
+          }
+        }
+      ],
+      [
+        "on",
+        {
+          "1": {
+            "2": 1,
+            "3": 1,
+            "16": 1,
+            "17": 1,
+            "18": 1,
+            "21": 1,
+            "24": 2,
+            "27": 1,
+            "29": 3
+          }
+        }
+      ],
+      [
+        "of",
+        {
+          "1": {
+            "1": 2,
+            "2": 1,
+            "6": 1,
+            "13": 1,
+            "20": 1,
+            "21": 1,
+            "24": 3,
+            "27": 2
+          }
+        }
+      ],
+      [
+        "objects",
+        {
+          "1": {
+            "23": 1
+          }
+        }
+      ],
+      [
+        "object",
+        {
+          "1": {
+            "0": 1,
+            "3": 1,
+            "5": 1,
+            "12": 1
+          }
+        }
+      ],
+      [
+        "center",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "creation",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "creating",
+        {
+          "1": {
+            "20": 1
+          }
+        }
+      ],
+      [
+        "create",
+        {
+          "1": {
+            "13": 1,
+            "15": 1,
+            "17": 1,
+            "20": 1,
+            "22": 1,
+            "25": 1,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "creates",
+        {
+          "1": {
+            "1": 2
+          }
+        }
+      ],
+      [
+        "crucial",
+        {
+          "1": {
+            "5": 1
+          }
+        }
+      ],
+      [
+        "custom",
+        {
+          "0": {
+            "20": 1
+          },
+          "1": {
+            "4": 4,
+            "10": 4,
+            "18": 1,
+            "20": 4,
+            "23": 1
+          }
+        }
+      ],
+      [
+        "current",
+        {
+          "1": {
+            "0": 2,
+            "1": 2,
+            "3": 1,
+            "6": 3,
+            "7": 2,
+            "9": 1,
+            "12": 2,
+            "14": 2
+          }
+        }
+      ],
+      [
+        "called",
+        {
+          "1": {
+            "21": 1
+          }
+        }
+      ],
+      [
+        "can",
+        {
+          "1": {
+            "18": 1,
+            "20": 1,
+            "22": 1
+          }
+        }
+      ],
+      [
+        "cases",
+        {
+          "1": {
+            "4": 1,
+            "10": 1,
+            "20": 1,
+            "21": 1
+          }
+        }
+      ],
+      [
+        "catch",
+        {
+          "1": {
+            "3": 2
+          }
+        }
+      ],
+      [
+        "cookbook",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "correct",
+        {
+          "1": {
+            "29": 1
+          }
+        }
+      ],
+      [
+        "correctly",
+        {
+          "1": {
+            "4": 1,
+            "29": 2
+          }
+        }
+      ],
+      [
+        "core",
+        {
+          "0": {
+            "18": 1
+          },
+          "1": {
+            "18": 1,
+            "19": 1,
+            "24": 1,
+            "25": 2
+          }
+        }
+      ],
+      [
+        "comes",
+        {
+          "1": {
+            "25": 1
+          }
+        }
+      ],
+      [
+        "common",
+        {
+          "1": {
+            "21": 1,
+            "23": 1,
+            "26": 1,
+            "29": 1
+          }
+        }
+      ],
+      [
+        "combine",
+        {
+          "1": {
+            "15": 1,
+            "16": 2,
+            "17": 1
+          }
+        }
+      ],
+      [
+        "comparison",
+        {
+          "1": {
+            "27": 1
+          }
+        }
+      ],
+      [
+        "compared",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "comparable",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "complete",
+        {
+          "1": {
+            "28": 1
+          }
+        }
+      ],
+      [
+        "completely",
+        {
+          "1": {
+            "21": 1
+          }
+        }
+      ],
+      [
+        "complex",
+        {
+          "1": {
+            "22": 1,
+            "23": 2
+          }
+        }
+      ],
+      [
+        "composable",
+        {
+          "1": {
+            "18": 1,
+            "21": 1
+          }
+        }
+      ],
+      [
+        "composables",
+        {
+          "1": {
+            "10": 1,
+            "18": 2,
+            "30": 2
+          }
+        }
+      ],
+      [
+        "composition",
+        {
+          "1": {
+            "13": 1,
+            "18": 4,
+            "24": 3,
+            "25": 1
+          }
+        }
+      ],
+      [
+        "components",
+        {
+          "1": {
+            "3": 2,
+            "8": 2,
+            "21": 3,
+            "22": 1,
+            "24": 1,
+            "25": 1,
+            "26": 1,
+            "30": 1
+          }
+        }
+      ],
+      [
+        "component",
+        {
+          "1": {
+            "0": 1,
+            "1": 1,
+            "2": 2,
+            "3": 6,
+            "4": 2,
+            "5": 1,
+            "11": 1,
+            "14": 2,
+            "17": 3,
+            "18": 3,
+            "20": 1,
+            "24": 1,
+            "27": 1,
+            "30": 1
+          }
+        }
+      ],
+      [
+        "computed",
+        {
+          "1": {
+            "1": 1
+          }
+        }
+      ],
+      [
+        "code",
+        {
+          "1": {
+            "13": 2
+          }
+        }
+      ],
+      [
+        "covered",
+        {
+          "1": {
+            "10": 1
+          }
+        }
+      ],
+      [
+        "config",
+        {
+          "1": {
+            "26": 1
+          }
+        }
+      ],
+      [
+        "configurable",
+        {
+          "1": {
+            "23": 1
+          }
+        }
+      ],
+      [
+        "configuration",
+        {
+          "1": {
+            "10": 1,
+            "18": 1,
+            "20": 1,
+            "21": 1,
+            "28": 1
+          }
+        }
+      ],
+      [
+        "converted",
+        {
+          "1": {
+            "23": 1
+          }
+        }
+      ],
+      [
+        "convention",
+        {
+          "1": {
+            "14": 1
+          }
+        }
+      ],
+      [
+        "concepts",
+        {
+          "0": {
+            "18": 1
+          },
+          "1": {
+            "18": 1,
+            "19": 2,
+            "25": 1
+          }
+        }
+      ],
+      [
+        "conditional",
+        {
+          "1": {
+            "17": 1
+          }
+        }
+      ],
+      [
+        "conduct",
+        {
+          "1": {
+            "13": 1
+          }
+        }
+      ],
+      [
+        "considerations",
+        {
+          "1": {
+            "21": 1
+          }
+        }
+      ],
+      [
+        "consistent",
+        {
+          "1": {
+            "7": 1
+          }
+        }
+      ],
+      [
+        "constructor",
+        {
+          "1": {
+            "23": 1
+          }
+        }
+      ],
+      [
+        "constructive",
+        {
+          "1": {
+            "13": 1
+          }
+        }
+      ],
+      [
+        "constraints",
+        {
+          "1": {
+            "9": 1,
+            "23": 4
+          }
+        }
+      ],
+      [
+        "control",
+        {
+          "1": {
+            "14": 1
+          }
+        }
+      ],
+      [
+        "contributions",
+        {
+          "1": {
+            "13": 2
+          }
+        }
+      ],
+      [
+        "contributing",
+        {
+          "0": {
+            "13": 1
+          },
+          "1": {
+            "13": 1
+          }
+        }
+      ],
+      [
+        "containing",
+        {
+          "1": {
+            "6": 1,
+            "7": 1,
+            "8": 1,
+            "9": 1,
+            "11": 1,
+            "12": 1,
+            "23": 1
+          }
+        }
+      ],
+      [
+        "content",
+        {
+          "1": {
+            "3": 1
+          }
+        }
+      ],
+      [
+        "context",
+        {
+          "1": {
+            "2": 1,
+            "4": 1,
+            "18": 1
+          }
+        }
+      ],
+      [
+        "client",
+        {
+          "1": {
+            "29": 1
+          }
+        }
+      ],
+      [
+        "click",
+        {
+          "1": {
+            "1": 1
+          }
+        }
+      ],
+      [
+        "class=",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "classes",
+        {
+          "1": {
+            "0": 1,
+            "1": 1,
+            "14": 1
+          }
+        }
+      ],
+      [
+        "cleaner",
+        {
+          "1": {
+            "23": 1
+          }
+        }
+      ],
+      [
+        "choose",
+        {
+          "1": {
+            "25": 1
+          }
+        }
+      ],
+      [
+        "check",
+        {
+          "1": {
+            "9": 1,
+            "29": 2
+          }
+        }
+      ],
+      [
+        "checking",
+        {
+          "1": {
+            "5": 1,
+            "30": 2
+          }
+        }
+      ],
+      [
+        "checks",
+        {
+          "1": {
+            "5": 1,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "child",
+        {
+          "1": {
+            "0": 1,
+            "1": 1,
+            "5": 2,
+            "8": 2,
+            "18": 1,
+            "21": 6,
+            "22": 5,
+            "29": 1
+          }
+        }
+      ],
+      [
+        "changes",
+        {
+          "1": {
+            "8": 1,
+            "11": 1,
+            "13": 1,
+            "17": 2,
+            "18": 2,
+            "21": 1,
+            "29": 1
+          }
+        }
+      ],
+      [
+        "change",
+        {
+          "1": {
+            "0": 1,
+            "6": 1
+          }
+        }
+      ],
+      [
+        "css",
+        {
+          "1": {
+            "0": 1,
+            "14": 1
+          }
+        }
+      ],
+      [
+        "tiny",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "timeframe",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "title",
+        {
+          "1": {
+            "16": 1
+          }
+        }
+      ],
+      [
+        "titles",
+        {
+          "0": {
+            "16": 1
+          },
+          "1": {
+            "16": 3,
+            "21": 2
+          }
+        }
+      ],
+      [
+        "techniques",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "text",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "testing",
+        {
+          "1": {
+            "20": 5,
+            "24": 1,
+            "25": 1,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "tests",
+        {
+          "1": {
+            "13": 2
+          }
+        }
+      ],
+      [
+        "takeaway",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "taking",
+        {
+          "1": {
+            "21": 1
+          }
+        }
+      ],
+      [
+        "target",
+        {
+          "1": {
+            "1": 1,
+            "2": 1
+          }
+        }
+      ],
+      [
+        "t",
+        {
+          "1": {
+            "20": 1,
+            "27": 1,
+            "29": 4
+          }
+        }
+      ],
+      [
+        "two",
+        {
+          "1": {
+            "18": 1
+          }
+        }
+      ],
+      [
+        "tuple",
+        {
+          "1": {
+            "6": 1,
+            "9": 1,
+            "11": 1
+          }
+        }
+      ],
+      [
+        "though",
+        {
+          "1": {
+            "29": 1
+          }
+        }
+      ],
+      [
+        "than",
+        {
+          "1": {
+            "23": 1
+          }
+        }
+      ],
+      [
+        "that",
+        {
+          "1": {
+            "1": 1,
+            "4": 1,
+            "18": 3,
+            "19": 1,
+            "24": 1
+          }
+        }
+      ],
+      [
+        "this",
+        {
+          "1": {
+            "2": 1,
+            "5": 1,
+            "24": 2,
+            "27": 1,
+            "29": 1
+          }
+        }
+      ],
+      [
+        "throughput",
+        {
+          "1": {
+            "24": 2,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "through",
+        {
+          "1": {
+            "1": 1,
+            "15": 1,
+            "17": 1,
+            "18": 5,
+            "21": 1
+          }
+        }
+      ],
+      [
+        "their",
+        {
+          "1": {
+            "29": 1
+          }
+        }
+      ],
+      [
+        "these",
+        {
+          "1": {
+            "27": 1
+          }
+        }
+      ],
+      [
+        "theme",
+        {
+          "1": {
+            "21": 3
+          }
+        }
+      ],
+      [
+        "the",
+        {
+          "1": {
+            "0": 1,
+            "1": 7,
+            "2": 7,
+            "3": 3,
+            "4": 1,
+            "5": 4,
+            "6": 4,
+            "7": 2,
+            "9": 3,
+            "10": 2,
+            "11": 4,
+            "12": 4,
+            "13": 2,
+            "14": 1,
+            "18": 1,
+            "19": 2,
+            "20": 1,
+            "21": 6,
+            "22": 4,
+            "23": 3,
+            "24": 8,
+            "25": 1,
+            "29": 1,
+            "30": 1
+          }
+        }
+      ],
+      [
+        "then",
+        {
+          "1": {
+            "0": 2,
+            "14": 2
+          }
+        }
+      ],
+      [
+        "total",
+        {
+          "1": {
+            "24": 2,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "top",
+        {
+          "1": {
+            "24": 2
+          }
+        }
+      ],
+      [
+        "to",
+        {
+          "1": {
+            "0": 2,
+            "2": 6,
+            "3": 5,
+            "5": 3,
+            "6": 1,
+            "8": 1,
+            "9": 2,
+            "10": 2,
+            "11": 2,
+            "12": 1,
+            "13": 1,
+            "14": 1,
+            "15": 1,
+            "16": 1,
+            "17": 1,
+            "19": 1,
+            "21": 4,
+            "22": 5,
+            "23": 5,
+            "24": 7,
+            "26": 1,
+            "27": 1,
+            "28": 1
+          }
+        }
+      ],
+      [
+        "typed",
+        {
+          "1": {
+            "30": 2
+          }
+        }
+      ],
+      [
+        "types",
+        {
+          "1": {
+            "30": 2
+          }
+        }
+      ],
+      [
+        "typescript",
+        {
+          "0": {
+            "30": 1
+          },
+          "1": {
+            "24": 2,
+            "25": 1,
+            "30": 2
+          }
+        }
+      ],
+      [
+        "type",
+        {
+          "1": {
+            "0": 1,
+            "1": 1,
+            "2": 1,
+            "3": 1,
+            "4": 1,
+            "5": 1,
+            "24": 1,
+            "30": 3
+          }
+        }
+      ],
+      [
+        "troubleshooting",
+        {
+          "0": {
+            "29": 1
+          },
+          "1": {
+            "29": 1
+          }
+        }
+      ],
+      [
+        "traffic",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "transition",
+        {
+          "1": {
+            "0": 6,
+            "14": 5
+          }
+        }
+      ],
+      [
+        "transitions",
+        {
+          "0": {
+            "14": 1
+          },
+          "1": {
+            "0": 3,
+            "14": 2
+          }
+        }
+      ],
+      [
+        "tree",
+        {
+          "1": {
+            "18": 1,
+            "21": 2,
+            "24": 2
+          }
+        }
+      ],
+      [
+        "trigger",
+        {
+          "1": {
+            "2": 1,
+            "11": 1
+          }
+        }
+      ],
+      [
+        "triggers",
+        {
+          "1": {
+            "0": 1
+          }
+        }
+      ],
+      [
+        "|",
+        {
+          "1": {
+            "0": 30,
+            "1": 35,
+            "2": 25,
+            "3": 30,
+            "4": 25,
+            "5": 20,
+            "24": 30,
+            "26": 24,
+            "27": 20
+          }
+        }
+      ],
+      [
+        "place",
+        {
+          "1": {
+            "27": 1
+          }
+        }
+      ],
+      [
+        "powered",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "powerful",
+        {
+          "1": {
+            "21": 1
+          }
+        }
+      ],
+      [
+        "philosophy",
+        {
+          "1": {
+            "24": 2
+          }
+        }
+      ],
+      [
+        "p50",
+        {
+          "1": {
+            "24": 1,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "per",
+        {
+          "1": {
+            "21": 2,
+            "24": 1,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "perfect",
+        {
+          "1": {
+            "20": 1
+          }
+        }
+      ],
+      [
+        "performance",
+        {
+          "0": {
+            "27": 1
+          },
+          "1": {
+            "5": 4,
+            "21": 2,
+            "24": 5,
+            "27": 3
+          }
+        }
+      ],
+      [
+        "permissions",
+        {
+          "1": {
+            "17": 2,
+            "21": 3
+          }
+        }
+      ],
+      [
+        "pull",
+        {
+          "1": {
+            "13": 2
+          }
+        }
+      ],
+      [
+        "pushing",
+        {
+          "1": {
+            "1": 1,
+            "2": 1
+          }
+        }
+      ],
+      [
+        "prioritization",
+        {
+          "1": {
+            "27": 1
+          }
+        }
+      ],
+      [
+        "prioritize",
+        {
+          "1": {
+            "5": 1,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "principles",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "practical",
+        {
+          "1": {
+            "21": 1,
+            "24": 1
+          }
+        }
+      ],
+      [
+        "practices",
+        {
+          "0": {
+            "27": 1
+          },
+          "1": {
+            "5": 2,
+            "27": 2
+          }
+        }
+      ],
+      [
+        "preact",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "precedence",
+        {
+          "1": {
+            "21": 1
+          }
+        }
+      ],
+      [
+        "prevent",
+        {
+          "1": {
+            "14": 1
+          }
+        }
+      ],
+      [
+        "present",
+        {
+          "1": {
+            "7": 1
+          }
+        }
+      ],
+      [
+        "preferred",
+        {
+          "1": {
+            "25": 1
+          }
+        }
+      ],
+      [
+        "prefer",
+        {
+          "1": {
+            "1": 1
+          }
+        }
+      ],
+      [
+        "prefix",
+        {
+          "1": {
+            "1": 1,
+            "22": 2
+          }
+        }
+      ],
+      [
+        "project",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "problem",
+        {
+          "1": {
+            "21": 1,
+            "29": 5
+          }
+        }
+      ],
+      [
+        "protectedroute",
+        {
+          "1": {
+            "17": 1
+          }
+        }
+      ],
+      [
+        "protected",
+        {
+          "1": {
+            "17": 1
+          }
+        }
+      ],
+      [
+        "protection",
+        {
+          "1": {
+            "17": 1
+          }
+        }
+      ],
+      [
+        "processes",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "process",
+        {
+          "1": {
+            "13": 1
+          }
+        }
+      ],
+      [
+        "programmatic",
+        {
+          "1": {
+            "10": 1,
+            "17": 1
+          }
+        }
+      ],
+      [
+        "programmatically",
+        {
+          "1": {
+            "6": 2
+          }
+        }
+      ],
+      [
+        "provides",
+        {
+          "1": {
+            "4": 1,
+            "10": 1,
+            "18": 2,
+            "21": 1,
+            "24": 1
+          }
+        }
+      ],
+      [
+        "providing",
+        {
+          "1": {
+            "0": 1,
+            "23": 1
+          }
+        }
+      ],
+      [
+        "properties",
+        {
+          "1": {
+            "21": 5
+          }
+        }
+      ],
+      [
+        "propagate",
+        {
+          "1": {
+            "8": 1,
+            "18": 1,
+            "21": 1
+          }
+        }
+      ],
+      [
+        "prop",
+        {
+          "1": {
+            "0": 2,
+            "1": 1,
+            "2": 1,
+            "3": 3,
+            "4": 1,
+            "5": 1,
+            "7": 1,
+            "8": 1,
+            "18": 1,
+            "21": 2,
+            "22": 2,
+            "29": 1
+          }
+        }
+      ],
+      [
+        "props",
+        {
+          "1": {
+            "0": 1,
+            "1": 1,
+            "2": 1,
+            "3": 3,
+            "4": 2,
+            "5": 1,
+            "7": 2,
+            "8": 2,
+            "18": 1,
+            "21": 1,
+            "22": 1,
+            "28": 1,
+            "30": 2
+          }
+        }
+      ],
+      [
+        "package",
+        {
+          "1": {
+            "25": 2,
+            "30": 1
+          }
+        }
+      ],
+      [
+        "parts",
+        {
+          "1": {
+            "23": 1
+          }
+        }
+      ],
+      [
+        "parser",
+        {
+          "1": {
+            "23": 2
+          }
+        }
+      ],
+      [
+        "parse",
+        {
+          "1": {
+            "12": 2
+          }
+        }
+      ],
+      [
+        "parsed",
+        {
+          "1": {
+            "11": 1
+          }
+        }
+      ],
+      [
+        "parent",
+        {
+          "1": {
+            "7": 1,
+            "8": 4,
+            "18": 2,
+            "21": 4,
+            "22": 5,
+            "29": 1
+          }
+        }
+      ],
+      [
+        "parameter",
+        {
+          "1": {
+            "6": 1,
+            "11": 2,
+            "22": 1,
+            "23": 3
+          }
+        }
+      ],
+      [
+        "parameters",
+        {
+          "1": {
+            "5": 1,
+            "7": 6,
+            "9": 2,
+            "11": 4,
+            "15": 2,
+            "16": 3,
+            "18": 2,
+            "22": 3,
+            "23": 4,
+            "24": 1,
+            "27": 2,
+            "29": 3
+          }
+        }
+      ],
+      [
+        "params",
+        {
+          "1": {
+            "3": 1,
+            "9": 1,
+            "11": 1,
+            "12": 1,
+            "22": 1
+          }
+        }
+      ],
+      [
+        "pattern",
+        {
+          "0": {
+            "23": 1
+          },
+          "1": {
+            "3": 4,
+            "9": 5,
+            "23": 3,
+            "24": 1,
+            "27": 1,
+            "29": 1
+          }
+        }
+      ],
+      [
+        "patterns",
+        {
+          "1": {
+            "3": 2,
+            "9": 1,
+            "10": 1,
+            "13": 1,
+            "18": 1,
+            "23": 5,
+            "24": 2,
+            "26": 1
+          }
+        }
+      ],
+      [
+        "paths",
+        {
+          "1": {
+            "23": 1
+          }
+        }
+      ],
+      [
+        "pathname",
+        {
+          "1": {
+            "6": 1
+          }
+        }
+      ],
+      [
+        "path",
+        {
+          "1": {
+            "1": 3,
+            "2": 3,
+            "3": 1,
+            "4": 1,
+            "9": 1,
+            "23": 3,
+            "24": 3
+          }
+        }
+      ],
+      [
+        "page",
+        {
+          "0": {
+            "16": 1
+          },
+          "1": {
+            "1": 1,
+            "11": 1,
+            "16": 1,
+            "21": 2
+          }
+        }
+      ],
+      [
+        "pages",
+        {
+          "1": {
+            "0": 1,
+            "21": 2
+          }
+        }
+      ],
+      [
+        "passed",
+        {
+          "1": {
+            "5": 1,
+            "8": 1,
+            "18": 1
+          }
+        }
+      ],
+      [
+        "passing",
+        {
+          "0": {
+            "21": 1
+          },
+          "1": {
+            "0": 1,
+            "3": 1,
+            "5": 2,
+            "8": 1,
+            "15": 1,
+            "16": 1,
+            "17": 2,
+            "18": 2,
+            "21": 2,
+            "24": 2
+          }
+        }
+      ],
+      [
+        "pass",
+        {
+          "1": {
+            "0": 1,
+            "3": 1,
+            "4": 1,
+            "5": 1,
+            "15": 1,
+            "21": 4,
+            "24": 2,
+            "28": 1,
+            "29": 1
+          }
+        }
+      ],
+      [
+        "about",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "affect",
+        {
+          "1": {
+            "20": 1
+          }
+        }
+      ],
+      [
+        "after",
+        {
+          "1": {
+            "5": 1,
+            "12": 1,
+            "26": 3
+          }
+        }
+      ],
+      [
+        "array",
+        {
+          "1": {
+            "26": 1
+          }
+        }
+      ],
+      [
+        "architecture",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "artillery",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "arbitrary",
+        {
+          "1": {
+            "18": 1
+          }
+        }
+      ],
+      [
+        "are",
+        {
+          "1": {
+            "1": 1,
+            "2": 1,
+            "7": 4,
+            "10": 1,
+            "11": 1,
+            "13": 2,
+            "22": 4,
+            "23": 1,
+            "29": 1,
+            "30": 2
+          }
+        }
+      ],
+      [
+        "apis",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "api",
+        {
+          "1": {
+            "11": 1,
+            "13": 1,
+            "14": 1,
+            "18": 3,
+            "19": 2,
+            "20": 1,
+            "24": 6,
+            "25": 1,
+            "26": 2,
+            "29": 1
+          }
+        }
+      ],
+      [
+        "applications",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "approach",
+        {
+          "1": {
+            "18": 1,
+            "24": 1
+          }
+        }
+      ],
+      [
+        "app",
+        {
+          "1": {
+            "4": 1,
+            "28": 2
+          }
+        }
+      ],
+      [
+        "attempts",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "at",
+        {
+          "1": {
+            "11": 1
+          }
+        }
+      ],
+      [
+        "available",
+        {
+          "1": {
+            "7": 1,
+            "8": 1,
+            "18": 1
+          }
+        }
+      ],
+      [
+        "avoid",
+        {
+          "1": {
+            "5": 1,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "adaptation",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "advantage",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "advanced",
+        {
+          "1": {
+            "4": 1,
+            "10": 4,
+            "23": 3,
+            "24": 1
+          }
+        }
+      ],
+      [
+        "add",
+        {
+          "1": {
+            "13": 1,
+            "14": 1,
+            "23": 1
+          }
+        }
+      ],
+      [
+        "adds",
+        {
+          "1": {
+            "11": 1
+          }
+        }
+      ],
+      [
+        "adding",
+        {
+          "1": {
+            "6": 1
+          }
+        }
+      ],
+      [
+        "accept",
+        {
+          "1": {
+            "30": 1
+          }
+        }
+      ],
+      [
+        "accepts",
+        {
+          "1": {
+            "6": 1
+          }
+        }
+      ],
+      [
+        "accessible",
+        {
+          "1": {
+            "18": 1
+          }
+        }
+      ],
+      [
+        "accessing",
+        {
+          "1": {
+            "3": 2,
+            "21": 1,
+            "22": 1
+          }
+        }
+      ],
+      [
+        "access",
+        {
+          "1": {
+            "7": 1,
+            "8": 2,
+            "10": 2,
+            "15": 1,
+            "18": 1
+          }
+        }
+      ],
+      [
+        "active",
+        {
+          "1": {
+            "1": 5,
+            "24": 2
+          }
+        }
+      ],
+      [
+        "against",
+        {
+          "1": {
+            "3": 1,
+            "9": 1
+          }
+        }
+      ],
+      [
+        "autocomplete",
+        {
+          "1": {
+            "30": 1
+          }
+        }
+      ],
+      [
+        "automatic",
+        {
+          "1": {
+            "18": 1,
+            "21": 1,
+            "22": 1,
+            "24": 2
+          }
+        }
+      ],
+      [
+        "automatically",
+        {
+          "1": {
+            "0": 1,
+            "1": 1,
+            "2": 3,
+            "7": 2,
+            "8": 1,
+            "18": 3,
+            "21": 2,
+            "22": 2,
+            "28": 1
+          }
+        }
+      ],
+      [
+        "authentication",
+        {
+          "1": {
+            "2": 1,
+            "17": 1
+          }
+        }
+      ],
+      [
+        "alternation",
+        {
+          "1": {
+            "23": 1
+          }
+        }
+      ],
+      [
+        "alternative",
+        {
+          "1": {
+            "17": 1
+          }
+        }
+      ],
+      [
+        "also",
+        {
+          "1": {
+            "7": 1,
+            "8": 1,
+            "10": 1
+          }
+        }
+      ],
+      [
+        "always",
+        {
+          "1": {
+            "4": 1,
+            "7": 1,
+            "18": 1,
+            "27": 1,
+            "28": 1,
+            "29": 1
+          }
+        }
+      ],
+      [
+        "all",
+        {
+          "1": {
+            "3": 2,
+            "5": 1,
+            "7": 1,
+            "8": 1,
+            "9": 1,
+            "11": 1,
+            "13": 1,
+            "18": 1,
+            "21": 3,
+            "24": 1,
+            "30": 2
+          }
+        }
+      ],
+      [
+        "allow",
+        {
+          "1": {
+            "2": 1,
+            "22": 1
+          }
+        }
+      ],
+      [
+        "aliases",
+        {
+          "1": {
+            "1": 1
+          }
+        }
+      ],
+      [
+        "alias",
+        {
+          "1": {
+            "1": 1,
+            "2": 1
+          }
+        }
+      ],
+      [
+        "an",
+        {
+          "1": {
+            "2": 1,
+            "6": 1,
+            "12": 1,
+            "24": 1,
+            "29": 1
+          }
+        }
+      ],
+      [
+        "another",
+        {
+          "1": {
+            "2": 1
+          }
+        }
+      ],
+      [
+        "and",
+        {
+          "1": {
+            "1": 2,
+            "3": 5,
+            "4": 3,
+            "5": 1,
+            "6": 1,
+            "8": 1,
+            "10": 2,
+            "11": 2,
+            "13": 2,
+            "15": 2,
+            "16": 1,
+            "17": 2,
+            "18": 1,
+            "19": 2,
+            "21": 1,
+            "24": 9,
+            "28": 1,
+            "29": 2
+          }
+        }
+      ],
+      [
+        "animations",
+        {
+          "1": {
+            "0": 1,
+            "14": 1
+          }
+        }
+      ],
+      [
+        "animated",
+        {
+          "0": {
+            "14": 1
+          },
+          "1": {
+            "0": 2,
+            "14": 2
+          }
+        }
+      ],
+      [
+        "animatedswitch",
+        {
+          "0": {
+            "0": 1
+          },
+          "1": {
+            "0": 1,
+            "14": 2
+          }
+        }
+      ],
+      [
+        "as",
+        {
+          "1": {
+            "1": 1,
+            "3": 1,
+            "5": 1,
+            "7": 1,
+            "8": 1
+          }
+        }
+      ],
+      [
+        "a",
+        {
+          "1": {
+            "1": 4,
+            "3": 1,
+            "6": 4,
+            "7": 2,
+            "8": 1,
+            "9": 4,
+            "11": 5,
+            "12": 1,
+            "13": 2,
+            "17": 1,
+            "18": 2,
+            "19": 2,
+            "21": 3,
+            "23": 2,
+            "24": 1,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "watchers",
+        {
+          "1": {
+            "17": 1
+          }
+        }
+      ],
+      [
+        "watch",
+        {
+          "1": {
+            "16": 2,
+            "17": 1
+          }
+        }
+      ],
+      [
+        "write",
+        {
+          "1": {
+            "13": 1
+          }
+        }
+      ],
+      [
+        "wrapper",
+        {
+          "1": {
+            "17": 1
+          }
+        }
+      ],
+      [
+        "wrap",
+        {
+          "1": {
+            "4": 1,
+            "14": 1,
+            "28": 1,
+            "29": 1
+          }
+        }
+      ],
+      [
+        "wraps",
+        {
+          "1": {
+            "0": 1,
+            "29": 1
+          }
+        }
+      ],
+      [
+        "welcome",
+        {
+          "1": {
+            "13": 1
+          }
+        }
+      ],
+      [
+        "world",
+        {
+          "1": {
+            "19": 1
+          }
+        }
+      ],
+      [
+        "working",
+        {
+          "1": {
+            "19": 1,
+            "29": 2
+          }
+        }
+      ],
+      [
+        "work",
+        {
+          "1": {
+            "4": 1,
+            "18": 1,
+            "29": 1
+          }
+        }
+      ],
+      [
+        "works",
+        {
+          "1": {
+            "4": 1,
+            "21": 1,
+            "22": 1,
+            "24": 1
+          }
+        }
+      ],
+      [
+        "wouter",
+        {
+          "0": {
+            "24": 1
+          },
+          "1": {
+            "4": 1,
+            "18": 2,
+            "19": 2,
+            "20": 1,
+            "21": 1,
+            "23": 1,
+            "24": 7,
+            "25": 1,
+            "26": 3,
+            "27": 3,
+            "28": 1,
+            "30": 1
+          }
+        }
+      ],
+      [
+        "wildcard",
+        {
+          "1": {
+            "23": 4
+          }
+        }
+      ],
+      [
+        "wildcards",
+        {
+          "1": {
+            "9": 1,
+            "23": 1,
+            "29": 1
+          }
+        }
+      ],
+      [
+        "will",
+        {
+          "1": {
+            "2": 1
+          }
+        }
+      ],
+      [
+        "without",
+        {
+          "1": {
+            "1": 1,
+            "4": 2,
+            "11": 1,
+            "20": 1,
+            "21": 2
+          }
+        }
+      ],
+      [
+        "with",
+        {
+          "1": {
+            "0": 2,
+            "1": 3,
+            "2": 1,
+            "3": 1,
+            "4": 3,
+            "8": 1,
+            "16": 3,
+            "17": 2,
+            "18": 3,
+            "19": 2,
+            "21": 5,
+            "22": 2,
+            "23": 1,
+            "24": 8,
+            "25": 1,
+            "27": 1,
+            "28": 2,
+            "29": 1
+          }
+        }
+      ],
+      [
+        "while",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "which",
+        {
+          "1": {
+            "10": 1
+          }
+        }
+      ],
+      [
+        "whichever",
+        {
+          "1": {
+            "1": 1
+          }
+        }
+      ],
+      [
+        "what",
+        {
+          "1": {
+            "19": 1,
+            "25": 1
+          }
+        }
+      ],
+      [
+        "where",
+        {
+          "1": {
+            "6": 1,
+            "7": 1,
+            "8": 1,
+            "9": 1,
+            "11": 1,
+            "23": 1
+          }
+        }
+      ],
+      [
+        "when",
+        {
+          "1": {
+            "0": 1,
+            "1": 1,
+            "2": 2,
+            "3": 3,
+            "5": 1,
+            "7": 3,
+            "8": 1,
+            "10": 1,
+            "14": 1,
+            "18": 2,
+            "21": 1,
+            "23": 1,
+            "29": 1
+          }
+        }
+      ]
+    ],
+    "serializationVersion": 2
+  }
+}

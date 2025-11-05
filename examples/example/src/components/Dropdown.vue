@@ -10,10 +10,11 @@
           v-for="item in items"
           :key="item.href"
           :href="item.href"
-          :classFn="isActive => isActive ? 'active' : ''"
           @click="closeDropdown"
         >
-          {{ item.label }}
+          <template #default="{ isActive }">
+            <a :class="{ active: isActive }">{{ item.label }}</a>
+          </template>
         </Link>
       </slot>
     </div>

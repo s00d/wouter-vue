@@ -1,13 +1,27 @@
-import { pathToRegexp } from 'path-to-regexp'
 import type { ComputedRef, Ref } from 'vue'
-import type { Path } from '../types/location-hook.d.js'
-import type { HrefsFormatter, Parser, RouterObject, SsrContext } from '../types/router.d.js'
+import type { Path } from '../types/location-hook'
+import type { HrefsFormatter, Parser, RouterObject, SsrContext } from '../types'
 
 // Re-export types for use in tests
 export type { RouterObject, SsrContext, Parser, HrefsFormatter }
 
 // Type definitions for better DX in generated .d.ts files
 export type RouteParams = Record<string, string>
+// RouteData represents JSON-serializable data that can be passed to routes
+// Supports nested objects and arrays for complex data structures
+export type RouteData = {
+  [key: string]: RouteDataValue
+}
+export type RouteDataValue = 
+  | string 
+  | number 
+  | boolean 
+  | null 
+  | undefined 
+  | RouteDataValue[]
+  | { [key: string]: RouteDataValue }
+// RouteData can be passed as plain object, ref, or computed ref
+export type RouteDataInput = RouteData | Ref<RouteData> | ComputedRef<RouteData>
 export type MatchResult = [true, RouteParams, string?] | [false, null]
 export type NavigateFn = (path: Path, options?: { replace?: boolean; state?: unknown }) => void
 export type SetSearchParamsFn = (
@@ -20,108 +34,11 @@ export type SetSearchParamsFn = (
 
 import { relativePath, sanitizeSearch } from './paths'
 import { memoryLocation } from './memory-location'
-import { isDev, isSSR } from './helpers'
+import { isDev } from './helpers/dev-helpers'
+import { isSSR } from './helpers/ssr-helpers'
 import { useBrowserLocation, useSearch as useBrowserSearch } from './use-browser-location'
 import { computed, inject as injectVue, ref, unref } from 'vue'
-
-/**
- * Adapter function that converts path-to-regexp API to match the Parser interface.
- * Supports parameter constraints syntax :param(pattern) and converts wildcard '*' to '/*splat' format.
- *
- * @param route - Route pattern string
- * @param loose - If true, matches don't need to reach the end (for nested routes)
- * @returns Object with RegExp pattern and array of parameter names
- */
-const parsePattern: Parser = (route: Path, loose?: boolean) => {
-  // Handle parameter constraints syntax :param(pattern)
-  // Extract constraints and parameter names
-  const constraintMatches = [...route.matchAll(/:(\w+)\(([^)]+)\)/g)]
-  const constraints = new Map<string, string>()
-  for (const match of constraintMatches) {
-    constraints.set(match[1], match[2])
-  }
-
-  // If we have constraints, build regex manually
-  if (constraints.size > 0) {
-    let regexStr = '^'
-    const keyNames: string[] = []
-    let lastIndex = 0
-
-    // Process the route and build regex with constraints
-    for (const match of constraintMatches) {
-      const fullMatch = match[0]
-      const paramName = match[1]
-      const pattern = match[2]
-      const matchIndex = route.indexOf(fullMatch, lastIndex)
-
-      // Add literal text before the parameter
-      if (matchIndex > lastIndex) {
-        const literal = route.substring(lastIndex, matchIndex)
-        regexStr += literal.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-      }
-
-      // Add constrained parameter group
-      regexStr += `(${pattern})`
-      keyNames.push(paramName)
-
-      lastIndex = matchIndex + fullMatch.length
-    }
-
-    // Add remaining literal text
-    if (lastIndex < route.length) {
-      const literal = route.substring(lastIndex)
-      regexStr += literal.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-    }
-
-    // Add end anchor or lookahead
-    if (!loose) {
-      // Strict match - must match exactly
-      regexStr += '$'
-    } else {
-      // Loose match (for nested routes) - can have more path after
-      // Use lookahead to ensure delimiter or end, but allow continuation
-      regexStr += '(?=/|$)'
-    }
-
-    const regex = new RegExp(regexStr, 'i')
-    return {
-      pattern: regex,
-      keys: keyNames,
-    }
-  }
-
-  // Handle wildcard '*' - convert to '/*splat' format
-  // path-to-regexp requires wildcard parameters to have a name
-  let processedRoute = route
-  if (route === '*' || route === '/*') {
-    processedRoute = '/*splat'
-  } else if (route.endsWith('/*')) {
-    // Replace trailing /* with /*splat (wildcard needs a name in path-to-regexp)
-    processedRoute = route.slice(0, -2) + '/*splat'
-  }
-
-  // Use pathToRegexp with end option: if loose is true, end is false
-  const { regexp, keys } = pathToRegexp(processedRoute, {
-    end: !loose,
-    sensitive: false,
-  })
-
-  // Extract parameter names from keys array
-  // path-to-regexp returns keys as objects with 'name' property
-  const keyNames: string[] = keys.map((key: { name: string | number }) => {
-    // Handle both string names and object keys
-    if (typeof key.name === 'string') {
-      return key.name
-    }
-    // Fallback if key structure is different
-    return String(key.name ?? '')
-  })
-
-  return {
-    pattern: regexp,
-    keys: keyNames,
-  }
-}
+import { parsePattern } from './pattern-parser'
 
 export type RouterRef =
   | RouterObject
@@ -248,15 +165,10 @@ export const defaultRouter: RouterObject = {
 
 export const RouterKey = Symbol('router')
 export const ParamsKey = Symbol('params')
+export const RouteDataKey = Symbol('route-data')
 
 // gets the closest parent router from the context
 export const useRouter = () => injectVue(RouterKey, defaultRouter)
-
-/**
- * Parameters context. Used by `useParams()` to get the
- * matched params from the innermost `Route` component.
- */
-export const Params0 = {}
 
 /**
  * Hook to access route parameters from the current matched route.
@@ -275,12 +187,36 @@ export const Params0 = {}
  * ```
  */
 export const useParams = (): Ref<RouteParams> => {
-  const params = injectVue(ParamsKey, Params0)
+  const params = injectVue(ParamsKey, ref({}))
   // If params is a ref, return it; otherwise wrap it in a ref
   if (params && typeof params === 'object' && 'value' in params) {
     return params as Ref<RouteParams>
   }
   return ref(params) as Ref<RouteParams>
+}
+
+/**
+ * Hook to access route data from the current matched route.
+ *
+ * Works inside `<Route>` components and returns data from the innermost matched route.
+ * Automatically merges data from parent routes.
+ *
+ * @returns `Ref<RouteData>` - Reactive reference to route data object
+ *
+ * @example
+ * ```typescript
+ * const routeData = useRouteData()
+ * console.log(routeData.value.theme)  // 'dark'
+ * console.log(routeData.value.layout)  // 'sidebar'
+ * ```
+ */
+export const useRouteData = (): Ref<RouteData> => {
+  const data = injectVue(RouteDataKey, ref({}))
+  // If data is already a ref/computed, return it; otherwise wrap in ref
+  if (data && typeof data === 'object' && 'value' in data) {
+    return data as Ref<RouteData>
+  }
+  return ref(data) as Ref<RouteData>
 }
 
 /*
@@ -507,11 +443,12 @@ export {
   Route,
   Link,
   Switch,
+  AnimatedSwitch,
   Redirect,
 } from './components/index'
 
 // Export normalizePath function (used by components but may be needed by users)
-export { normalizePath } from './helpers'
+export { normalizePath } from './helpers/path-helpers'
 
 /**
  * Hook to access and manipulate URL search parameters reactively.

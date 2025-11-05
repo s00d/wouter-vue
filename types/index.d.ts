@@ -1,8 +1,15 @@
 import { ComputedRef, Ref } from 'vue';
-import { Path } from '../types/location-hook.d.js';
-import { HrefsFormatter, Parser, RouterObject, SsrContext } from '../types/router.d.js';
+import { Path } from '../types/location-hook';
+import { HrefsFormatter, Parser, RouterObject, SsrContext } from '../types';
 export type { RouterObject, SsrContext, Parser, HrefsFormatter };
 export type RouteParams = Record<string, string>;
+export type RouteData = {
+    [key: string]: RouteDataValue;
+};
+export type RouteDataValue = string | number | boolean | null | undefined | RouteDataValue[] | {
+    [key: string]: RouteDataValue;
+};
+export type RouteDataInput = RouteData | Ref<RouteData> | ComputedRef<RouteData>;
 export type MatchResult = [true, RouteParams, string?] | [false, null];
 export type NavigateFn = (path: Path, options?: {
     replace?: boolean;
@@ -49,12 +56,8 @@ export declare const normalizeBooleanProp: (value: unknown) => boolean;
 export declare const defaultRouter: RouterObject;
 export declare const RouterKey: unique symbol;
 export declare const ParamsKey: unique symbol;
+export declare const RouteDataKey: unique symbol;
 export declare const useRouter: () => RouterObject;
-/**
- * Parameters context. Used by `useParams()` to get the
- * matched params from the innermost `Route` component.
- */
-export declare const Params0: {};
 /**
  * Hook to access route parameters from the current matched route.
  *
@@ -72,6 +75,22 @@ export declare const Params0: {};
  * ```
  */
 export declare const useParams: () => Ref<RouteParams>;
+/**
+ * Hook to access route data from the current matched route.
+ *
+ * Works inside `<Route>` components and returns data from the innermost matched route.
+ * Automatically merges data from parent routes.
+ *
+ * @returns `Ref<RouteData>` - Reactive reference to route data object
+ *
+ * @example
+ * ```typescript
+ * const routeData = useRouteData()
+ * console.log(routeData.value.theme)  // 'dark'
+ * console.log(routeData.value.layout)  // 'sidebar'
+ * ```
+ */
+export declare const useRouteData: () => Ref<RouteData>;
 /**
  * Internal version of useLocation to avoid redundant useRouter calls.
  * Optimized to use type guards for better performance.
@@ -154,8 +173,8 @@ export declare const matchRoute: (parser: Parser, route: string | RegExp, path: 
  * ```
  */
 export declare const useRoute: (pattern: string | RegExp) => [ComputedRef<boolean>, ComputedRef<RouteParams | null>];
-export { Router, Route, Link, Switch, Redirect, } from './components/index';
-export { normalizePath } from './helpers';
+export { Router, Route, Link, Switch, AnimatedSwitch, Redirect, } from './components/index';
+export { normalizePath } from './helpers/path-helpers';
 /**
  * Hook to access and manipulate URL search parameters reactively.
  *

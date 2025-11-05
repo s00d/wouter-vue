@@ -1,6 +1,6 @@
 {
   "name": "wouter-vue",
-  "version": "1.0.7",
+  "version": "1.1.0",
   "description": "Minimalist-friendly ~2KB router for Vue 3, inspired by wouter",
   "type": "module",
   "keywords": [
@@ -53,8 +53,8 @@
       "default": "./dist/memory-location.js"
     },
     "./vite-plugin-routes": {
-      "types": "./types/vite-plugin-routes.d.ts",
-      "default": "./src/vite-plugin-routes.js"
+      "types": "./src/vite-plugin-routes.ts",
+      "default": "./src/vite-plugin-routes.ts"
     },
     "./ssr": {
       "types": "./types/ssr.d.ts",
@@ -77,7 +77,7 @@
         "types/memory-location.d.ts"
       ],
       "vite-plugin-routes": [
-        "types/vite-plugin-routes.d.ts"
+        "src/vite-plugin-routes.ts"
       ],
       "ssr": [
         "types/ssr.d.ts"

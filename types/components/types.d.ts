@@ -3,7 +3,7 @@
  */
 export type ComponentSetupContext = {
     slots: {
-        default?: (() => unknown) | ((params: unknown) => unknown);
+        default?: (() => unknown) | ((params: any) => unknown);
     };
     attrs?: Record<string, unknown>;
 };

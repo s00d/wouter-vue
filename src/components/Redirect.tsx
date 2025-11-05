@@ -4,12 +4,14 @@
  * Navigates to a new location when rendered.
  */
 
-import { onMounted } from 'vue'
-import type { Path } from '../../types/location-hook.d.js'
-import type { RouterObject, SsrContext } from '../../types/router.d.js'
+import { onBeforeMount } from 'vue'
+import type { Path } from '../../types/location-hook'
+import type { RouterObject, SsrContext } from '../../types'
 import { useLocationFromRouter, useRouter } from '../index'
-import { getRouterValue, resolveTargetPath, validateTargetPathProps, devWarn } from '../helpers'
-import { PropsResolver } from '../helpers'
+import { resolveTargetPath, validateTargetPathProps } from '../helpers/path-helpers'
+import { getRouterValue } from '../helpers/router-helpers'
+import { devWarn } from '../helpers/dev-helpers'
+import { PropsResolver } from '../helpers/vue-helpers'
 
 type RedirectProps = {
   to?: Path
@@ -50,9 +52,10 @@ export const Redirect = {
       ssrCtx.redirectTo = targetPath
     }
 
-    // Client-side navigation should happen after mount to avoid side effects during render
+    // Client-side navigation should happen as early as possible (onBeforeMount)
+    // to minimize "flickering" of content before redirect
     // SSR context is set synchronously above for server-side redirects
-    onMounted(() => {
+    onBeforeMount(() => {
       try {
         navigateFn(targetPath, { replace: props.replace, state: props.state })
       } catch (error) {
@@ -64,6 +67,7 @@ export const Redirect = {
       }
     })
 
+    // Return null immediately to avoid rendering any content
     return () => null
   },
 }

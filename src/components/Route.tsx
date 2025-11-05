@@ -5,33 +5,36 @@
  */
 
 import type { ComputedRef } from 'vue'
-import { computed, defineAsyncComponent, inject as injectVue, provide as provideVue, h } from 'vue'
-import type { Path } from '../../types/location-hook.d.js'
+import { computed, defineAsyncComponent, inject as injectVue, provide as provideVue, h, ref } from 'vue'
+import type { Path } from '../../types/location-hook'
 import type { MatchResult } from '../index.js'
 import {
   useLocationFromRouter,
   useRouter,
   ParamsKey,
-  Params0,
+  RouteDataKey,
   normalizeRouterRef,
   normalizeBooleanProp,
   matchRoute,
+  type RouteDataInput,
 } from '../index'
 import type { RouterRef } from '../index'
 import { Router } from './Router'
 import type { ComponentSetupContext } from './types'
-import { devWarn, resolveSlotWithParams, unwrapValue } from '../helpers'
+import { devWarn } from '../helpers/dev-helpers'
+import { resolveSlotWithParams, unwrapValue } from '../helpers/vue-helpers'
 
 type RouteProps = {
   path?: string | RegExp
   component?: unknown
   nest?: unknown
   match?: MatchResult
+  data?: RouteDataInput
 }
 
 export const Route = {
   name: 'Route',
-  props: ['path', 'component', 'nest', 'match'],
+  props: ['path', 'component', 'nest', 'match', 'data'],
   setup(props: RouteProps, { slots }: ComponentSetupContext) {
     // Dev mode validation (only warn, don't prevent rendering)
     if (props.path === undefined && props.match === undefined) {
@@ -47,6 +50,18 @@ export const Route = {
 
     const router = useRouter()
     const [location] = useLocationFromRouter(router)
+
+    // Get parent route data - might be a ref/computed
+    const parentData = injectVue(RouteDataKey, ref({}))
+
+    // Merge route data reactively - child overrides parent
+    const mergedData = computed(() => ({
+      ...unwrapValue(parentData), // Unwrap reactive parent data
+      ...(props.data ? unwrapValue(props.data) : {}), // Unwrap if reactive, child overrides parent
+    }))
+
+    // Provide merged data context for children
+    provideVue(RouteDataKey, mergedData)
 
     // Optimized: combine router unwrapping and matching in single computed
     const result = computed(() => {
@@ -73,7 +88,7 @@ export const Route = {
     const routeParams = computed(() => result.value[1])
 
     // Get parent params - might be a ref
-    const injectedParams = injectVue(ParamsKey, Params0)
+    const injectedParams = injectVue(ParamsKey, ref({}))
     // Use shallowRef-like approach: parentParams don't need deep reactivity
     // They're typically static or change infrequently
     const parentParams = computed(() => unwrapValue(injectedParams))
@@ -105,18 +120,20 @@ export const Route = {
       const component = resolvedComponent.value
       // slots.default can be a function that receives params as argument (scoped slot) or no-arg function
       const defaultSlot = slots.default
+      const slotProps = { params: params.value, data: mergedData.value }
       const routeContent = component
-        ? h(component, { params: params.value })
-        : resolveSlotWithParams(defaultSlot, params.value) || null
+        ? h(component, slotProps)
+        : resolveSlotWithParams(defaultSlot, slotProps) || null
 
       const nestEnabled = normalizeBooleanProp(props.nest)
       if (nestEnabled && result.value[2]) {
         // For nested routes, create a Router with the correct base
-        // We need to re-provide params in the render function
+        // We need to re-provide params and data in the render function
         const Wrapper = {
           setup() {
-            // Provide the reactive params ref
+            // Provide the reactive params and data refs
             provideVue(ParamsKey, params)
+            provideVue(RouteDataKey, mergedData)
             return () => routeContent
           },
         }

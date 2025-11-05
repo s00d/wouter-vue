@@ -6,26 +6,18 @@
 
 import type { ComputedRef } from 'vue'
 import { computed, h } from 'vue'
-import type { Path } from '../../types/location-hook.d.js'
+import type { Path } from '../../types/location-hook'
 import { useLocationFromRouter, useRouter, defaultRouter, normalizeBooleanProp } from '../index'
 import type { ComponentSetupContext } from './types'
-import {
-  normalizePath,
-  useRouterValue,
-  resolveSlot,
-  resolveTargetPath,
-  validateTargetPathProps,
-  shouldIgnoreNavigationClick,
-} from '../helpers'
-import { PropsResolver } from '../helpers'
+import { normalizePath, resolveTargetPath, validateTargetPathProps, shouldIgnoreNavigationClick } from '../helpers/path-helpers'
+import { useRouterValue } from '../helpers/router-helpers'
+import { resolveSlot, resolveSlotWithParams, PropsResolver } from '../helpers/vue-helpers'
 
 type LinkProps = {
   href?: string
   to?: string
   onClick?: (event: MouseEvent) => void
   asChild?: boolean
-  classFn?: (isActive: boolean) => string
-  className?: string
   replace?: boolean
 }
 
@@ -36,8 +28,6 @@ export const Link = {
     to: String,
     onClick: Function,
     asChild: Boolean,
-    classFn: Function,
-    className: String,
     replace: Boolean,
   },
   inheritAttrs: false,
@@ -95,36 +85,37 @@ export const Link = {
       const normalizedTarget = normalizePath(targetPath)
       const isActive = normalizedCurrent === normalizedTarget
 
-      // Handle classFn prop for active link styling
-      // Check both props and attrs for classFn (template syntax may pass via attrs)
-      const classFnValue = attrsResolver.get<(isActive: boolean) => string>('classFn')
-      let className: string | undefined = undefined
+      // Check if default slot is a scoped slot (function that accepts params)
+      // In Vue 3, scoped slots are functions that accept an object with slot props
+      // We try to resolve with params first (for scoped slots), then fall back to regular slot
+      const defaultSlot = slots.default
+      let content: unknown = null
 
-      if (typeof classFnValue === 'function') {
-        className = classFnValue(isActive)
+      if (defaultSlot) {
+        // For scoped slots, we need to detect if slot accepts parameters
+        // In SSR, function.length might not be reliable, so we use resolveSlotWithParams
+        // which handles both cases safely
+        if (typeof defaultSlot === 'function') {
+          // Try scoped slot with params first
+          // resolveSlotWithParams will fall back to regular slot if params aren't accepted
+          content = resolveSlotWithParams(defaultSlot, { isActive })
+        } else {
+          // Regular slot (not a function)
+          content = resolveSlot(defaultSlot)
+        }
+      } else {
+        content = null
       }
 
-      // Merge static classes from className prop or attrs.class
+      // Get class from attrs (standard Vue class attribute)
       const classNameFromAttrs = attrsResolver.get<string>('class')
-      const staticClass =
-        attrsResolver.get<string>('className') ||
-        (typeof classNameFromAttrs === 'string' ? classNameFromAttrs : undefined)
-
-      // Combine active class with static class
-      if (className && staticClass) {
-        className = `${staticClass} ${className}`.trim()
-      } else if (staticClass) {
-        className = staticClass
-      }
-
-      const content = resolveSlot(slots.default)
 
       return h(
         'a',
         {
           onClick,
           href: href.value,
-          class: className || undefined,
+          class: typeof classNameFromAttrs === 'string' ? classNameFromAttrs : undefined,
           // Merge attrs (including data-testid) to root element
           ...(attrs as Record<string, unknown>),
         },

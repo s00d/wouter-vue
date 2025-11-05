@@ -1,4 +1,4 @@
-import { RouterObject } from '../types/router.d.js';
+import { RouterObject } from '../types';
 /**
  * Creates a default router configuration for SSR environments.
  * Uses memory-location instead of browser location hooks.

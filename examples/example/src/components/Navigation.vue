@@ -1,18 +1,15 @@
 <template>
   <nav class="navigation">
     <div class="nav-links">
-      <Link 
-        href="/" 
-        :classFn="isActive => isActive ? 'active' : ''"
-      >
-        Home
+      <Link href="/">
+        <template #default="{ isActive }">
+          <a :class="{ active: isActive }">Home</a>
+        </template>
       </Link>
-      <Link 
-        href="/about" 
-         class="test"
-        :classFn="isActive => isActive ? 'active' : ''"
-      >
-        About
+      <Link href="/about">
+        <template #default="{ isActive }">
+          <a class="test" :class="{ active: isActive }">About</a>
+        </template>
       </Link>
       
       <Dropdown
@@ -23,11 +20,10 @@
         ]"
       />
       
-      <Link 
-        href="/heavy" 
-        :classFn="isActive => isActive ? 'active' : ''"
-      >
-        Heavy (Async)
+      <Link href="/heavy">
+        <template #default="{ isActive }">
+          <a :class="{ active: isActive }">Heavy (Async)</a>
+        </template>
       </Link>
     </div>
     

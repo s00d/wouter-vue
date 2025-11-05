@@ -1,0 +1,233 @@
+{
+  "root": [
+    {
+      "path": "/",
+      "title": "Getting Started",
+      "children": [
+        {
+          "path": "/core-concepts",
+          "title": "Core Concepts",
+          "children": [],
+          "isFile": true
+        },
+        {
+          "path": "/getting-started",
+          "title": "Getting Started",
+          "children": [],
+          "isFile": true
+        },
+        {
+          "path": "/installation",
+          "title": "Installation",
+          "children": [],
+          "isFile": true
+        }
+      ],
+      "isFile": false
+    },
+    {
+      "path": "/api",
+      "title": "Api",
+      "children": [
+        {
+          "path": "/api/components",
+          "title": "Components",
+          "children": [
+            {
+              "path": "/api/components/animated-switch",
+              "title": "AnimatedSwitch",
+              "children": [],
+              "isFile": true
+            },
+            {
+              "path": "/api/components/link",
+              "title": "Link",
+              "children": [],
+              "isFile": true
+            },
+            {
+              "path": "/api/components/redirect",
+              "title": "Redirect",
+              "children": [],
+              "isFile": true
+            },
+            {
+              "path": "/api/components/route",
+              "title": "Route",
+              "children": [],
+              "isFile": true
+            },
+            {
+              "path": "/api/components/router",
+              "title": "Router",
+              "children": [],
+              "isFile": true
+            },
+            {
+              "path": "/api/components/switch",
+              "title": "Switch",
+              "children": [],
+              "isFile": true
+            }
+          ],
+          "isFile": false
+        },
+        {
+          "path": "/api/composables",
+          "title": "Composables",
+          "children": [
+            {
+              "path": "/api/composables/use-location",
+              "title": "useLocation",
+              "children": [],
+              "isFile": true
+            },
+            {
+              "path": "/api/composables/use-params",
+              "title": "useParams",
+              "children": [],
+              "isFile": true
+            },
+            {
+              "path": "/api/composables/use-route",
+              "title": "useRoute",
+              "children": [],
+              "isFile": true
+            },
+            {
+              "path": "/api/composables/use-route-data",
+              "title": "useRouteData",
+              "children": [],
+              "isFile": true
+            },
+            {
+              "path": "/api/composables/use-router",
+              "title": "useRouter",
+              "children": [],
+              "isFile": true
+            },
+            {
+              "path": "/api/composables/use-search",
+              "title": "useSearch",
+              "children": [],
+              "isFile": true
+            },
+            {
+              "path": "/api/composables/use-search-params",
+              "title": "useSearchParams",
+              "children": [],
+              "isFile": true
+            }
+          ],
+          "isFile": false
+        }
+      ],
+      "isFile": false
+    },
+    {
+      "path": "/guides",
+      "title": "Guides",
+      "children": [
+        {
+          "path": "/guides/custom-location-hooks",
+          "title": "Custom Location Hooks",
+          "children": [],
+          "isFile": true
+        },
+        {
+          "path": "/guides/hierarchical-data",
+          "title": "Hierarchical Data Passing",
+          "children": [],
+          "isFile": true
+        },
+        {
+          "path": "/guides/nested-routing",
+          "title": "Nested Routing",
+          "children": [],
+          "isFile": true
+        },
+        {
+          "path": "/guides/route-patterns",
+          "title": "Route Pattern Matching",
+          "children": [],
+          "isFile": true
+        }
+      ],
+      "isFile": false
+    },
+    {
+      "path": "/cookbook",
+      "title": "Cookbook",
+      "children": [
+        {
+          "path": "/cookbook/animated-transitions",
+          "title": "Animated Route Transitions",
+          "children": [],
+          "isFile": true
+        },
+        {
+          "path": "/cookbook/breadcrumbs",
+          "title": "Breadcrumbs",
+          "children": [],
+          "isFile": true
+        },
+        {
+          "path": "/cookbook/dynamic-page-titles",
+          "title": "Dynamic Page Titles",
+          "children": [],
+          "isFile": true
+        },
+        {
+          "path": "/cookbook/route-guards",
+          "title": "Route Guards",
+          "children": [],
+          "isFile": true
+        }
+      ],
+      "isFile": false
+    },
+    {
+      "path": "/other",
+      "title": "Other",
+      "children": [
+        {
+          "path": "/contributing",
+          "title": "Contributing",
+          "children": [],
+          "isFile": true
+        },
+        {
+          "path": "/migration",
+          "title": "Migration Guide",
+          "children": [],
+          "isFile": true
+        },
+        {
+          "path": "/performance",
+          "title": "Performance & Best Practices",
+          "children": [],
+          "isFile": true
+        },
+        {
+          "path": "/server-side-rendering",
+          "title": "Server-Side Rendering (SSR)",
+          "children": [],
+          "isFile": true
+        },
+        {
+          "path": "/troubleshooting",
+          "title": "Troubleshooting",
+          "children": [],
+          "isFile": true
+        },
+        {
+          "path": "/typescript",
+          "title": "TypeScript",
+          "children": [],
+          "isFile": true
+        }
+      ],
+      "isFile": false
+    }
+  ]
+}

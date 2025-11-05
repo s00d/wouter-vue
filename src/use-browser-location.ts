@@ -1,5 +1,5 @@
 import { type Ref, ref, watchEffect } from 'vue'
-import { isSSR } from './helpers'
+import { isSSR } from './helpers/ssr-helpers'
 
 type Path = string
 type SearchString = string
@@ -33,7 +33,11 @@ const subscribeToLocationUpdates = (callback: () => void): (() => void) => {
 
 // Vue version using ref instead of useSyncExternalStore
 export function useLocationProperty<S extends Primitive>(fn: () => S, ssrFn?: () => S): Ref<S> {
-  const property = ref(typeof ssrFn === 'function' ? ssrFn() : fn()) as Ref<S>
+  // Явно определяем начальное значение:
+  // - Если это SSR И есть функция для сервера (ssrFn), используем её.
+  // - Иначе (на клиенте), всегда используем браузерную функцию (fn).
+  const initialValue = isSSR() && typeof ssrFn === 'function' ? ssrFn() : fn()
+  const property = ref(initialValue) as Ref<S>
 
   watchEffect((onInvalidate) => {
     const callback = () => {

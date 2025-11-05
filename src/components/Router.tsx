@@ -5,12 +5,14 @@
  */
 
 import { computed, inject as injectVue, provide as provideVue } from 'vue'
-import type { Path } from '../../types/location-hook.d.js'
-import type { HrefsFormatter, Parser, RouterObject, SsrContext } from '../../types/router.d.js'
+import type { Path } from '../../types/location-hook'
+import type { HrefsFormatter, Parser, RouterObject, SsrContext } from '../../types'
 import { RouterKey, defaultRouter } from '../index'
 import type { ComponentSetupContext } from './types'
-import { parseSsrPath, resolveSlot, getRouterValue } from '../helpers'
-import { PropsResolver } from '../helpers'
+import { parseSsrPath } from '../helpers/ssr-helpers'
+import { resolveSlot } from '../helpers/vue-helpers'
+import { getRouterValue } from '../helpers/router-helpers'
+import { PropsResolver } from '../helpers/vue-helpers'
 
 type RouterProps = {
   hook?: RouterObject['hook']
