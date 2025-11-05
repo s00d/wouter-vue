@@ -91,6 +91,12 @@ async function run() {
     ? `file://${entryServerPath}`
     : `file://${path.resolve(entryServerPath)}`;
   
+  // Ensure GITHUB_PAGES env is available for the imported module
+  // Set it before importing so it's available in entry-server.js
+  if (isGitHubPages) {
+    process.env.GITHUB_PAGES = 'true';
+  }
+  
   const { render } = await import(entryServerUrl);
   
   // Ensure dist/client exists
@@ -110,9 +116,14 @@ async function run() {
   // Render each route
   for (const routePath of routesToPrerender) {
     try {
-      // For GitHub Pages, pass the full URL with base path to render function
-      // The render function will normalize it
-      const urlToRender = basePath ? `${basePath}${routePath}` : routePath;
+      // Формируем полный URL, который увидит сервер, включая basePath
+      // Это имитирует реальный запрос на GitHub Pages
+      const urlToRender = basePath 
+        ? `${basePath}${routePath}`.replace(/\/+/g, '/') // Убираем двойные слеши
+        : routePath;
+      console.log(`Rendering URL: ${urlToRender}`);
+      
+      // Передаем ПОЛНЫЙ URL в функцию рендеринга
       const appHtml = await render(urlToRender);
       
       // File path should be relative to dist/client (without base path)

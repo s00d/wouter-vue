@@ -23,7 +23,16 @@ const props = defineProps({
 
 // Get base path from Vite's BASE_URL or window location
 // Remove trailing slash if present (Router expects base without trailing slash)
-let basePath = import.meta.env.BASE_URL || '';
+let basePath = '';
+try {
+  // Try to get from import.meta.env (available in Vite builds)
+  basePath = import.meta.env.BASE_URL || '';
+} catch (e) {
+  // Fallback: use process.env for SSR
+  if (process.env.GITHUB_PAGES === 'true') {
+    basePath = '/wouter-vue';
+  }
+}
 if (basePath.endsWith('/')) {
   basePath = basePath.slice(0, -1);
 }
