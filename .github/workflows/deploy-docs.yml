@@ -39,6 +39,8 @@ jobs:
         run: pnpm run build
 
       - name: Build static site
+        env:
+          GITHUB_PAGES: true
         run: cd docs && pnpm run build:docs
 
       - name: Setup GitHub Pages

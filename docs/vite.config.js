@@ -43,6 +43,7 @@ export default ${JSON.stringify(searchIndex, null, 2)};
 }
 
 export default defineConfig({
+  base: process.env.GITHUB_PAGES ? '/wouter-vue/' : '/',
   plugins: [
     generateMenuPlugin(),
     vue({
