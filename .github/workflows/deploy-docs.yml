@@ -15,9 +15,6 @@ permissions:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: docs
 
     steps:
       - name: Checkout
@@ -39,7 +36,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build static site
-        run: pnpm run build:docs
+        run: cd docs && pnpm run build:docs
 
       - name: Setup GitHub Pages
         uses: actions/configure-pages@v4
