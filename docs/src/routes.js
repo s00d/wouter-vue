@@ -5,7 +5,13 @@
 
 export function createRoutes() {
   // Use Vite's import.meta.glob to get all Markdown files
-  const pages = import.meta.glob('./content/**/*.md', { eager: false });
+  // For SSR, we'll use eager loading via separate entry point
+  // For browser, use lazy loading
+  // Vite requires static options, so we use eager: false for client bundle
+  // and handle SSR eager loading in the SSR entry point
+  const pages = import.meta.glob('./content/**/*.md', { 
+    eager: false 
+  });
 
   const routes = [];
   for (const path in pages) {
@@ -28,7 +34,7 @@ export function createRoutes() {
 
     routes.push({
       path: url,
-      component: pages[path], // Async import
+      component: pages[path], // Async import function
     });
   }
 

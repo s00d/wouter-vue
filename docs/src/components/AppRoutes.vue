@@ -32,11 +32,16 @@ const routes = createRoutes().map(route => ({
   // Create async page component that wraps markdown with single root element
   pageComponent: defineAsyncComponent({
     loader: async () => {
+      // Load the markdown component
+      const component = typeof route.component === 'function' 
+        ? await route.component() 
+        : route.component;
+      
       // Return a component with single root element (RouteWrapper)
       return {
         components: { RouteWrapper },
         setup() {
-          return () => h(RouteWrapper, { component: route.component });
+          return () => h(RouteWrapper, { component });
         },
       };
     },

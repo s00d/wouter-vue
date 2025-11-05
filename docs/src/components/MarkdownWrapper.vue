@@ -14,7 +14,7 @@ const props = defineProps({
   },
 });
 
-// Simply load the markdown component
+// Load the markdown component asynchronously
 const content = defineAsyncComponent({
   loader: async () => {
     return typeof props.component === 'function' 

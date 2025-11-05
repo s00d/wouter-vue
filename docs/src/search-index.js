@@ -152,7 +152,7 @@ export default {
       "id": "/",
       "path": "/",
       "title": "Wouter for Vue 3",
-      "content": "<div class=\"text-center mb-12\">  Wouter for Vue 3 wouter-vue is a minimal, high-performance router for Vue 3 (7.9KB gzipped, 17.5KB uncompressed) that relies on Composition API and provides an intuitive routing experience. </div>  Features - 📦 Minimal bundle size (7.9KB gzipped, 17.5KB uncompressed) - 72% smaller response size vs vue-router - ⚡ Outstanding performance - 72% higher throughput, handles 83% more requests - 🎯 Vue 3 Composition API - Fully reactive routing with TypeScript support - 🔧 Optional  - No top-level router required, works out of the box - 📦 Minimal dependencies (Vue 3 + path-to-regexp) - 🎨 Server-Side Rendering (SSR) - Full SSR support with Vite - 🗂️ Nested routing - Flexible route parameters and nested structures - 🔗 Active links - Scoped slot API for active state styling - 💾 TypeScript - Full type definitions included - 📊 Hierarchical & Reactive Data Passing - Pass data down routing tree with automatic merging  Performance Based on load testing with Artillery.io (3,300 virtual users, 200 routes, 6-minute duration): | Metric | wouter-vue | vue-router | Advantage | |--------|-----------|------------|-----------| | Throughput | 117 req/s | 68 req/s | +72% faster | | Total Requests | 36,300 | 19,800 | +83% more requests | | Latency (mean) | 0.9 ms | 0.6 ms | Comparable | | Latency (p50) | 1 ms | 1 ms | Same performance | Key Takeaway: wouter-vue processes 72% more requests per second (117 vs 68 req/s) with identical median latency (1ms) compared to vue-router, while handling nearly double the total requests (36,300 vs 19,800) in the same timeframe, making it ideal for high-traffic applications.  Quick Start  Installation Requirements: Vue 3.5.22 or higher  Next Steps - Getting Started - Learn the basics - API Reference - Explore all APIs - Guides - Advanced patterns and techniques - Cookbook - Practical examples and recipes  About wouter-vue is inspired by the original wouter router for React and Preact. The original wouter's minimalist philosophy, hook-based architecture, and elegant simplicity resonated strongly, leading to the creation of this Vue 3 adaptation. This project attempts to bring the same core principles and design philosophy to Vue's ecosystem: - Minimalist approach - Keep it tiny with minimal dependencies - Composition API first - Leverage Vue's reactivity system instead of React hooks - Optional Router - No mandatory top-level component - Familiar API - Similar components and patterns for easy migration - Performance focused - Small bundle size and efficient routing - Path-to-RegExp powered - Uses path-to-regexp for robust route matching with full pattern support - Hierarchical data passing - Pass reactive data down routing tree with automatic merging"
+      "content": "<div class=\"text-center mb-12\">  Wouter for Vue 3 wouter-vue is a minimal, high-performance router for Vue 3 (7.9KB gzipped, 17.5KB uncompressed) that relies on Composition API and provides an intuitive routing experience. </div>  Features - 📦 Minimal bundle size (7.9KB gzipped, 17.5KB uncompressed) - 72% smaller response size vs vue-router - ⚡ Outstanding performance - 72% higher throughput, handles 83% more requests - 🎯 Vue 3 Composition API - Fully reactive routing with TypeScript support - 🔧 Optional  - No top-level router required, works out of the box - 📦 Minimal dependencies (Vue 3 + path-to-regexp) - 🎨 Server-Side Rendering (SSR) - Full SSR support with Vite - 🗂️ Nested routing - Flexible route parameters and nested structures - 🔗 Active links - Scoped slot API for active state styling - 💾 TypeScript - Full type definitions included - 📊 Hierarchical & Reactive Data Passing - Pass data down routing tree with automatic merging  Performance Based on load testing with Artillery.io (3,300 virtual users, 200 routes, 6-minute duration): | Metric | wouter-vue | vue-router | Advantage | |--------|-----------|------------|-----------| | Throughput | 117 req/s | 68 req/s | +72% faster | | Total Requests | 36,300 | 19,800 | +83% more requests | | Latency (mean) | 0.9 ms | 0.6 ms | Comparable | | Latency (p50) | 1 ms | 1 ms | Same performance | Key Takeaway: wouter-vue processes 72% more requests per second (117 vs 68 req/s) with identical median latency (1ms) compared to vue-router, while handling nearly double the total requests (36,300 vs 19,800) in the same timeframe, making it ideal for high-traffic applications.  Quick Start  Installation Requirements: Vue 3.5.22 or higher  Next Steps - Getting Started - Learn the basics - API Reference - Explore all APIs - Guides - Advanced patterns and techniques - Cookbook - Practical examples and recipes  About wouter-vue is inspired by the original wouter router for React and Preact. The original wouter's minimalist philosophy, hook-based architecture, and elegant simplicity resonated strongly, leading to the creation of this Vue 3 adaptation. This project attempts to bring the same core principles and design philosophy to Vue's ecosystem: - Minimalist approach - Keep it tiny with minimal dependencies - Composition API first - Leverage Vue's reactivity system instead of React hooks - Optional Router - No mandatory top-level component - Familiar API - Similar components and patterns for easy migration - Performance focused - Small bundle size and efficient routing - Path-to-RegExp powered - Uses path-to-regexp for robust route matching with full pattern support - Hierarchical data passing - Pass reactive data down routing tree with automatic merging --- <div class=\"bg-blue-50 border-l-4 border-blue-500 p-4 my-8 rounded-r\">  💡 Built with wouter-vue This entire documentation site is built entirely with wouter-vue, including: - Server-Side Rendering (SSR) and Static Site Generation (SSG) - All routing and navigation - Dynamic route generation from Markdown files - Search functionality - Smooth page transitions See the source code to explore how wouter-vue powers this documentation site. </div>"
     },
     {
       "id": "/installation",
@@ -330,7 +330,7 @@ export default {
       ],
       "24": [
         4,
-        259
+        301
       ],
       "25": [
         1,
@@ -359,7 +359,7 @@ export default {
     },
     "averageFieldLength": [
       1.7741935483870968,
-      69.51612903225806
+      70.87096774193547
     ],
     "storedFields": {
       "0": {
@@ -485,7 +485,7 @@ export default {
       "24": {
         "path": "/",
         "title": "Wouter for Vue 3",
-        "content": "<div class=\"text-center mb-12\">  Wouter for Vue 3 wouter-vue is a minimal, high-performance router for Vue 3 (7.9KB gzipped, 17.5KB uncompressed) that relies on Composition API and provides an intuitive routing experience. </div>  Features - 📦 Minimal bundle size (7.9KB gzipped, 17.5KB uncompressed) - 72% smaller response size vs vue-router - ⚡ Outstanding performance - 72% higher throughput, handles 83% more requests - 🎯 Vue 3 Composition API - Fully reactive routing with TypeScript support - 🔧 Optional  - No top-level router required, works out of the box - 📦 Minimal dependencies (Vue 3 + path-to-regexp) - 🎨 Server-Side Rendering (SSR) - Full SSR support with Vite - 🗂️ Nested routing - Flexible route parameters and nested structures - 🔗 Active links - Scoped slot API for active state styling - 💾 TypeScript - Full type definitions included - 📊 Hierarchical & Reactive Data Passing - Pass data down routing tree with automatic merging  Performance Based on load testing with Artillery.io (3,300 virtual users, 200 routes, 6-minute duration): | Metric | wouter-vue | vue-router | Advantage | |--------|-----------|------------|-----------| | Throughput | 117 req/s | 68 req/s | +72% faster | | Total Requests | 36,300 | 19,800 | +83% more requests | | Latency (mean) | 0.9 ms | 0.6 ms | Comparable | | Latency (p50) | 1 ms | 1 ms | Same performance | Key Takeaway: wouter-vue processes 72% more requests per second (117 vs 68 req/s) with identical median latency (1ms) compared to vue-router, while handling nearly double the total requests (36,300 vs 19,800) in the same timeframe, making it ideal for high-traffic applications.  Quick Start  Installation Requirements: Vue 3.5.22 or higher  Next Steps - Getting Started - Learn the basics - API Reference - Explore all APIs - Guides - Advanced patterns and techniques - Cookbook - Practical examples and recipes  About wouter-vue is inspired by the original wouter router for React and Preact. The original wouter's minimalist philosophy, hook-based architecture, and elegant simplicity resonated strongly, leading to the creation of this Vue 3 adaptation. This project attempts to bring the same core principles and design philosophy to Vue's ecosystem: - Minimalist approach - Keep it tiny with minimal dependencies - Composition API first - Leverage Vue's reactivity system instead of React hooks - Optional Router - No mandatory top-level component - Familiar API - Similar components and patterns for easy migration - Performance focused - Small bundle size and efficient routing - Path-to-RegExp powered - Uses path-to-regexp for robust route matching with full pattern support - Hierarchical data passing - Pass reactive data down routing tree with automatic merging"
+        "content": "<div class=\"text-center mb-12\">  Wouter for Vue 3 wouter-vue is a minimal, high-performance router for Vue 3 (7.9KB gzipped, 17.5KB uncompressed) that relies on Composition API and provides an intuitive routing experience. </div>  Features - 📦 Minimal bundle size (7.9KB gzipped, 17.5KB uncompressed) - 72% smaller response size vs vue-router - ⚡ Outstanding performance - 72% higher throughput, handles 83% more requests - 🎯 Vue 3 Composition API - Fully reactive routing with TypeScript support - 🔧 Optional  - No top-level router required, works out of the box - 📦 Minimal dependencies (Vue 3 + path-to-regexp) - 🎨 Server-Side Rendering (SSR) - Full SSR support with Vite - 🗂️ Nested routing - Flexible route parameters and nested structures - 🔗 Active links - Scoped slot API for active state styling - 💾 TypeScript - Full type definitions included - 📊 Hierarchical & Reactive Data Passing - Pass data down routing tree with automatic merging  Performance Based on load testing with Artillery.io (3,300 virtual users, 200 routes, 6-minute duration): | Metric | wouter-vue | vue-router | Advantage | |--------|-----------|------------|-----------| | Throughput | 117 req/s | 68 req/s | +72% faster | | Total Requests | 36,300 | 19,800 | +83% more requests | | Latency (mean) | 0.9 ms | 0.6 ms | Comparable | | Latency (p50) | 1 ms | 1 ms | Same performance | Key Takeaway: wouter-vue processes 72% more requests per second (117 vs 68 req/s) with identical median latency (1ms) compared to vue-router, while handling nearly double the total requests (36,300 vs 19,800) in the same timeframe, making it ideal for high-traffic applications.  Quick Start  Installation Requirements: Vue 3.5.22 or higher  Next Steps - Getting Started - Learn the basics - API Reference - Explore all APIs - Guides - Advanced patterns and techniques - Cookbook - Practical examples and recipes  About wouter-vue is inspired by the original wouter router for React and Preact. The original wouter's minimalist philosophy, hook-based architecture, and elegant simplicity resonated strongly, leading to the creation of this Vue 3 adaptation. This project attempts to bring the same core principles and design philosophy to Vue's ecosystem: - Minimalist approach - Keep it tiny with minimal dependencies - Composition API first - Leverage Vue's reactivity system instead of React hooks - Optional Router - No mandatory top-level component - Familiar API - Similar components and patterns for easy migration - Performance focused - Small bundle size and efficient routing - Path-to-RegExp powered - Uses path-to-regexp for robust route matching with full pattern support - Hierarchical data passing - Pass reactive data down routing tree with automatic merging --- <div class=\"bg-blue-50 border-l-4 border-blue-500 p-4 my-8 rounded-r\">  💡 Built with wouter-vue This entire documentation site is built entirely with wouter-vue, including: - Server-Side Rendering (SSR) and Static Site Generation (SSG) - All routing and navigation - Dynamic route generation from Markdown files - Search functionality - Smooth page transitions See the source code to explore how wouter-vue powers this documentation site. </div>"
       },
       "25": {
         "path": "/installation",
@@ -561,6 +561,14 @@ export default {
         }
       ],
       [
+        "8",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
         "800",
         {
           "1": {
@@ -611,6 +619,14 @@ export default {
       ],
       [
         "+",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "💡",
         {
           "1": {
             "24": 1
@@ -677,7 +693,7 @@ export default {
         "<",
         {
           "1": {
-            "24": 1
+            "24": 2
           }
         }
       ],
@@ -685,7 +701,7 @@ export default {
         "<div",
         {
           "1": {
-            "24": 1
+            "24": 2
           }
         }
       ],
@@ -710,7 +726,7 @@ export default {
         ">",
         {
           "1": {
-            "24": 1
+            "24": 2
           }
         }
       ],
@@ -788,6 +804,22 @@ export default {
         }
       ],
       [
+        "500",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "50",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
         "5kb",
         {
           "1": {
@@ -811,6 +843,7 @@ export default {
           "1": {
             "13": 1,
             "23": 1,
+            "24": 2,
             "26": 1
           }
         }
@@ -947,6 +980,41 @@ export default {
         }
       ],
       [
+        "generation",
+        {
+          "1": {
+            "24": 2
+          }
+        }
+      ],
+      [
+        "getting",
+        {
+          "0": {
+            "19": 1
+          },
+          "1": {
+            "19": 1,
+            "24": 1,
+            "25": 1
+          }
+        }
+      ],
+      [
+        "get",
+        {
+          "1": {
+            "6": 1,
+            "7": 1,
+            "10": 1,
+            "11": 1,
+            "12": 1,
+            "13": 1,
+            "19": 1
+          }
+        }
+      ],
+      [
         "guide",
         {
           "0": {
@@ -1017,33 +1085,6 @@ export default {
           "1": {
             "17": 1,
             "18": 1
-          }
-        }
-      ],
-      [
-        "getting",
-        {
-          "0": {
-            "19": 1
-          },
-          "1": {
-            "19": 1,
-            "24": 1,
-            "25": 1
-          }
-        }
-      ],
-      [
-        "get",
-        {
-          "1": {
-            "6": 1,
-            "7": 1,
-            "10": 1,
-            "11": 1,
-            "12": 1,
-            "13": 1,
-            "19": 1
           }
         }
       ],
@@ -1207,12 +1248,20 @@ export default {
             "20": 1,
             "21": 2,
             "23": 2,
-            "24": 15,
+            "24": 18,
             "25": 2,
             "26": 5,
             "27": 4,
             "28": 2,
             "30": 1
+          }
+        }
+      ],
+      [
+        "my",
+        {
+          "1": {
+            "24": 1
           }
         }
       ],
@@ -1380,6 +1429,14 @@ export default {
         {
           "1": {
             "27": 1
+          }
+        }
+      ],
+      [
+        "markdown",
+        {
+          "1": {
+            "24": 1
           }
         }
       ],
@@ -1699,6 +1756,14 @@ export default {
         }
       ],
       [
+        "including",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
         "inspired",
         {
           "1": {
@@ -1914,7 +1979,7 @@ export default {
             "20": 3,
             "21": 5,
             "23": 2,
-            "24": 2,
+            "24": 3,
             "27": 1,
             "29": 2
           }
@@ -1941,6 +2006,14 @@ export default {
             "19": 1,
             "22": 1,
             "24": 2
+          }
+        }
+      ],
+      [
+        "l",
+        {
+          "1": {
+            "24": 1
           }
         }
       ],
@@ -2216,7 +2289,8 @@ export default {
             "13": 1,
             "19": 1,
             "21": 1,
-            "22": 1
+            "22": 1,
+            "24": 1
           }
         }
       ],
@@ -2817,6 +2891,22 @@ export default {
         }
       ],
       [
+        "entirely",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "entire",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
         "entry",
         {
           "1": {
@@ -2857,7 +2947,7 @@ export default {
         {
           "1": {
             "19": 1,
-            "24": 1
+            "24": 2
           }
         }
       ],
@@ -3122,6 +3212,7 @@ export default {
             "10": 2,
             "15": 1,
             "19": 1,
+            "24": 1,
             "26": 1
           }
         }
@@ -3131,6 +3222,55 @@ export default {
         {
           "1": {
             "6": 2
+          }
+        }
+      ],
+      [
+        "source",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "solutions",
+        {
+          "1": {
+            "29": 1
+          }
+        }
+      ],
+      [
+        "solution",
+        {
+          "1": {
+            "21": 1,
+            "29": 5
+          }
+        }
+      ],
+      [
+        "ssg",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "ssr",
+        {
+          "0": {
+            "28": 1
+          },
+          "1": {
+            "2": 6,
+            "4": 6,
+            "24": 3,
+            "25": 1,
+            "28": 5,
+            "29": 1
           }
         }
       ],
@@ -3155,7 +3295,8 @@ export default {
         {
           "1": {
             "0": 1,
-            "14": 1
+            "14": 1,
+            "24": 1
           }
         }
       ],
@@ -3208,23 +3349,6 @@ export default {
         {
           "1": {
             "14": 1
-          }
-        }
-      ],
-      [
-        "solutions",
-        {
-          "1": {
-            "29": 1
-          }
-        }
-      ],
-      [
-        "solution",
-        {
-          "1": {
-            "21": 1,
-            "29": 5
           }
         }
       ],
@@ -3399,7 +3523,8 @@ export default {
         "static",
         {
           "1": {
-            "20": 1
+            "20": 1,
+            "24": 1
           }
         }
       ],
@@ -3499,6 +3624,14 @@ export default {
         }
       ],
       [
+        "site",
+        {
+          "1": {
+            "24": 3
+          }
+        }
+      ],
+      [
         "size",
         {
           "1": {
@@ -3523,7 +3656,7 @@ export default {
           "1": {
             "2": 1,
             "4": 1,
-            "24": 1,
+            "24": 2,
             "28": 1,
             "29": 1
           }
@@ -3604,7 +3737,8 @@ export default {
           "1": {
             "4": 1,
             "11": 3,
-            "12": 4
+            "12": 4,
+            "24": 1
           }
         }
       ],
@@ -3686,7 +3820,7 @@ export default {
             "2": 3,
             "4": 1,
             "20": 1,
-            "24": 1,
+            "24": 2,
             "28": 2,
             "29": 1
           }
@@ -3713,25 +3847,10 @@ export default {
             "19": 1,
             "21": 1,
             "23": 1,
+            "24": 1,
             "26": 1,
             "27": 1,
             "28": 1,
-            "29": 1
-          }
-        }
-      ],
-      [
-        "ssr",
-        {
-          "0": {
-            "28": 1
-          },
-          "1": {
-            "2": 6,
-            "4": 6,
-            "24": 2,
-            "25": 1,
-            "28": 5,
             "29": 1
           }
         }
@@ -3789,6 +3908,14 @@ export default {
         {
           "1": {
             "29": 1
+          }
+        }
+      ],
+      [
+        "files",
+        {
+          "1": {
+            "24": 1
           }
         }
       ],
@@ -3996,6 +4123,7 @@ export default {
             "21": 3,
             "22": 2,
             "23": 1,
+            "24": 1,
             "26": 1,
             "27": 1,
             "30": 1
@@ -4022,7 +4150,8 @@ export default {
         "functionality",
         {
           "1": {
-            "18": 1
+            "18": 1,
+            "24": 1
           }
         }
       ],
@@ -4062,7 +4191,15 @@ export default {
         }
       ],
       [
-        "robust",
+        "r",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "rounded",
         {
           "1": {
             "24": 1
@@ -4088,7 +4225,7 @@ export default {
             "21": 2,
             "22": 3,
             "23": 1,
-            "24": 6,
+            "24": 7,
             "25": 1
           }
         }
@@ -4160,11 +4297,19 @@ export default {
             "21": 3,
             "22": 2,
             "23": 2,
-            "24": 2,
+            "24": 3,
             "25": 1,
             "26": 2,
             "27": 1,
             "29": 2
+          }
+        }
+      ],
+      [
+        "robust",
+        {
+          "1": {
+            "24": 1
           }
         }
       ],
@@ -4537,7 +4682,7 @@ export default {
             "3": 2,
             "4": 1,
             "17": 1,
-            "24": 1,
+            "24": 2,
             "28": 1
           }
         }
@@ -4636,6 +4781,7 @@ export default {
           "1": {
             "13": 2,
             "23": 1,
+            "24": 2,
             "26": 1,
             "27": 1
           }
@@ -4678,7 +4824,7 @@ export default {
         "div>",
         {
           "1": {
-            "24": 1
+            "24": 2
           }
         }
       ],
@@ -4716,6 +4862,7 @@ export default {
             "5": 1,
             "16": 3,
             "21": 1,
+            "24": 1,
             "27": 3
           }
         }
@@ -4886,6 +5033,30 @@ export default {
         }
       ],
       [
+        "blue",
+        {
+          "1": {
+            "24": 2
+          }
+        }
+      ],
+      [
+        "bg",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "border",
+        {
+          "1": {
+            "24": 2
+          }
+        }
+      ],
+      [
         "box",
         {
           "1": {
@@ -4900,6 +5071,14 @@ export default {
             "0": 1,
             "3": 1,
             "14": 1
+          }
+        }
+      ],
+      [
+        "built",
+        {
+          "1": {
+            "24": 2
           }
         }
       ],
@@ -5626,7 +5805,8 @@ export default {
         "code",
         {
           "1": {
-            "13": 2
+            "13": 2,
+            "24": 1
           }
         }
       ],
@@ -5831,7 +6011,7 @@ export default {
         "class=",
         {
           "1": {
-            "24": 1
+            "24": 2
           }
         }
       ],
@@ -6093,7 +6273,7 @@ export default {
           "1": {
             "2": 1,
             "5": 1,
-            "24": 2,
+            "24": 4,
             "27": 1,
             "29": 1
           }
@@ -6168,7 +6348,7 @@ export default {
             "21": 6,
             "22": 4,
             "23": 3,
-            "24": 8,
+            "24": 9,
             "25": 1,
             "29": 1,
             "30": 1
@@ -6224,7 +6404,7 @@ export default {
             "21": 4,
             "22": 5,
             "23": 5,
-            "24": 7,
+            "24": 8,
             "26": 1,
             "27": 1,
             "28": 1
@@ -6311,7 +6491,8 @@ export default {
           },
           "1": {
             "0": 3,
-            "14": 2
+            "14": 2,
+            "24": 1
           }
         }
       ],
@@ -6363,6 +6544,22 @@ export default {
         {
           "1": {
             "27": 1
+          }
+        }
+      ],
+      [
+        "p",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "powers",
+        {
+          "1": {
+            "24": 1
           }
         }
       ],
@@ -6879,7 +7076,8 @@ export default {
             "1": 1,
             "11": 1,
             "16": 1,
-            "21": 2
+            "21": 2,
+            "24": 1
           }
         }
       ],
@@ -7312,7 +7510,7 @@ export default {
             "13": 1,
             "18": 1,
             "21": 3,
-            "24": 1,
+            "24": 2,
             "30": 2
           }
         }
@@ -7382,7 +7580,7 @@ export default {
             "18": 1,
             "19": 2,
             "21": 1,
-            "24": 9,
+            "24": 11,
             "28": 1,
             "29": 2
           }
@@ -7568,7 +7766,7 @@ export default {
             "20": 1,
             "21": 1,
             "23": 1,
-            "24": 7,
+            "24": 10,
             "25": 1,
             "26": 3,
             "27": 3,
@@ -7632,7 +7830,7 @@ export default {
             "21": 5,
             "22": 2,
             "23": 1,
-            "24": 8,
+            "24": 10,
             "25": 1,
             "27": 1,
             "28": 2,
