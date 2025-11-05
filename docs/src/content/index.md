@@ -94,4 +94,20 @@ This project attempts to bring the same core principles and design philosophy to
 - **Path-to-RegExp powered** - Uses [path-to-regexp](https://github.com/pillarjs/path-to-regexp) for robust route matching with full pattern support
 - **Hierarchical data passing** - Pass reactive data down routing tree with automatic merging
 
+---
+
+<div class="bg-blue-50 border-l-4 border-blue-500 p-4 my-8 rounded-r">
+
+## 💡 Built with wouter-vue
+
+**This entire documentation site is built entirely with wouter-vue**, including:
+- Server-Side Rendering (SSR) and Static Site Generation (SSG)
+- All routing and navigation
+- Dynamic route generation from Markdown files
+- Search functionality
+- Smooth page transitions
+
+See the [source code](https://github.com/s00d/wouter-vue/tree/main/docs) to explore how wouter-vue powers this documentation site.
+
+</div>
 
