@@ -30,9 +30,11 @@ export async function render(url) {
     const matchingRoute = routes.find(r => r.path === path);
     if (matchingRoute && typeof matchingRoute.component === 'function') {
       try {
+        // Preload the component module
         await matchingRoute.component();
       } catch (err) {
         console.warn(`Failed to preload component for route ${path}:`, err);
+        // Don't throw - let Suspense handle it
       }
     }
 

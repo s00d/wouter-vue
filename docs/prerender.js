@@ -50,6 +50,13 @@ function getRoutesFromMenu() {
 }
 
 async function run() {
+  // Check if we're building for GitHub Pages
+  const isGitHubPages = process.env.GITHUB_PAGES === 'true';
+  const basePath = isGitHubPages ? '/wouter-vue' : '';
+  
+  console.log(`Prerendering for ${isGitHubPages ? 'GitHub Pages' : 'local'} (base: ${basePath || '/'})`);
+  console.log(`GITHUB_PAGES env: ${process.env.GITHUB_PAGES}`);
+  
   // Find entry-server.js file (it has a hash in the name and is in client subfolder)
   const serverDir = toAbsolute('dist/server/client');
   let entryServerPath = null;
@@ -101,13 +108,17 @@ async function run() {
   console.log(`Found ${routesToPrerender.length} routes to prerender`);
 
   // Render each route
-  for (const url of routesToPrerender) {
+  for (const routePath of routesToPrerender) {
     try {
-      const appHtml = await render(url);
+      // For GitHub Pages, pass the full URL with base path to render function
+      // The render function will normalize it
+      const urlToRender = basePath ? `${basePath}${routePath}` : routePath;
+      const appHtml = await render(urlToRender);
       
-      const filePath = url.endsWith('/') 
-        ? `${url}index.html` 
-        : `${url}/index.html`;
+      // File path should be relative to dist/client (without base path)
+      const filePath = routePath.endsWith('/') 
+        ? `${routePath}index.html` 
+        : `${routePath}/index.html`;
       
       const fullPath = path.join(distPath, filePath);
       const dir = path.dirname(fullPath);
@@ -119,9 +130,10 @@ async function run() {
       const html = template.replace(/<!--ssr-outlet-->/, appHtml);
       
       fs.writeFileSync(fullPath, html);
-      console.log(`✓ Prerendered: ${url}`);
+      console.log(`✓ Prerendered: ${routePath} -> ${filePath}`);
     } catch (error) {
-      console.error(`✗ Failed to prerender ${url}:`, error);
+      console.error(`✗ Failed to prerender ${routePath}:`, error);
+      throw error; // Re-throw to fail the build
     }
   }
   
