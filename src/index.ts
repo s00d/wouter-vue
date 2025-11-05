@@ -32,7 +32,7 @@ export type SetSearchParamsFn = (
   options?: { replace?: boolean; state?: unknown }
 ) => void
 
-import { relativePath, sanitizeSearch } from './paths'
+import { relativePath, absolutePath, sanitizeSearch } from './paths'
 import { memoryLocation } from './memory-location'
 import { isDev } from './helpers/dev-helpers'
 import { isSSR } from './helpers/ssr-helpers'
@@ -235,7 +235,14 @@ export const useLocationFromRouter = (router: RouterRef): [ComputedRef<Path>, Na
     return result as [Ref<Path> | Path, (path: Path, ...args: unknown[]) => unknown]
   })
 
-  const navigateFn = hookResult.value[1] as NavigateFn
+  // Wrap navigate function to add base path
+  // Need to access hookResult.value inside the function to get latest navigate function
+  const navigateFn: NavigateFn = (path: Path, options?: { replace?: boolean; state?: unknown }) => {
+    const base = routerValue.value.base
+    const absolute = absolutePath(path, base)
+    const originalNavigateFn = hookResult.value[1] as NavigateFn
+    return originalNavigateFn(absolute, options)
+  }
 
   // Compute final location reactively, unwrapping refs with unref
   const finalLocation = computed(() => {
