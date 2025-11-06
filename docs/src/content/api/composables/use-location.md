@@ -1,6 +1,8 @@
 ---
 title: useLocation
 description: Get current location and navigate programmatically
+section: API Reference
+order: 31
 ---
 
 # useLocation

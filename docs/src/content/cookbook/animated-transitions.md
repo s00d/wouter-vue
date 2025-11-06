@@ -1,6 +1,8 @@
 ---
 title: Animated Route Transitions
 description: Add smooth transitions between routes
+section: Cookbook
+order: 61
 ---
 
 # Animated Route Transitions

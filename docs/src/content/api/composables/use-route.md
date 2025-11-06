@@ -1,6 +1,8 @@
 ---
 title: useRoute
 description: Check if current location matches a route pattern
+section: API Reference
+order: 33
 ---
 
 # useRoute

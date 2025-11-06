@@ -1,6 +1,8 @@
 ---
 title: Route Guards
 description: Protect routes with authentication and authorization
+section: Cookbook
+order: 64
 ---
 
 # Route Guards

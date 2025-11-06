@@ -1,6 +1,8 @@
 ---
 title: TypeScript
 description: TypeScript support in wouter-vue
+section: Other
+order: 83
 ---
 
 # TypeScript

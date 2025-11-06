@@ -4,14 +4,15 @@
  * Creates a navigation link that updates the URL without a full page reload.
  */
 
-import type { ComputedRef } from 'vue'
-import { computed, h } from 'vue'
+import type { ComputedRef, VNode } from 'vue'
+import { computed, h, cloneVNode } from 'vue'
 import type { Path } from '../../types/location-hook'
 import { useLocationFromRouter, useRouter, defaultRouter, normalizeBooleanProp } from '../index'
 import type { ComponentSetupContext } from './types'
 import { normalizePath, resolveTargetPath, validateTargetPathProps, shouldIgnoreNavigationClick } from '../helpers/path-helpers'
 import { useRouterValue } from '../helpers/router-helpers'
 import { resolveSlot, resolveSlotWithParams, PropsResolver } from '../helpers/vue-helpers'
+import { devWarn } from '../helpers/dev-helpers'
 
 type LinkProps = {
   href?: string
@@ -109,6 +110,45 @@ export const Link = {
 
       // Get class from attrs (standard Vue class attribute)
       const classNameFromAttrs = attrsResolver.get<string>('class')
+
+      const asChild = normalizeBooleanProp(props.asChild)
+
+      if (asChild) {
+        // asChild mode: merge props with single child element
+        // Normalize content to array of VNodes
+        let children: VNode[] = []
+        if (Array.isArray(content)) {
+          children = content.filter((item): item is VNode => item != null && typeof item === 'object' && 'type' in item)
+        } else if (content != null && typeof content === 'object' && 'type' in content) {
+          children = [content as VNode]
+        }
+        
+        if (children.length !== 1) {
+          devWarn(
+            'Link',
+            `asChild requires exactly one child element, but got ${children.length} children.`
+          )
+          return children.length > 0 ? children : null
+        }
+
+        const child = children[0]
+
+        // Merge props: attrs from Link, then child's props, then Link's behavior props
+        const mergedProps = {
+          ...attrs,
+          ...(child.props || {}),
+          onClick: (event: MouseEvent) => {
+            onClick(event)
+            // Also call original onClick if it exists on child
+            if (typeof child.props?.onClick === 'function') {
+              child.props.onClick(event)
+            }
+          },
+          href: href.value,
+        }
+
+        return cloneVNode(child, mergedProps)
+      }
 
       return h(
         'a',

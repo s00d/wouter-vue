@@ -1,6 +1,8 @@
 ---
 title: useSearchParams
 description: Get and manipulate URL search parameters
+section: API Reference
+order: 37
 ---
 
 # useSearchParams

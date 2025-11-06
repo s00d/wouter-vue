@@ -4,10 +4,9 @@ import App from './App.vue';
 
 export async function render(url) {
   try {
-    console.log(`[SSR Render] Received URL: ${url}`);
-    
     let path = url || '/';
     let search = '';
+    
     if (typeof url === 'string') {
       const qIdx = url.indexOf('?');
       if (qIdx >= 0) {
@@ -16,10 +15,8 @@ export async function render(url) {
       }
     }
 
-    // Pass the full path to App.vue
-    // Router will handle base path internally
+    // renderToString automatically waits for all <Suspense> to resolve
     const app = createSSRApp(() => h(App, { ssrPath: path, ssrSearch: search }));
-    
     const html = await renderToString(app);
     
     return html || '<div>No content rendered</div>';

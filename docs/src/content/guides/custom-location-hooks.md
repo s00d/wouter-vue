@@ -1,6 +1,8 @@
 ---
 title: Custom Location Hooks
 description: Use hash-based routing or memory location for testing
+section: Guides
+order: 14
 ---
 
 # Custom Location Hooks
@@ -16,11 +18,14 @@ Use hash-based routing (e.g., `#/about`) instead of browser history:
 import { Router } from 'wouter-vue';
 import { useHashLocation } from 'wouter-vue/use-hash-location';
 
-const hashLocation = useHashLocation();
+// Wrap useHashLocation in a function that matches Router's hook signature
+const hashLocationHook = (router) => {
+  return useHashLocation({ ssrPath: router.ssrPath });
+};
 </script>
 
 <template>
-  <Router :location="hashLocation">
+  <Router :hook="hashLocationHook">
     <Route path="/">
       <HomePage />
     </Route>
@@ -40,15 +45,25 @@ const hashLocation = useHashLocation();
 Use memory location for testing - routes don't affect browser history:
 
 ```vue
+<script>
+import { memoryLocation } from 'wouter-vue/memory-location';
+
+// Create memory location instance
+const memLoc = memoryLocation({ record: true });
+
+// Call hook() once to get the location tuple
+const locationTuple = memLoc.hook();
+
+// Factory function that always returns the same tuple
+const locationHook = () => locationTuple;
+</script>
+
 <script setup>
 import { Router } from 'wouter-vue';
-import { useMemoryLocation } from 'wouter-vue/memory-location';
-
-const memoryLocation = useMemoryLocation();
 </script>
 
 <template>
-  <Router :location="memoryLocation">
+  <Router :hook="locationHook">
     <Route path="/">
       <HomePage />
     </Route>
@@ -92,5 +107,8 @@ function useCustomLocation() {
 - Default location hook is `useBrowserLocation()` (browser history API)
 - Hash location is useful for static hosting without server configuration
 - Memory location is perfect for testing environments
+- **Important**: Router component uses `:hook` prop, not `:location`
+- Custom hooks must be functions that accept a `RouterObject` and return `[Ref<Path>, NavigateFn]`
+- For `memoryLocation`, call `hook()` once and reuse the result to ensure all components share the same reactive state
 
 

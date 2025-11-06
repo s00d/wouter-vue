@@ -1,6 +1,8 @@
 ---
 title: Route
 description: Match and render components based on URL patterns
+section: API Reference
+order: 41
 ---
 
 # Route

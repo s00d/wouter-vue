@@ -1,6 +1,8 @@
 ---
 title: useSearch
 description: Get the current URL search string
+section: API Reference
+order: 36
 ---
 
 # useSearch

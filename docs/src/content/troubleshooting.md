@@ -1,6 +1,8 @@
 ---
 title: Troubleshooting
 description: Common issues and solutions
+section: Other
+order: 85
 ---
 
 # Troubleshooting

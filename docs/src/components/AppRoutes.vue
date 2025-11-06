@@ -6,7 +6,7 @@
           v-for="route in routes"
           :key="route.path"
           :path="route.path"
-          :component="route.pageComponent"
+          :component="route.component"
         />
         <Route :component="NotFoundPage" />
         </AnimatedSwitch>
@@ -19,34 +19,15 @@
 </template>
 
 <script setup>
-import { Suspense, defineAsyncComponent, h } from 'vue';
+import { Suspense } from 'vue';
 import { Route, AnimatedSwitch } from 'wouter-vue';
 import { createRoutes } from '../routes.js';
 import Layout from './Layout.vue';
 import LoadingSpinner from './LoadingSpinner.vue';
-import RouteWrapper from './RouteWrapper.vue';
 
 // Generate routes from Markdown files
-const routes = createRoutes().map(route => ({
-  ...route,
-  // Create async page component that wraps markdown with single root element
-  pageComponent: defineAsyncComponent({
-    loader: async () => {
-      // Load the markdown component
-      const component = typeof route.component === 'function' 
-        ? await route.component() 
-        : route.component;
-      
-      // Return a component with single root element (RouteWrapper)
-      return {
-        components: { RouteWrapper },
-        setup() {
-          return () => h(RouteWrapper, { component });
-        },
-      };
-    },
-  }),
-}));
+// vite-plugin-md creates components with single root element, so we can pass them directly
+const routes = createRoutes();
 
 // 404 page component
 const NotFoundPage = () => import('../pages/NotFoundPage.vue');

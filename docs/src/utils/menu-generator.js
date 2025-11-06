@@ -46,6 +46,8 @@ export function generateMenu(baseDir) {
           path: `/${url}`,
           filePath: relativePath,
           title: frontmatter.title || formatTitle(entry.name.replace('.md', '')),
+          section: frontmatter.section || null,
+          order: frontmatter.order !== undefined ? frontmatter.order : 999,
           parts: url.split('/').filter(Boolean),
         });
       }
@@ -54,101 +56,116 @@ export function generateMenu(baseDir) {
   
   scanDirectory(contentDir);
   
-  // Organize into sections
-  const sections = new Map();
-  const sectionOrder = ['getting-started', 'api', 'guides', 'cookbook'];
-  
-  // Process root-level files first
-  const rootFiles = files.filter(f => f.parts.length === 1);
-  const rootFileMapping = {
-    'getting-started': 'getting-started',
-    'installation': 'getting-started',
-    'core-concepts': 'getting-started',
-    'server-side-rendering': 'other',
-    'performance': 'other',
-    'typescript': 'other',
-    'migration': 'other',
-    'troubleshooting': 'other',
-    'contributing': 'other',
+  // Map section names to display names and order
+  const sectionDisplayNames = {
+    'Introduction': 'Introduction',
+    'Guides': 'Guides',
+    'API Reference': 'API Reference',
+    'Cookbook': 'Cookbook',
+    'Other': 'Other',
   };
   
-  // Initialize sections
-  sectionOrder.forEach(sectionName => {
-    sections.set(sectionName, {
-      path: sectionName === 'getting-started' ? '/' : `/${sectionName}`,
-      title: formatTitle(sectionName),
-      children: new Map(),
-      isFile: false,
+  const sectionOrder = ['Introduction', 'Guides', 'API Reference', 'Cookbook', 'Other'];
+  
+  // Organize into sections based on frontmatter
+  const sections = new Map();
+  
+  // Helper function to determine section from file
+  function getSectionForFile(file) {
+    // If section is explicitly set in frontmatter, use it
+    if (file.section) {
+      return file.section;
+    }
+    
+    // Fallback: determine section from path structure
+    if (file.parts.length > 1) {
+      const firstPart = file.parts[0];
+      const sectionMap = {
+        'api': 'API Reference',
+        'guides': 'Guides',
+        'cookbook': 'Cookbook',
+      };
+      return sectionMap[firstPart] || 'Other';
+    }
+    
+    // Root-level files default to "Other" if no section specified
+    return 'Other';
+  }
+  
+  // Group files by section
+  files.forEach(file => {
+    const sectionName = getSectionForFile(file);
+    
+    if (!sections.has(sectionName)) {
+      sections.set(sectionName, {
+        title: sectionDisplayNames[sectionName] || sectionName,
+        files: [],
+        children: new Map(),
+      });
+    }
+    
+    sections.get(sectionName).files.push(file);
+  });
+  
+  // Process files within each section
+  sections.forEach((section, sectionName) => {
+    // Sort files by order, then alphabetically
+    section.files.sort((a, b) => {
+      if (a.order !== b.order) {
+        return a.order - b.order;
+      }
+      return a.title.localeCompare(b.title);
+    });
+    
+    // Build nested structure for files in this section
+    section.files.forEach(file => {
+      // For nested files (e.g., /api/composables/use-location)
+      if (file.parts.length > 1) {
+        const sectionPart = file.parts[0];
+        let current = section.children;
+        
+        // Build nested structure starting from second part
+        for (let i = 1; i < file.parts.length; i++) {
+          const part = file.parts[i];
+          const isLast = i === file.parts.length - 1;
+          const fullPath = '/' + file.parts.slice(0, i + 1).join('/');
+          
+          if (!current.has(part)) {
+            current.set(part, {
+              path: fullPath,
+              title: isLast ? file.title : formatTitle(part),
+              order: file.order,
+              children: new Map(),
+              isFile: isLast,
+            });
+          } else if (isLast) {
+            // Update title and order if frontmatter has it
+            const existing = current.get(part);
+            existing.title = file.title;
+            existing.order = file.order;
+          }
+          
+          if (!isLast) {
+            current = current.get(part).children;
+          }
+        }
+      } else {
+        // Root-level files in section
+        const fileName = file.parts[0];
+        if (!section.children.has(fileName)) {
+          section.children.set(fileName, {
+            path: file.path,
+            title: file.title,
+            order: file.order,
+            children: [],
+            isFile: true,
+          });
+        }
+      }
     });
   });
   
-  sections.set('other', {
-    path: '/other',
-    title: 'Other',
-    children: new Map(),
-    isFile: false,
-  });
-  
-  // Add root-level files to appropriate sections
-  rootFiles.forEach(file => {
-    const fileName = file.parts[0];
-    const sectionName = rootFileMapping[fileName] || 'other';
-    const section = sections.get(sectionName);
-    
-    if (section && !section.children.has(fileName)) {
-      section.children.set(fileName, {
-        path: file.path,
-        title: file.title,
-        children: [],
-        isFile: true,
-      });
-    }
-  });
-  
-  // Process nested files
-  const nestedFiles = files.filter(f => f.parts.length > 1);
-  
-  nestedFiles.forEach(file => {
-    const sectionName = file.parts[0];
-    let section = sections.get(sectionName);
-    
-    if (!section) {
-      section = {
-        path: `/${sectionName}`,
-        title: formatTitle(sectionName),
-        children: new Map(),
-        isFile: false,
-      };
-      sections.set(sectionName, section);
-    }
-    
-    // Build nested structure
-    let current = section.children;
-    
-    for (let i = 1; i < file.parts.length; i++) {
-      const part = file.parts[i];
-      const isLast = i === file.parts.length - 1;
-      const fullPath = '/' + file.parts.slice(0, i + 1).join('/');
-      
-      if (!current.has(part)) {
-        current.set(part, {
-          path: fullPath,
-          title: isLast ? file.title : formatTitle(part),
-          children: new Map(),
-          isFile: isLast,
-        });
-      } else if (isLast) {
-        // Update title if frontmatter has it
-        current.get(part).title = file.title;
-      }
-      
-      if (!isLast) {
-        current = current.get(part).children;
-      }
-    }
-  });
-  
-  // Convert Map to Array structure
+  // Convert Map to Array structure with sorting
   function mapToArray(map) {
     return Array.from(map.values())
       .map(item => ({
@@ -156,6 +173,10 @@ export function generateMenu(baseDir) {
         children: item.children.size > 0 ? mapToArray(item.children) : [],
       }))
       .sort((a, b) => {
+        // Sort by order if available, then by type (folders first), then alphabetically
+        if (a.order !== undefined && b.order !== undefined && a.order !== b.order) {
+          return a.order - b.order;
+        }
         if (a.isFile && !b.isFile) return 1;
         if (!a.isFile && b.isFile) return -1;
         return a.title.localeCompare(b.title);
@@ -165,12 +186,22 @@ export function generateMenu(baseDir) {
   // Build final structure
   const root = [];
   
-  // Add sections in order
+  // Add sections in predefined order
   sectionOrder.forEach(sectionName => {
     const section = sections.get(sectionName);
     if (section && section.children.size > 0) {
+      // Determine path for section (use first child's path parent or default)
+      let sectionPath = '/';
+      const firstChild = Array.from(section.children.values())[0];
+      if (firstChild && firstChild.path) {
+        const pathParts = firstChild.path.split('/').filter(Boolean);
+        if (pathParts.length > 0) {
+          sectionPath = `/${pathParts[0]}`;
+        }
+      }
+      
       root.push({
-        path: section.path,
+        path: sectionPath,
         title: section.title,
         children: mapToArray(section.children),
         isFile: false,
@@ -178,11 +209,20 @@ export function generateMenu(baseDir) {
     }
   });
   
-  // Add other sections
-  sections.forEach((section, key) => {
-    if (!sectionOrder.includes(key) && section.children.size > 0) {
+  // Add any remaining sections not in predefined order
+  sections.forEach((section, sectionName) => {
+    if (!sectionOrder.includes(sectionName) && section.children.size > 0) {
+      let sectionPath = '/';
+      const firstChild = Array.from(section.children.values())[0];
+      if (firstChild && firstChild.path) {
+        const pathParts = firstChild.path.split('/').filter(Boolean);
+        if (pathParts.length > 0) {
+          sectionPath = `/${pathParts[0]}`;
+        }
+      }
+      
       root.push({
-        path: section.path,
+        path: sectionPath,
         title: section.title,
         children: mapToArray(section.children),
         isFile: false,

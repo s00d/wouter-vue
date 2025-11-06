@@ -1,5 +1,5 @@
 <template>
-  <nav class="p-4">
+  <nav class="p-4 bg-white dark:bg-gray-800">
     <ul class="space-y-2">
       <MenuItem 
         v-for="item in menuItems" 
@@ -36,5 +36,14 @@ nav::-webkit-scrollbar-thumb {
 
 nav::-webkit-scrollbar-thumb:hover {
   background: #a0aec0;
+}
+
+/* Dark mode scrollbar */
+:global(.dark) nav::-webkit-scrollbar-thumb {
+  background: #4b5563;
+}
+
+:global(.dark) nav::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
 }
 </style>

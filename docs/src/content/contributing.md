@@ -1,6 +1,8 @@
 ---
 title: Contributing
 description: Contribute to wouter-vue
+section: Other
+order: 86
 ---
 
 # Contributing

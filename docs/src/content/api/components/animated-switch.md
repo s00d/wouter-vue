@@ -1,6 +1,8 @@
 ---
 title: AnimatedSwitch
 description: Switch component with animated route transitions
+section: API Reference
+order: 43
 ---
 
 # AnimatedSwitch

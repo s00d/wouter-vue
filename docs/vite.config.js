@@ -68,40 +68,33 @@ export default defineConfig({
         },
       },
       markdownItSetup(md) {
-        // Ensure code blocks are always rendered as code, not Vue components
+        // Custom fence renderer that creates wrapper for CodeBlock component
         const defaultFence = md.renderer.rules.fence;
         md.renderer.rules.fence = function(tokens, idx, options, env, self) {
           const token = tokens[idx];
           const info = token.info ? token.info.trim() : '';
           const langName = info.split(/\s+/g)[0];
+          const code = token.content;
           
-          // Always render code blocks as HTML, never as Vue components
-          if (langName === 'vue') {
-            // For vue code blocks, render as highlighted code using html/js syntax
-            // highlight.js doesn't have 'vue' language, so we use 'html' or 'javascript'
-            let highlighted;
-            try {
-              // Try html first (vue templates are similar to HTML)
-              if (hljs.getLanguage('html')) {
-                highlighted = hljs.highlight(token.content, { language: 'html', ignoreIllegals: true }).value;
-              } else {
-                // Fallback to plain text if html is not available
-                highlighted = hljs.highlight(token.content, { language: 'plaintext', ignoreIllegals: true }).value;
-              }
-            } catch (err) {
-              // Fallback: escape HTML and render as plain text
-              highlighted = token.content.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-            }
-            return `<pre class="hljs"><code class="language-vue">${highlighted}</code></pre>`;
-          }
+          // Escape code for HTML attribute (more robust escaping)
+          const escapedCode = code
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
           
-          // Use default fence renderer for other languages
-          return defaultFence ? defaultFence(tokens, idx, options, env, self) : '';
+          // Create wrapper div with data attributes for CodeBlock component
+          // The CodeBlock component will be mounted here by Layout.vue
+          return `<div class="code-block-mount" data-code="${escapedCode}" data-lang="${langName || ''}"></div>`;
         };
       },
-      wrapperClasses: 'max-w-none',
+      wrapperClasses: 'prose prose-slate dark:prose-invert max-w-none',
     }),
   ],
+  optimizeDeps: {
+    exclude: ['@vue/repl'],
+  },
   server: {
     port: 5173,
     fs: {

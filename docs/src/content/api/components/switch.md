@@ -1,6 +1,8 @@
 ---
 title: Switch
 description: Render only the first matching route for performance
+section: API Reference
+order: 42
 ---
 
 # Switch

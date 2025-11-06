@@ -1,6 +1,8 @@
 ---
 title: Breadcrumbs
 description: Create breadcrumb navigation using route data
+section: Cookbook
+order: 62
 ---
 
 # Breadcrumbs

@@ -1,6 +1,8 @@
 ---
 title: useRouteData
 description: Access hierarchical route data passed from parent routes
+section: API Reference
+order: 34
 ---
 
 # useRouteData

@@ -14,7 +14,7 @@ export default {
       "id": "/api/components/link",
       "path": "/api/components/link",
       "title": "Link",
-      "content": "Link Creates a navigation link with active state support.  Description The  component creates a navigation link that updates the URL without a full page reload. It supports active state detection through scoped slots.  Props | Prop | Type | Default | Description | |------|------|---------|-------------| |  |  |  | Target path | |  |  |  | Alias for  | |  |  |  | Replace history entry instead of pushing | |  |  |  | Click handler | |  |  |  | Render as child element |  Usage Simple link: Active link with scoped slot: Link with replace: Relative link (for nested routes): Multiple classes:  Active State Detection The  value is  when: - The link's path exactly matches the current location - The link's path is a prefix of the current location (for nested routes)  Notes -  and  are aliases - use whichever you prefer - Active state is computed reactively and updates automatically - See Nested Routing for relative link examples"
+      "content": "Link Creates a navigation link with active state support.  Description The  component creates a navigation link that updates the URL without a full page reload. It supports active state detection through scoped slots and can merge navigation behavior with custom child elements using the  prop.  Props | Prop | Type | Default | Description | |------|------|---------|-------------| |  |  |  | Target path | |  |  |  | Alias for  | |  |  |  | Replace history entry instead of pushing | |  |  |  | Click handler | |  |  |  | Merge props with single child element instead of rendering  tag |  Usage Simple link: Active link with scoped slot: Link with replace: Relative link (for nested routes): Multiple classes: Using  prop: The  prop allows you to merge navigation behavior with a custom child element instead of rendering an  tag. This is useful when you want to use a button, div, or other element as a link. Important notes about : - Requires exactly one child element - Merges  and  props with the child element - Child's original  handler is preserved and called before navigation - Useful for avoiding nested  tags (e.g., )  Active State Detection The  value is  when: - The link's path exactly matches the current location - The link's path is a prefix of the current location (for nested routes)  Notes -  and  are aliases - use whichever you prefer - Active state is computed reactively and updates automatically - See Nested Routing for relative link examples"
     },
     {
       "id": "/api/components/redirect",
@@ -32,7 +32,7 @@ export default {
       "id": "/api/components/router",
       "path": "/api/components/router",
       "title": "Router",
-      "content": "Router Optional router component that provides routing context for nested routes and SSR support.  Description The  component is optional - wouter-vue works without it for simple cases. However, it's recommended for: - Nested routing - Server-Side Rendering (SSR) - Custom location hooks - Advanced routing scenarios  Props | Prop | Type | Default | Description | |------|------|---------|-------------| |  |  |  | Custom location hook (optional) | |  |  |  | Initial path for SSR (optional) | |  |  |  | Initial search string for SSR (optional) |  Usage Basic usage: With SSR: With custom location hook:  Notes - Without , routes still work but nested routing may not function correctly - For SSR, always wrap your app with  and pass  and  props - See Custom Location Hooks for more information"
+      "content": "Router Optional router component that provides routing context for nested routes and SSR support.  Description The  component is optional - wouter-vue works without it for simple cases. However, it's recommended for: - Nested routing - Server-Side Rendering (SSR) - Custom location hooks - Advanced routing scenarios  Props | Prop | Type | Default | Description | |------|------|---------|-------------| |  |  |  | Custom location hook (optional) | |  |  |  | Initial path for SSR (optional) | |  |  |  | Initial search string for SSR (optional) | |  |  |  | Base path for routing (e.g., ). Automatically read from  in Vite |  Usage Basic usage: With SSR and base path: With custom location hook:  Notes - Without , routes still work but nested routing may not function correctly - For SSR, always wrap your app with  and pass  and  props - Set  prop automatically from  for subdirectory deployments - Router handles base path internally - all navigation works correctly with base path - See Custom Location Hooks for more information - See Server-Side Rendering for complete SSR setup"
     },
     {
       "id": "/api/components/switch",
@@ -128,7 +128,7 @@ export default {
       "id": "/guides/custom-location-hooks",
       "path": "/guides/custom-location-hooks",
       "title": "Custom Location Hooks",
-      "content": "Custom Location Hooks wouter-vue supports custom location hooks for different routing behaviors.  Hash-based Routing Use hash-based routing (e.g., ) instead of browser history: Example URLs: -  -   Memory Location (Testing) Use memory location for testing - routes don't affect browser history: Use cases: - Unit testing - Component testing - Storybook stories - Isolated routing scenarios  Creating Custom Hooks You can create custom location hooks by implementing the  interface: Example:  Notes - Default location hook is  (browser history API) - Hash location is useful for static hosting without server configuration - Memory location is perfect for testing environments"
+      "content": "Custom Location Hooks wouter-vue supports custom location hooks for different routing behaviors.  Hash-based Routing Use hash-based routing (e.g., ) instead of browser history: Example URLs: -  -   Memory Location (Testing) Use memory location for testing - routes don't affect browser history: Use cases: - Unit testing - Component testing - Storybook stories - Isolated routing scenarios  Creating Custom Hooks You can create custom location hooks by implementing the  interface: Example:  Notes - Default location hook is  (browser history API) - Hash location is useful for static hosting without server configuration - Memory location is perfect for testing environments - Important: Router component uses  prop, not  - Custom hooks must be functions that accept a  and return  - For , call  once and reuse the result to ensure all components share the same reactive state"
     },
     {
       "id": "/guides/hierarchical-data",
@@ -152,7 +152,7 @@ export default {
       "id": "/",
       "path": "/",
       "title": "Wouter for Vue 3",
-      "content": "<div class=\"text-center mb-12\">  Wouter for Vue 3 wouter-vue is a minimal, high-performance router for Vue 3 (7.9KB gzipped, 17.5KB uncompressed) that relies on Composition API and provides an intuitive routing experience. </div>  Features - 📦 Minimal bundle size (7.9KB gzipped, 17.5KB uncompressed) - 72% smaller response size vs vue-router - ⚡ Outstanding performance - 72% higher throughput, handles 83% more requests - 🎯 Vue 3 Composition API - Fully reactive routing with TypeScript support - 🔧 Optional  - No top-level router required, works out of the box - 📦 Minimal dependencies (Vue 3 + path-to-regexp) - 🎨 Server-Side Rendering (SSR) - Full SSR support with Vite - 🗂️ Nested routing - Flexible route parameters and nested structures - 🔗 Active links - Scoped slot API for active state styling - 💾 TypeScript - Full type definitions included - 📊 Hierarchical & Reactive Data Passing - Pass data down routing tree with automatic merging  Performance Based on load testing with Artillery.io (3,300 virtual users, 200 routes, 6-minute duration): | Metric | wouter-vue | vue-router | Advantage | |--------|-----------|------------|-----------| | Throughput | 117 req/s | 68 req/s | +72% faster | | Total Requests | 36,300 | 19,800 | +83% more requests | | Latency (mean) | 0.9 ms | 0.6 ms | Comparable | | Latency (p50) | 1 ms | 1 ms | Same performance | Key Takeaway: wouter-vue processes 72% more requests per second (117 vs 68 req/s) with identical median latency (1ms) compared to vue-router, while handling nearly double the total requests (36,300 vs 19,800) in the same timeframe, making it ideal for high-traffic applications.  Quick Start  Installation Requirements: Vue 3.5.22 or higher  Next Steps - Getting Started - Learn the basics - API Reference - Explore all APIs - Guides - Advanced patterns and techniques - Cookbook - Practical examples and recipes  About wouter-vue is inspired by the original wouter router for React and Preact. The original wouter's minimalist philosophy, hook-based architecture, and elegant simplicity resonated strongly, leading to the creation of this Vue 3 adaptation. This project attempts to bring the same core principles and design philosophy to Vue's ecosystem: - Minimalist approach - Keep it tiny with minimal dependencies - Composition API first - Leverage Vue's reactivity system instead of React hooks - Optional Router - No mandatory top-level component - Familiar API - Similar components and patterns for easy migration - Performance focused - Small bundle size and efficient routing - Path-to-RegExp powered - Uses path-to-regexp for robust route matching with full pattern support - Hierarchical data passing - Pass reactive data down routing tree with automatic merging --- <div class=\"bg-blue-50 border-l-4 border-blue-500 p-4 my-8 rounded-r\">  💡 Built with wouter-vue This entire documentation site is built entirely with wouter-vue, including: - Server-Side Rendering (SSR) and Static Site Generation (SSG) - All routing and navigation - Dynamic route generation from Markdown files - Search functionality - Smooth page transitions See the source code to explore how wouter-vue powers this documentation site. </div>"
+      "content": "<div class=\"text-center mb-12\">  Wouter for Vue 3 wouter-vue is a minimal, high-performance router for Vue 3 (7.9KB gzipped, 17.5KB uncompressed) that relies on Composition API and provides an intuitive routing experience. </div>  Features - 📦 Minimal bundle size (7.9KB gzipped, 17.5KB uncompressed) - 72% smaller response size vs vue-router - ⚡ Outstanding performance - 72% higher throughput, handles 83% more requests - 🎯 Vue 3 Composition API - Fully reactive routing with TypeScript support - 🔧 Optional  - No top-level router required, works out of the box - 📦 Minimal dependencies (Vue 3 + path-to-regexp) - 🎨 Server-Side Rendering (SSR) - Full SSR support with Vite - 🗂️ Nested routing - Flexible route parameters and nested structures - 🔗 Active links - Scoped slot API for active state styling - 💾 TypeScript - Full type definitions included - 📊 Hierarchical & Reactive Data Passing - Pass data down routing tree with automatic merging  Performance Based on load testing with Artillery.io (3,300 virtual users, 200 routes, 6-minute duration): | Metric | wouter-vue | vue-router | Advantage | |--------|-----------|------------|-----------| | Throughput | 117 req/s | 68 req/s | +72% faster | | Total Requests | 36,300 | 19,800 | +83% more requests | | Latency (mean) | 0.9 ms | 0.6 ms | Comparable | | Latency (p50) | 1 ms | 1 ms | Same performance | Key Takeaway: wouter-vue processes 72% more requests per second (117 vs 68 req/s) with identical median latency (1ms) compared to vue-router, while handling nearly double the total requests (36,300 vs 19,800) in the same timeframe, making it ideal for high-traffic applications.  Quick Start  Installation Requirements: Vue 3.5.22 or higher  Next Steps - Getting Started - Learn the basics - API Reference - Explore all APIs - Guides - Advanced patterns and techniques - Cookbook - Practical examples and recipes  About wouter-vue is inspired by the original wouter router for React and Preact. The original wouter's minimalist philosophy, hook-based architecture, and elegant simplicity resonated strongly, leading to the creation of this Vue 3 adaptation. This project attempts to bring the same core principles and design philosophy to Vue's ecosystem: - Minimalist approach - Keep it tiny with minimal dependencies - Composition API first - Leverage Vue's reactivity system instead of React hooks - Optional Router - No mandatory top-level component - Familiar API - Similar components and patterns for easy migration - Performance focused - Small bundle size and efficient routing - Path-to-RegExp powered - Uses path-to-regexp for robust route matching with full pattern support - Hierarchical data passing - Pass reactive data down routing tree with automatic merging --- <div class=\"bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 dark:border-blue-400 p-4 my-8 rounded-r text-gray-900 dark:text-gray-100\">  💡 Built with wouter-vue This entire documentation site is built entirely with wouter-vue, including: - Server-Side Rendering (SSR) and Static Site Generation (SSG) - All routing and navigation - Dynamic route generation from Markdown files - Search functionality - Smooth page transitions See the source code to explore how wouter-vue powers this documentation site. </div>"
     },
     {
       "id": "/installation",
@@ -176,7 +176,7 @@ export default {
       "id": "/server-side-rendering",
       "path": "/server-side-rendering",
       "title": "Server-Side Rendering (SSR)",
-      "content": "Server-Side Rendering (SSR) wouter-vue supports full SSR with Vite.  Basic Setup entry-server.js: App.vue:  Vite Configuration  Redirect Handling  automatically sets SSR redirects:  Notes - Always wrap app with  for SSR - Pass  and  props to  - See full example for complete SSR setup"
+      "content": "Server-Side Rendering (SSR) wouter-vue supports full SSR with Vite, including Static Site Generation (SSG) for pre-rendering.  Basic Setup entry-server.js: App.vue:  Vite Configuration vite.config.js:  Base Path Configuration When deploying to a subdirectory (like GitHub Pages), configure the base path: 1. Set base in vite.config.js:     2. App.vue automatically reads it:     3. Router handles it automatically:    - Passes  prop to     - Router internally strips base from URLs    - All navigation works correctly  Static Site Generation (SSG) For pre-rendering static pages, create a  script: Add to :  Redirect Handling  automatically sets SSR redirects:  Router Props | Prop | Type | Default | Description | |------|------|---------|-------------| |  |  |  | Initial path for SSR (optional) | |  |  |  | Initial search string for SSR (optional) | |  |  |  | Base path for routing (e.g., ) |  Notes - Always wrap app with  for SSR - Pass  and  props to  from entry-server - Set  prop automatically from  - Router handles base path internally - no manual URL manipulation needed - See full example for complete SSR setup - This documentation site is built with wouter-vue SSR/SSG - see source code"
     },
     {
       "id": "/troubleshooting",
@@ -238,7 +238,7 @@ export default {
       ],
       "1": [
         1,
-        85
+        123
       ],
       "2": [
         1,
@@ -250,7 +250,7 @@ export default {
       ],
       "4": [
         1,
-        74
+        94
       ],
       "5": [
         1,
@@ -314,7 +314,7 @@ export default {
       ],
       "20": [
         3,
-        62
+        89
       ],
       "21": [
         3,
@@ -330,7 +330,7 @@ export default {
       ],
       "24": [
         4,
-        301
+        307
       ],
       "25": [
         1,
@@ -346,7 +346,7 @@ export default {
       ],
       "28": [
         5,
-        35
+        108
       ],
       "29": [
         1,
@@ -359,7 +359,7 @@ export default {
     },
     "averageFieldLength": [
       1.7741935483870968,
-      70.87096774193547
+      76.16129032258064
     ],
     "storedFields": {
       "0": {
@@ -370,7 +370,7 @@ export default {
       "1": {
         "path": "/api/components/link",
         "title": "Link",
-        "content": "Link Creates a navigation link with active state support.  Description The  component creates a navigation link that updates the URL without a full page reload. It supports active state detection through scoped slots.  Props | Prop | Type | Default | Description | |------|------|---------|-------------| |  |  |  | Target path | |  |  |  | Alias for  | |  |  |  | Replace history entry instead of pushing | |  |  |  | Click handler | |  |  |  | Render as child element |  Usage Simple link: Active link with scoped slot: Link with replace: Relative link (for nested routes): Multiple classes:  Active State Detection The  value is  when: - The link's path exactly matches the current location - The link's path is a prefix of the current location (for nested routes)  Notes -  and  are aliases - use whichever you prefer - Active state is computed reactively and updates automatically - See Nested Routing for relative link examples"
+        "content": "Link Creates a navigation link with active state support.  Description The  component creates a navigation link that updates the URL without a full page reload. It supports active state detection through scoped slots and can merge navigation behavior with custom child elements using the  prop.  Props | Prop | Type | Default | Description | |------|------|---------|-------------| |  |  |  | Target path | |  |  |  | Alias for  | |  |  |  | Replace history entry instead of pushing | |  |  |  | Click handler | |  |  |  | Merge props with single child element instead of rendering  tag |  Usage Simple link: Active link with scoped slot: Link with replace: Relative link (for nested routes): Multiple classes: Using  prop: The  prop allows you to merge navigation behavior with a custom child element instead of rendering an  tag. This is useful when you want to use a button, div, or other element as a link. Important notes about : - Requires exactly one child element - Merges  and  props with the child element - Child's original  handler is preserved and called before navigation - Useful for avoiding nested  tags (e.g., )  Active State Detection The  value is  when: - The link's path exactly matches the current location - The link's path is a prefix of the current location (for nested routes)  Notes -  and  are aliases - use whichever you prefer - Active state is computed reactively and updates automatically - See Nested Routing for relative link examples"
       },
       "2": {
         "path": "/api/components/redirect",
@@ -385,7 +385,7 @@ export default {
       "4": {
         "path": "/api/components/router",
         "title": "Router",
-        "content": "Router Optional router component that provides routing context for nested routes and SSR support.  Description The  component is optional - wouter-vue works without it for simple cases. However, it's recommended for: - Nested routing - Server-Side Rendering (SSR) - Custom location hooks - Advanced routing scenarios  Props | Prop | Type | Default | Description | |------|------|---------|-------------| |  |  |  | Custom location hook (optional) | |  |  |  | Initial path for SSR (optional) | |  |  |  | Initial search string for SSR (optional) |  Usage Basic usage: With SSR: With custom location hook:  Notes - Without , routes still work but nested routing may not function correctly - For SSR, always wrap your app with  and pass  and  props - See Custom Location Hooks for more information"
+        "content": "Router Optional router component that provides routing context for nested routes and SSR support.  Description The  component is optional - wouter-vue works without it for simple cases. However, it's recommended for: - Nested routing - Server-Side Rendering (SSR) - Custom location hooks - Advanced routing scenarios  Props | Prop | Type | Default | Description | |------|------|---------|-------------| |  |  |  | Custom location hook (optional) | |  |  |  | Initial path for SSR (optional) | |  |  |  | Initial search string for SSR (optional) | |  |  |  | Base path for routing (e.g., ). Automatically read from  in Vite |  Usage Basic usage: With SSR and base path: With custom location hook:  Notes - Without , routes still work but nested routing may not function correctly - For SSR, always wrap your app with  and pass  and  props - Set  prop automatically from  for subdirectory deployments - Router handles base path internally - all navigation works correctly with base path - See Custom Location Hooks for more information - See Server-Side Rendering for complete SSR setup"
       },
       "5": {
         "path": "/api/components/switch",
@@ -465,7 +465,7 @@ export default {
       "20": {
         "path": "/guides/custom-location-hooks",
         "title": "Custom Location Hooks",
-        "content": "Custom Location Hooks wouter-vue supports custom location hooks for different routing behaviors.  Hash-based Routing Use hash-based routing (e.g., ) instead of browser history: Example URLs: -  -   Memory Location (Testing) Use memory location for testing - routes don't affect browser history: Use cases: - Unit testing - Component testing - Storybook stories - Isolated routing scenarios  Creating Custom Hooks You can create custom location hooks by implementing the  interface: Example:  Notes - Default location hook is  (browser history API) - Hash location is useful for static hosting without server configuration - Memory location is perfect for testing environments"
+        "content": "Custom Location Hooks wouter-vue supports custom location hooks for different routing behaviors.  Hash-based Routing Use hash-based routing (e.g., ) instead of browser history: Example URLs: -  -   Memory Location (Testing) Use memory location for testing - routes don't affect browser history: Use cases: - Unit testing - Component testing - Storybook stories - Isolated routing scenarios  Creating Custom Hooks You can create custom location hooks by implementing the  interface: Example:  Notes - Default location hook is  (browser history API) - Hash location is useful for static hosting without server configuration - Memory location is perfect for testing environments - Important: Router component uses  prop, not  - Custom hooks must be functions that accept a  and return  - For , call  once and reuse the result to ensure all components share the same reactive state"
       },
       "21": {
         "path": "/guides/hierarchical-data",
@@ -485,7 +485,7 @@ export default {
       "24": {
         "path": "/",
         "title": "Wouter for Vue 3",
-        "content": "<div class=\"text-center mb-12\">  Wouter for Vue 3 wouter-vue is a minimal, high-performance router for Vue 3 (7.9KB gzipped, 17.5KB uncompressed) that relies on Composition API and provides an intuitive routing experience. </div>  Features - 📦 Minimal bundle size (7.9KB gzipped, 17.5KB uncompressed) - 72% smaller response size vs vue-router - ⚡ Outstanding performance - 72% higher throughput, handles 83% more requests - 🎯 Vue 3 Composition API - Fully reactive routing with TypeScript support - 🔧 Optional  - No top-level router required, works out of the box - 📦 Minimal dependencies (Vue 3 + path-to-regexp) - 🎨 Server-Side Rendering (SSR) - Full SSR support with Vite - 🗂️ Nested routing - Flexible route parameters and nested structures - 🔗 Active links - Scoped slot API for active state styling - 💾 TypeScript - Full type definitions included - 📊 Hierarchical & Reactive Data Passing - Pass data down routing tree with automatic merging  Performance Based on load testing with Artillery.io (3,300 virtual users, 200 routes, 6-minute duration): | Metric | wouter-vue | vue-router | Advantage | |--------|-----------|------------|-----------| | Throughput | 117 req/s | 68 req/s | +72% faster | | Total Requests | 36,300 | 19,800 | +83% more requests | | Latency (mean) | 0.9 ms | 0.6 ms | Comparable | | Latency (p50) | 1 ms | 1 ms | Same performance | Key Takeaway: wouter-vue processes 72% more requests per second (117 vs 68 req/s) with identical median latency (1ms) compared to vue-router, while handling nearly double the total requests (36,300 vs 19,800) in the same timeframe, making it ideal for high-traffic applications.  Quick Start  Installation Requirements: Vue 3.5.22 or higher  Next Steps - Getting Started - Learn the basics - API Reference - Explore all APIs - Guides - Advanced patterns and techniques - Cookbook - Practical examples and recipes  About wouter-vue is inspired by the original wouter router for React and Preact. The original wouter's minimalist philosophy, hook-based architecture, and elegant simplicity resonated strongly, leading to the creation of this Vue 3 adaptation. This project attempts to bring the same core principles and design philosophy to Vue's ecosystem: - Minimalist approach - Keep it tiny with minimal dependencies - Composition API first - Leverage Vue's reactivity system instead of React hooks - Optional Router - No mandatory top-level component - Familiar API - Similar components and patterns for easy migration - Performance focused - Small bundle size and efficient routing - Path-to-RegExp powered - Uses path-to-regexp for robust route matching with full pattern support - Hierarchical data passing - Pass reactive data down routing tree with automatic merging --- <div class=\"bg-blue-50 border-l-4 border-blue-500 p-4 my-8 rounded-r\">  💡 Built with wouter-vue This entire documentation site is built entirely with wouter-vue, including: - Server-Side Rendering (SSR) and Static Site Generation (SSG) - All routing and navigation - Dynamic route generation from Markdown files - Search functionality - Smooth page transitions See the source code to explore how wouter-vue powers this documentation site. </div>"
+        "content": "<div class=\"text-center mb-12\">  Wouter for Vue 3 wouter-vue is a minimal, high-performance router for Vue 3 (7.9KB gzipped, 17.5KB uncompressed) that relies on Composition API and provides an intuitive routing experience. </div>  Features - 📦 Minimal bundle size (7.9KB gzipped, 17.5KB uncompressed) - 72% smaller response size vs vue-router - ⚡ Outstanding performance - 72% higher throughput, handles 83% more requests - 🎯 Vue 3 Composition API - Fully reactive routing with TypeScript support - 🔧 Optional  - No top-level router required, works out of the box - 📦 Minimal dependencies (Vue 3 + path-to-regexp) - 🎨 Server-Side Rendering (SSR) - Full SSR support with Vite - 🗂️ Nested routing - Flexible route parameters and nested structures - 🔗 Active links - Scoped slot API for active state styling - 💾 TypeScript - Full type definitions included - 📊 Hierarchical & Reactive Data Passing - Pass data down routing tree with automatic merging  Performance Based on load testing with Artillery.io (3,300 virtual users, 200 routes, 6-minute duration): | Metric | wouter-vue | vue-router | Advantage | |--------|-----------|------------|-----------| | Throughput | 117 req/s | 68 req/s | +72% faster | | Total Requests | 36,300 | 19,800 | +83% more requests | | Latency (mean) | 0.9 ms | 0.6 ms | Comparable | | Latency (p50) | 1 ms | 1 ms | Same performance | Key Takeaway: wouter-vue processes 72% more requests per second (117 vs 68 req/s) with identical median latency (1ms) compared to vue-router, while handling nearly double the total requests (36,300 vs 19,800) in the same timeframe, making it ideal for high-traffic applications.  Quick Start  Installation Requirements: Vue 3.5.22 or higher  Next Steps - Getting Started - Learn the basics - API Reference - Explore all APIs - Guides - Advanced patterns and techniques - Cookbook - Practical examples and recipes  About wouter-vue is inspired by the original wouter router for React and Preact. The original wouter's minimalist philosophy, hook-based architecture, and elegant simplicity resonated strongly, leading to the creation of this Vue 3 adaptation. This project attempts to bring the same core principles and design philosophy to Vue's ecosystem: - Minimalist approach - Keep it tiny with minimal dependencies - Composition API first - Leverage Vue's reactivity system instead of React hooks - Optional Router - No mandatory top-level component - Familiar API - Similar components and patterns for easy migration - Performance focused - Small bundle size and efficient routing - Path-to-RegExp powered - Uses path-to-regexp for robust route matching with full pattern support - Hierarchical data passing - Pass reactive data down routing tree with automatic merging --- <div class=\"bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 dark:border-blue-400 p-4 my-8 rounded-r text-gray-900 dark:text-gray-100\">  💡 Built with wouter-vue This entire documentation site is built entirely with wouter-vue, including: - Server-Side Rendering (SSR) and Static Site Generation (SSG) - All routing and navigation - Dynamic route generation from Markdown files - Search functionality - Smooth page transitions See the source code to explore how wouter-vue powers this documentation site. </div>"
       },
       "25": {
         "path": "/installation",
@@ -505,7 +505,7 @@ export default {
       "28": {
         "path": "/server-side-rendering",
         "title": "Server-Side Rendering (SSR)",
-        "content": "Server-Side Rendering (SSR) wouter-vue supports full SSR with Vite.  Basic Setup entry-server.js: App.vue:  Vite Configuration  Redirect Handling  automatically sets SSR redirects:  Notes - Always wrap app with  for SSR - Pass  and  props to  - See full example for complete SSR setup"
+        "content": "Server-Side Rendering (SSR) wouter-vue supports full SSR with Vite, including Static Site Generation (SSG) for pre-rendering.  Basic Setup entry-server.js: App.vue:  Vite Configuration vite.config.js:  Base Path Configuration When deploying to a subdirectory (like GitHub Pages), configure the base path: 1. Set base in vite.config.js:     2. App.vue automatically reads it:     3. Router handles it automatically:    - Passes  prop to     - Router internally strips base from URLs    - All navigation works correctly  Static Site Generation (SSG) For pre-rendering static pages, create a  script: Add to :  Redirect Handling  automatically sets SSR redirects:  Router Props | Prop | Type | Default | Description | |------|------|---------|-------------| |  |  |  | Initial path for SSR (optional) | |  |  |  | Initial search string for SSR (optional) | |  |  |  | Base path for routing (e.g., ) |  Notes - Always wrap app with  for SSR - Pass  and  props to  from entry-server - Set  prop automatically from  - Router handles base path internally - no manual URL manipulation needed - See full example for complete SSR setup - This documentation site is built with wouter-vue SSR/SSG - see source code"
       },
       "29": {
         "path": "/troubleshooting",
@@ -524,7 +524,7 @@ export default {
         "js",
         {
           "1": {
-            "28": 1
+            "28": 3
           }
         }
       ],
@@ -533,6 +533,14 @@ export default {
         {
           "1": {
             "19": 1
+          }
+        }
+      ],
+      [
+        "900",
+        {
+          "1": {
+            "24": 2
           }
         }
       ],
@@ -838,13 +846,10 @@ export default {
         }
       ],
       [
-        "4",
+        "400",
         {
           "1": {
-            "13": 1,
-            "23": 1,
-            "24": 2,
-            "26": 1
+            "24": 1
           }
         }
       ],
@@ -857,11 +862,21 @@ export default {
         }
       ],
       [
-        "22",
+        "4",
         {
           "1": {
-            "24": 1,
-            "25": 1
+            "13": 1,
+            "23": 1,
+            "24": 2,
+            "26": 1
+          }
+        }
+      ],
+      [
+        "20",
+        {
+          "1": {
+            "24": 1
           }
         }
       ],
@@ -875,12 +890,30 @@ export default {
         }
       ],
       [
+        "22",
+        {
+          "1": {
+            "24": 1,
+            "25": 1
+          }
+        }
+      ],
+      [
         "2",
         {
           "1": {
             "13": 1,
             "23": 1,
-            "26": 1
+            "26": 1,
+            "28": 1
+          }
+        }
+      ],
+      [
+        "100",
+        {
+          "1": {
+            "24": 1
           }
         }
       ],
@@ -933,7 +966,8 @@ export default {
             "13": 1,
             "24": 2,
             "26": 1,
-            "27": 3
+            "27": 3,
+            "28": 1
           }
         }
       ],
@@ -967,7 +1001,143 @@ export default {
             "24": 7,
             "25": 1,
             "26": 1,
+            "27": 1,
+            "28": 1
+          }
+        }
+      ],
+      [
+        "❌",
+        {
+          "1": {
+            "5": 1,
             "27": 1
+          }
+        }
+      ],
+      [
+        "✅",
+        {
+          "1": {
+            "5": 2,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "version",
+        {
+          "1": {
+            "29": 1
+          }
+        }
+      ],
+      [
+        "vs",
+        {
+          "1": {
+            "24": 3
+          }
+        }
+      ],
+      [
+        "validation",
+        {
+          "1": {
+            "23": 1
+          }
+        }
+      ],
+      [
+        "validate",
+        {
+          "1": {
+            "23": 1
+          }
+        }
+      ],
+      [
+        "values",
+        {
+          "1": {
+            "23": 3,
+            "30": 1
+          }
+        }
+      ],
+      [
+        "value",
+        {
+          "1": {
+            "1": 1,
+            "11": 2
+          }
+        }
+      ],
+      [
+        "virtual",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "via",
+        {
+          "1": {
+            "7": 1,
+            "8": 1,
+            "18": 1,
+            "21": 2,
+            "22": 1,
+            "23": 1
+          }
+        }
+      ],
+      [
+        "vite",
+        {
+          "1": {
+            "4": 1,
+            "24": 1,
+            "28": 4
+          }
+        }
+      ],
+      [
+        "v",
+        {
+          "1": {
+            "5": 1,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "vue",
+        {
+          "0": {
+            "24": 1
+          },
+          "1": {
+            "0": 2,
+            "3": 1,
+            "4": 1,
+            "13": 1,
+            "14": 2,
+            "17": 2,
+            "18": 5,
+            "19": 2,
+            "20": 1,
+            "21": 2,
+            "23": 2,
+            "24": 18,
+            "25": 2,
+            "26": 5,
+            "27": 4,
+            "28": 4,
+            "30": 1
           }
         }
       ],
@@ -975,6 +1145,7 @@ export default {
         "github",
         {
           "1": {
+            "28": 1,
             "29": 1
           }
         }
@@ -983,7 +1154,8 @@ export default {
         "generation",
         {
           "1": {
-            "24": 2
+            "24": 2,
+            "28": 2
           }
         }
       ],
@@ -1011,6 +1183,22 @@ export default {
             "12": 1,
             "13": 1,
             "19": 1
+          }
+        }
+      ],
+      [
+        "gray",
+        {
+          "1": {
+            "24": 2
+          }
+        }
+      ],
+      [
+        "group",
+        {
+          "1": {
+            "21": 1
           }
         }
       ],
@@ -1061,25 +1249,6 @@ export default {
         }
       ],
       [
-        "group",
-        {
-          "1": {
-            "21": 1
-          }
-        }
-      ],
-      [
-        "g",
-        {
-          "1": {
-            "18": 1,
-            "20": 1,
-            "22": 1,
-            "23": 1
-          }
-        }
-      ],
-      [
         "global",
         {
           "1": {
@@ -1097,20 +1266,16 @@ export default {
         }
       ],
       [
-        "❌",
+        "g",
         {
           "1": {
-            "5": 1,
-            "27": 1
-          }
-        }
-      ],
-      [
-        "✅",
-        {
-          "1": {
-            "5": 2,
-            "27": 1
+            "1": 1,
+            "4": 1,
+            "18": 1,
+            "20": 1,
+            "22": 1,
+            "23": 1,
+            "28": 1
           }
         }
       ],
@@ -1129,7 +1294,7 @@ export default {
         "you",
         {
           "1": {
-            "1": 1,
+            "1": 3,
             "5": 1,
             "10": 1,
             "19": 1,
@@ -1142,7 +1307,301 @@ export default {
         }
       ],
       [
-        "version",
+        "ide",
+        {
+          "1": {
+            "30": 1
+          }
+        }
+      ],
+      [
+        "ideal",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "identical",
+        {
+          "1": {
+            "24": 1,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "io",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "if",
+        {
+          "1": {
+            "6": 1,
+            "7": 1,
+            "9": 2
+          }
+        }
+      ],
+      [
+        "impact",
+        {
+          "1": {
+            "21": 1
+          }
+        }
+      ],
+      [
+        "implementing",
+        {
+          "1": {
+            "20": 1
+          }
+        }
+      ],
+      [
+        "implement",
+        {
+          "1": {
+            "17": 1
+          }
+        }
+      ],
+      [
+        "important",
+        {
+          "1": {
+            "1": 1,
+            "7": 1,
+            "20": 1,
+            "23": 1
+          }
+        }
+      ],
+      [
+        "immediately",
+        {
+          "1": {
+            "2": 2
+          }
+        }
+      ],
+      [
+        "includes",
+        {
+          "1": {
+            "30": 1
+          }
+        }
+      ],
+      [
+        "included",
+        {
+          "1": {
+            "24": 1,
+            "25": 1,
+            "30": 1
+          }
+        }
+      ],
+      [
+        "including",
+        {
+          "1": {
+            "24": 1,
+            "28": 1
+          }
+        }
+      ],
+      [
+        "inspired",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "inside",
+        {
+          "1": {
+            "23": 1
+          }
+        }
+      ],
+      [
+        "install",
+        {
+          "1": {
+            "19": 1,
+            "26": 1
+          }
+        }
+      ],
+      [
+        "installation",
+        {
+          "0": {
+            "25": 1
+          },
+          "1": {
+            "19": 1,
+            "24": 1,
+            "25": 1
+          }
+        }
+      ],
+      [
+        "instance",
+        {
+          "1": {
+            "10": 2,
+            "18": 1
+          }
+        }
+      ],
+      [
+        "instead",
+        {
+          "1": {
+            "1": 3,
+            "2": 1,
+            "5": 1,
+            "6": 1,
+            "12": 1,
+            "20": 1,
+            "24": 1,
+            "27": 2
+          }
+        }
+      ],
+      [
+        "inheritance",
+        {
+          "1": {
+            "21": 1
+          }
+        }
+      ],
+      [
+        "inherited",
+        {
+          "1": {
+            "5": 1,
+            "21": 1
+          }
+        }
+      ],
+      [
+        "intuitive",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "interface",
+        {
+          "1": {
+            "20": 1
+          }
+        }
+      ],
+      [
+        "interactions",
+        {
+          "1": {
+            "13": 1
+          }
+        }
+      ],
+      [
+        "internals",
+        {
+          "1": {
+            "10": 1
+          }
+        }
+      ],
+      [
+        "internally",
+        {
+          "1": {
+            "4": 1,
+            "23": 1,
+            "28": 2
+          }
+        }
+      ],
+      [
+        "into",
+        {
+          "1": {
+            "12": 1,
+            "23": 1
+          }
+        }
+      ],
+      [
+        "indicating",
+        {
+          "1": {
+            "9": 1
+          }
+        }
+      ],
+      [
+        "information",
+        {
+          "1": {
+            "4": 1,
+            "8": 1,
+            "15": 1,
+            "18": 1
+          }
+        }
+      ],
+      [
+        "initial",
+        {
+          "1": {
+            "4": 2,
+            "16": 1,
+            "28": 2
+          }
+        }
+      ],
+      [
+        "in",
+        {
+          "1": {
+            "2": 3,
+            "3": 2,
+            "4": 1,
+            "8": 1,
+            "12": 1,
+            "13": 1,
+            "16": 2,
+            "19": 1,
+            "21": 2,
+            "22": 3,
+            "24": 1,
+            "27": 1,
+            "28": 1,
+            "29": 2,
+            "30": 2
+          }
+        }
+      ],
+      [
+        "issue",
         {
           "1": {
             "29": 1
@@ -1150,110 +1609,66 @@ export default {
         }
       ],
       [
-        "virtual",
+        "issues",
         {
           "1": {
-            "24": 1
+            "29": 2
           }
         }
       ],
       [
-        "vite",
+        "isolated",
         {
           "1": {
-            "24": 1,
-            "28": 2
+            "20": 1
           }
         }
       ],
       [
-        "via",
+        "is",
         {
           "1": {
+            "1": 5,
+            "4": 1,
+            "5": 2,
+            "6": 2,
             "7": 1,
-            "8": 1,
-            "18": 1,
-            "21": 2,
-            "22": 1,
-            "23": 1
+            "8": 4,
+            "9": 2,
+            "11": 3,
+            "18": 2,
+            "20": 3,
+            "21": 5,
+            "23": 2,
+            "24": 3,
+            "27": 1,
+            "28": 1,
+            "29": 2
           }
         }
       ],
       [
-        "vs",
+        "its",
         {
           "1": {
-            "24": 3
+            "3": 1
           }
         }
       ],
       [
-        "validation",
-        {
-          "1": {
-            "23": 1
-          }
-        }
-      ],
-      [
-        "validate",
-        {
-          "1": {
-            "23": 1
-          }
-        }
-      ],
-      [
-        "values",
-        {
-          "1": {
-            "23": 3,
-            "30": 1
-          }
-        }
-      ],
-      [
-        "value",
+        "it",
         {
           "1": {
             "1": 1,
-            "11": 2
-          }
-        }
-      ],
-      [
-        "v",
-        {
-          "1": {
-            "5": 1,
-            "27": 1
-          }
-        }
-      ],
-      [
-        "vue",
-        {
-          "0": {
-            "24": 1
-          },
-          "1": {
-            "0": 2,
+            "2": 2,
             "3": 1,
-            "4": 1,
-            "13": 1,
-            "14": 2,
-            "17": 2,
-            "18": 5,
-            "19": 2,
-            "20": 1,
-            "21": 2,
-            "23": 2,
-            "24": 18,
-            "25": 2,
-            "26": 5,
-            "27": 4,
-            "28": 2,
-            "30": 1
+            "4": 2,
+            "5": 1,
+            "7": 1,
+            "19": 1,
+            "22": 1,
+            "24": 2,
+            "28": 2
           }
         }
       ],
@@ -1279,6 +1694,25 @@ export default {
         {
           "1": {
             "24": 1
+          }
+        }
+      ],
+      [
+        "must",
+        {
+          "1": {
+            "20": 1
+          }
+        }
+      ],
+      [
+        "multiple",
+        {
+          "1": {
+            "1": 1,
+            "11": 2,
+            "22": 1,
+            "23": 2
           }
         }
       ],
@@ -1333,10 +1767,13 @@ export default {
         }
       ],
       [
-        "merges",
+        "merging",
         {
           "1": {
-            "21": 1
+            "8": 1,
+            "21": 4,
+            "22": 1,
+            "24": 2
           }
         }
       ],
@@ -1353,13 +1790,19 @@ export default {
         }
       ],
       [
-        "merging",
+        "merges",
         {
           "1": {
-            "8": 1,
-            "21": 4,
-            "22": 1,
-            "24": 2
+            "1": 1,
+            "21": 1
+          }
+        }
+      ],
+      [
+        "merge",
+        {
+          "1": {
+            "1": 3
           }
         }
       ],
@@ -1465,6 +1908,22 @@ export default {
         }
       ],
       [
+        "manipulation",
+        {
+          "1": {
+            "28": 1
+          }
+        }
+      ],
+      [
+        "manipulate",
+        {
+          "1": {
+            "11": 1
+          }
+        }
+      ],
+      [
         "manager",
         {
           "1": {
@@ -1508,15 +1967,8 @@ export default {
         "manual",
         {
           "1": {
-            "14": 1
-          }
-        }
-      ],
-      [
-        "manipulate",
-        {
-          "1": {
-            "11": 1
+            "14": 1,
+            "28": 1
           }
         }
       ],
@@ -1591,17 +2043,6 @@ export default {
         }
       ],
       [
-        "multiple",
-        {
-          "1": {
-            "1": 1,
-            "11": 2,
-            "22": 1,
-            "23": 2
-          }
-        }
-      ],
-      [
         "monitor",
         {
           "1": {
@@ -1650,362 +2091,6 @@ export default {
             "0": 1,
             "2": 2,
             "22": 1
-          }
-        }
-      ],
-      [
-        "ide",
-        {
-          "1": {
-            "30": 1
-          }
-        }
-      ],
-      [
-        "ideal",
-        {
-          "1": {
-            "24": 1
-          }
-        }
-      ],
-      [
-        "identical",
-        {
-          "1": {
-            "24": 1,
-            "27": 1
-          }
-        }
-      ],
-      [
-        "io",
-        {
-          "1": {
-            "24": 1
-          }
-        }
-      ],
-      [
-        "impact",
-        {
-          "1": {
-            "21": 1
-          }
-        }
-      ],
-      [
-        "implementing",
-        {
-          "1": {
-            "20": 1
-          }
-        }
-      ],
-      [
-        "implement",
-        {
-          "1": {
-            "17": 1
-          }
-        }
-      ],
-      [
-        "important",
-        {
-          "1": {
-            "7": 1,
-            "23": 1
-          }
-        }
-      ],
-      [
-        "immediately",
-        {
-          "1": {
-            "2": 2
-          }
-        }
-      ],
-      [
-        "if",
-        {
-          "1": {
-            "6": 1,
-            "7": 1,
-            "9": 2
-          }
-        }
-      ],
-      [
-        "includes",
-        {
-          "1": {
-            "30": 1
-          }
-        }
-      ],
-      [
-        "included",
-        {
-          "1": {
-            "24": 1,
-            "25": 1,
-            "30": 1
-          }
-        }
-      ],
-      [
-        "including",
-        {
-          "1": {
-            "24": 1
-          }
-        }
-      ],
-      [
-        "inspired",
-        {
-          "1": {
-            "24": 1
-          }
-        }
-      ],
-      [
-        "inside",
-        {
-          "1": {
-            "23": 1
-          }
-        }
-      ],
-      [
-        "install",
-        {
-          "1": {
-            "19": 1,
-            "26": 1
-          }
-        }
-      ],
-      [
-        "installation",
-        {
-          "0": {
-            "25": 1
-          },
-          "1": {
-            "19": 1,
-            "24": 1,
-            "25": 1
-          }
-        }
-      ],
-      [
-        "instance",
-        {
-          "1": {
-            "10": 2,
-            "18": 1
-          }
-        }
-      ],
-      [
-        "instead",
-        {
-          "1": {
-            "1": 1,
-            "2": 1,
-            "5": 1,
-            "6": 1,
-            "12": 1,
-            "20": 1,
-            "24": 1,
-            "27": 2
-          }
-        }
-      ],
-      [
-        "inheritance",
-        {
-          "1": {
-            "21": 1
-          }
-        }
-      ],
-      [
-        "inherited",
-        {
-          "1": {
-            "5": 1,
-            "21": 1
-          }
-        }
-      ],
-      [
-        "intuitive",
-        {
-          "1": {
-            "24": 1
-          }
-        }
-      ],
-      [
-        "internally",
-        {
-          "1": {
-            "23": 1
-          }
-        }
-      ],
-      [
-        "internals",
-        {
-          "1": {
-            "10": 1
-          }
-        }
-      ],
-      [
-        "interface",
-        {
-          "1": {
-            "20": 1
-          }
-        }
-      ],
-      [
-        "interactions",
-        {
-          "1": {
-            "13": 1
-          }
-        }
-      ],
-      [
-        "into",
-        {
-          "1": {
-            "12": 1,
-            "23": 1
-          }
-        }
-      ],
-      [
-        "indicating",
-        {
-          "1": {
-            "9": 1
-          }
-        }
-      ],
-      [
-        "information",
-        {
-          "1": {
-            "4": 1,
-            "8": 1,
-            "15": 1,
-            "18": 1
-          }
-        }
-      ],
-      [
-        "initial",
-        {
-          "1": {
-            "4": 2,
-            "16": 1
-          }
-        }
-      ],
-      [
-        "in",
-        {
-          "1": {
-            "2": 3,
-            "3": 2,
-            "8": 1,
-            "12": 1,
-            "13": 1,
-            "16": 2,
-            "19": 1,
-            "21": 2,
-            "22": 3,
-            "24": 1,
-            "27": 1,
-            "29": 2,
-            "30": 2
-          }
-        }
-      ],
-      [
-        "issue",
-        {
-          "1": {
-            "29": 1
-          }
-        }
-      ],
-      [
-        "issues",
-        {
-          "1": {
-            "29": 2
-          }
-        }
-      ],
-      [
-        "isolated",
-        {
-          "1": {
-            "20": 1
-          }
-        }
-      ],
-      [
-        "is",
-        {
-          "1": {
-            "1": 3,
-            "4": 1,
-            "5": 2,
-            "6": 2,
-            "7": 1,
-            "8": 4,
-            "9": 2,
-            "11": 3,
-            "18": 2,
-            "20": 3,
-            "21": 5,
-            "23": 2,
-            "24": 3,
-            "27": 1,
-            "29": 2
-          }
-        }
-      ],
-      [
-        "its",
-        {
-          "1": {
-            "3": 1
-          }
-        }
-      ],
-      [
-        "it",
-        {
-          "1": {
-            "1": 1,
-            "2": 2,
-            "3": 1,
-            "4": 2,
-            "5": 1,
-            "7": 1,
-            "19": 1,
-            "22": 1,
-            "24": 2
           }
         }
       ],
@@ -2174,7 +2259,7 @@ export default {
             "1": 1
           },
           "1": {
-            "1": 10
+            "1": 11
           }
         }
       ],
@@ -2182,7 +2267,8 @@ export default {
         "like",
         {
           "1": {
-            "10": 2
+            "10": 2,
+            "28": 1
           }
         }
       ],
@@ -2321,7 +2407,7 @@ export default {
           "1": {
             "4": 2,
             "10": 3,
-            "20": 4,
+            "20": 5,
             "24": 1,
             "25": 1
           }
@@ -2348,8 +2434,10 @@ export default {
         "handles",
         {
           "1": {
+            "4": 1,
             "24": 1,
-            "27": 1
+            "27": 1,
+            "28": 2
           }
         }
       ],
@@ -2365,7 +2453,7 @@ export default {
         "handler",
         {
           "1": {
-            "1": 1
+            "1": 2
           }
         }
       ],
@@ -2552,7 +2640,8 @@ export default {
         "urls",
         {
           "1": {
-            "20": 1
+            "20": 1,
+            "28": 1
           }
         }
       ],
@@ -2567,23 +2656,8 @@ export default {
             "18": 1,
             "22": 1,
             "23": 1,
+            "28": 1,
             "29": 1
-          }
-        }
-      ],
-      [
-        "using",
-        {
-          "1": {
-            "3": 1,
-            "7": 3,
-            "8": 1,
-            "14": 1,
-            "15": 2,
-            "16": 1,
-            "17": 1,
-            "18": 1,
-            "29": 2
           }
         }
       ],
@@ -2661,19 +2735,10 @@ export default {
         }
       ],
       [
-        "useful",
-        {
-          "1": {
-            "2": 1,
-            "20": 1
-          }
-        }
-      ],
-      [
         "use",
         {
           "1": {
-            "1": 1,
+            "1": 2,
             "3": 1,
             "5": 1,
             "10": 2,
@@ -2689,6 +2754,16 @@ export default {
             "23": 3,
             "27": 3,
             "29": 2
+          }
+        }
+      ],
+      [
+        "useful",
+        {
+          "1": {
+            "1": 2,
+            "2": 1,
+            "20": 1
           }
         }
       ],
@@ -2722,9 +2797,27 @@ export default {
             "9": 1,
             "14": 1,
             "18": 2,
+            "20": 1,
             "21": 1,
             "23": 1,
             "24": 1
+          }
+        }
+      ],
+      [
+        "using",
+        {
+          "1": {
+            "1": 2,
+            "3": 1,
+            "7": 3,
+            "8": 1,
+            "14": 1,
+            "15": 2,
+            "16": 1,
+            "17": 1,
+            "18": 1,
+            "29": 2
           }
         }
       ],
@@ -2787,6 +2880,14 @@ export default {
         "element",
         {
           "1": {
+            "1": 5
+          }
+        }
+      ],
+      [
+        "elements",
+        {
+          "1": {
             "1": 1
           }
         }
@@ -2797,17 +2898,6 @@ export default {
           "1": {
             "21": 1,
             "24": 1
-          }
-        }
-      ],
-      [
-        "e",
-        {
-          "1": {
-            "18": 1,
-            "20": 1,
-            "22": 1,
-            "23": 1
           }
         }
       ],
@@ -2851,6 +2941,7 @@ export default {
         "ensure",
         {
           "1": {
+            "20": 1,
             "29": 4
           }
         }
@@ -2913,7 +3004,7 @@ export default {
             "1": 1,
             "2": 1,
             "6": 1,
-            "28": 1
+            "28": 2
           }
         }
       ],
@@ -2923,6 +3014,20 @@ export default {
           "1": {
             "0": 2,
             "14": 2
+          }
+        }
+      ],
+      [
+        "e",
+        {
+          "1": {
+            "1": 1,
+            "4": 1,
+            "18": 1,
+            "20": 1,
+            "22": 1,
+            "23": 1,
+            "28": 1
           }
         }
       ],
@@ -3005,7 +3110,7 @@ export default {
         "exactly",
         {
           "1": {
-            "1": 1,
+            "1": 2,
             "23": 2
           }
         }
@@ -3043,6 +3148,7 @@ export default {
             "18": 1,
             "21": 1,
             "24": 2,
+            "28": 1,
             "30": 1
           }
         }
@@ -3060,7 +3166,7 @@ export default {
         {
           "1": {
             "0": 1,
-            "1": 1,
+            "1": 2,
             "2": 1,
             "3": 1,
             "4": 1,
@@ -3084,6 +3190,7 @@ export default {
         {
           "1": {
             "4": 1,
+            "20": 1,
             "29": 4
           }
         }
@@ -3119,7 +3226,7 @@ export default {
             "22": 1
           },
           "1": {
-            "1": 3,
+            "1": 4,
             "3": 4,
             "4": 3,
             "7": 3,
@@ -3145,6 +3252,7 @@ export default {
         "needed",
         {
           "1": {
+            "28": 1,
             "30": 1
           }
         }
@@ -3208,12 +3316,14 @@ export default {
         "navigation",
         {
           "1": {
-            "1": 2,
+            "1": 5,
+            "4": 1,
             "10": 2,
             "15": 1,
             "19": 1,
             "24": 1,
-            "26": 1
+            "26": 1,
+            "28": 1
           }
         }
       ],
@@ -3229,7 +3339,8 @@ export default {
         "source",
         {
           "1": {
-            "24": 1
+            "24": 1,
+            "28": 1
           }
         }
       ],
@@ -3254,7 +3365,8 @@ export default {
         "ssg",
         {
           "1": {
-            "24": 1
+            "24": 1,
+            "28": 3
           }
         }
       ],
@@ -3266,10 +3378,10 @@ export default {
           },
           "1": {
             "2": 6,
-            "4": 6,
+            "4": 7,
             "24": 3,
             "25": 1,
-            "28": 5,
+            "28": 8,
             "29": 1
           }
         }
@@ -3331,6 +3443,7 @@ export default {
         "same",
         {
           "1": {
+            "20": 1,
             "21": 1,
             "24": 3
           }
@@ -3341,6 +3454,14 @@ export default {
         {
           "1": {
             "21": 2
+          }
+        }
+      ],
+      [
+        "share",
+        {
+          "1": {
+            "20": 1
           }
         }
       ],
@@ -3369,6 +3490,19 @@ export default {
         }
       ],
       [
+        "switch",
+        {
+          "0": {
+            "5": 1
+          },
+          "1": {
+            "5": 1,
+            "21": 1,
+            "27": 1
+          }
+        }
+      ],
+      [
         "submit",
         {
           "1": {
@@ -3381,6 +3515,15 @@ export default {
         {
           "1": {
             "10": 1
+          }
+        }
+      ],
+      [
+        "subdirectory",
+        {
+          "1": {
+            "4": 1,
+            "28": 1
           }
         }
       ],
@@ -3414,19 +3557,6 @@ export default {
             "24": 3,
             "25": 1,
             "30": 1
-          }
-        }
-      ],
-      [
-        "switch",
-        {
-          "0": {
-            "5": 1
-          },
-          "1": {
-            "5": 1,
-            "21": 1,
-            "27": 1
           }
         }
       ],
@@ -3524,7 +3654,8 @@ export default {
         {
           "1": {
             "20": 1,
-            "24": 1
+            "24": 1,
+            "28": 3
           }
         }
       ],
@@ -3541,6 +3672,7 @@ export default {
         {
           "1": {
             "1": 4,
+            "20": 1,
             "24": 1
           }
         }
@@ -3550,6 +3682,14 @@ export default {
         {
           "1": {
             "30": 1
+          }
+        }
+      ],
+      [
+        "strips",
+        {
+          "1": {
+            "28": 1
           }
         }
       ],
@@ -3567,7 +3707,8 @@ export default {
           "1": {
             "4": 1,
             "12": 4,
-            "23": 2
+            "23": 2,
+            "28": 1
           }
         }
       ],
@@ -3606,6 +3747,14 @@ export default {
         }
       ],
       [
+        "script",
+        {
+          "1": {
+            "28": 1
+          }
+        }
+      ],
+      [
         "scenarios",
         {
           "1": {
@@ -3624,10 +3773,164 @@ export default {
         }
       ],
       [
+        "segment",
+        {
+          "1": {
+            "23": 1
+          }
+        }
+      ],
+      [
+        "segments",
+        {
+          "1": {
+            "23": 4
+          }
+        }
+      ],
+      [
+        "seamlessly",
+        {
+          "1": {
+            "18": 1,
+            "21": 1
+          }
+        }
+      ],
+      [
+        "search",
+        {
+          "1": {
+            "4": 1,
+            "11": 3,
+            "12": 4,
+            "24": 1,
+            "28": 1
+          }
+        }
+      ],
+      [
+        "second",
+        {
+          "1": {
+            "6": 1,
+            "24": 1,
+            "27": 1
+          }
+        }
+      ],
+      [
+        "sequentially",
+        {
+          "1": {
+            "5": 1
+          }
+        }
+      ],
+      [
+        "setting",
+        {
+          "1": {
+            "11": 1
+          }
+        }
+      ],
+      [
+        "setup",
+        {
+          "1": {
+            "4": 1,
+            "13": 1,
+            "28": 2
+          }
+        }
+      ],
+      [
+        "set",
+        {
+          "1": {
+            "4": 1,
+            "28": 2,
+            "29": 1
+          }
+        }
+      ],
+      [
+        "setsearchparams",
+        {
+          "1": {
+            "11": 1
+          }
+        }
+      ],
+      [
+        "sets",
+        {
+          "1": {
+            "2": 2,
+            "28": 1
+          }
+        }
+      ],
+      [
+        "send",
+        {
+          "1": {
+            "2": 1
+          }
+        }
+      ],
+      [
+        "server",
+        {
+          "0": {
+            "28": 1
+          },
+          "1": {
+            "2": 3,
+            "4": 2,
+            "20": 1,
+            "24": 2,
+            "28": 3,
+            "29": 1
+          }
+        }
+      ],
+      [
+        "see",
+        {
+          "1": {
+            "0": 2,
+            "1": 1,
+            "2": 1,
+            "3": 3,
+            "4": 2,
+            "5": 2,
+            "8": 1,
+            "9": 1,
+            "10": 1,
+            "14": 1,
+            "15": 1,
+            "16": 1,
+            "17": 1,
+            "18": 1,
+            "19": 1,
+            "21": 1,
+            "23": 1,
+            "24": 1,
+            "26": 1,
+            "27": 1,
+            "28": 2,
+            "29": 1
+          }
+        }
+      ],
+      [
         "site",
         {
           "1": {
-            "24": 3
+            "24": 3,
+            "28": 3
           }
         }
       ],
@@ -3640,14 +3943,6 @@ export default {
         }
       ],
       [
-        "single",
-        {
-          "1": {
-            "23": 1
-          }
-        }
-      ],
-      [
         "side",
         {
           "0": {
@@ -3655,7 +3950,7 @@ export default {
           },
           "1": {
             "2": 1,
-            "4": 1,
+            "4": 2,
             "24": 2,
             "28": 1,
             "29": 1
@@ -3707,151 +4002,11 @@ export default {
         }
       ],
       [
-        "segment",
+        "single",
         {
           "1": {
-            "23": 1
-          }
-        }
-      ],
-      [
-        "segments",
-        {
-          "1": {
-            "23": 4
-          }
-        }
-      ],
-      [
-        "seamlessly",
-        {
-          "1": {
-            "18": 1,
-            "21": 1
-          }
-        }
-      ],
-      [
-        "search",
-        {
-          "1": {
-            "4": 1,
-            "11": 3,
-            "12": 4,
-            "24": 1
-          }
-        }
-      ],
-      [
-        "set",
-        {
-          "1": {
-            "29": 1
-          }
-        }
-      ],
-      [
-        "setup",
-        {
-          "1": {
-            "13": 1,
-            "28": 2
-          }
-        }
-      ],
-      [
-        "setting",
-        {
-          "1": {
-            "11": 1
-          }
-        }
-      ],
-      [
-        "setsearchparams",
-        {
-          "1": {
-            "11": 1
-          }
-        }
-      ],
-      [
-        "sets",
-        {
-          "1": {
-            "2": 2,
-            "28": 1
-          }
-        }
-      ],
-      [
-        "second",
-        {
-          "1": {
-            "6": 1,
-            "24": 1,
-            "27": 1
-          }
-        }
-      ],
-      [
-        "sequentially",
-        {
-          "1": {
-            "5": 1
-          }
-        }
-      ],
-      [
-        "send",
-        {
-          "1": {
-            "2": 1
-          }
-        }
-      ],
-      [
-        "server",
-        {
-          "0": {
-            "28": 1
-          },
-          "1": {
-            "2": 3,
-            "4": 1,
-            "20": 1,
-            "24": 2,
-            "28": 2,
-            "29": 1
-          }
-        }
-      ],
-      [
-        "see",
-        {
-          "1": {
-            "0": 2,
             "1": 1,
-            "2": 1,
-            "3": 3,
-            "4": 1,
-            "5": 2,
-            "8": 1,
-            "9": 1,
-            "10": 1,
-            "14": 1,
-            "15": 1,
-            "16": 1,
-            "17": 1,
-            "18": 1,
-            "19": 1,
-            "21": 1,
-            "23": 1,
-            "24": 1,
-            "26": 1,
-            "27": 1,
-            "28": 1,
-            "29": 1
+            "23": 1
           }
         }
       ],
@@ -3888,7 +4043,7 @@ export default {
         {
           "1": {
             "0": 1,
-            "1": 2,
+            "1": 3,
             "2": 1,
             "4": 1,
             "13": 1,
@@ -4069,10 +4224,10 @@ export default {
           },
           "1": {
             "0": 5,
-            "1": 4,
+            "1": 5,
             "2": 3,
             "3": 4,
-            "4": 7,
+            "4": 10,
             "5": 6,
             "8": 1,
             "9": 1,
@@ -4083,7 +4238,7 @@ export default {
             "16": 3,
             "17": 3,
             "18": 4,
-            "20": 4,
+            "20": 5,
             "21": 6,
             "22": 2,
             "23": 8,
@@ -4091,7 +4246,7 @@ export default {
             "25": 1,
             "26": 2,
             "27": 4,
-            "28": 2,
+            "28": 7,
             "29": 2
           }
         }
@@ -4117,6 +4272,7 @@ export default {
         "from",
         {
           "1": {
+            "4": 2,
             "7": 3,
             "8": 2,
             "18": 2,
@@ -4126,6 +4282,7 @@ export default {
             "24": 1,
             "26": 1,
             "27": 1,
+            "28": 3,
             "30": 1
           }
         }
@@ -4143,6 +4300,14 @@ export default {
         {
           "1": {
             "19": 1
+          }
+        }
+      ],
+      [
+        "functions",
+        {
+          "1": {
+            "20": 1
           }
         }
       ],
@@ -4216,7 +4381,7 @@ export default {
             "0": 1,
             "1": 1,
             "3": 3,
-            "4": 4,
+            "4": 5,
             "5": 1,
             "7": 1,
             "10": 2,
@@ -4226,7 +4391,8 @@ export default {
             "22": 3,
             "23": 1,
             "24": 7,
-            "25": 1
+            "25": 1,
+            "28": 1
           }
         }
       ],
@@ -4237,13 +4403,15 @@ export default {
             "4": 1
           },
           "1": {
-            "4": 2,
+            "4": 3,
             "10": 4,
             "18": 1,
             "19": 1,
+            "20": 1,
             "24": 7,
             "26": 3,
-            "27": 1
+            "27": 1,
+            "28": 4
           }
         }
       ],
@@ -4330,29 +4498,6 @@ export default {
         }
       ],
       [
-        "return",
-        {
-          "1": {
-            "30": 1
-          }
-        }
-      ],
-      [
-        "returns",
-        {
-          "1": {
-            "6": 2,
-            "7": 4,
-            "8": 2,
-            "9": 2,
-            "10": 2,
-            "11": 2,
-            "12": 2,
-            "18": 1
-          }
-        }
-      ],
-      [
         "re",
         {
           "1": {
@@ -4392,36 +4537,19 @@ export default {
         }
       ],
       [
-        "resonated",
-        {
-          "1": {
-            "24": 1
-          }
-        }
-      ],
-      [
-        "respectful",
-        {
-          "1": {
-            "13": 1
-          }
-        }
-      ],
-      [
-        "response",
-        {
-          "1": {
-            "2": 1,
-            "24": 1
-          }
-        }
-      ],
-      [
         "req",
         {
           "1": {
             "24": 3,
             "27": 2
+          }
+        }
+      ],
+      [
+        "requiring",
+        {
+          "1": {
+            "23": 2
           }
         }
       ],
@@ -4444,10 +4572,10 @@ export default {
         }
       ],
       [
-        "requiring",
+        "requires",
         {
           "1": {
-            "23": 2
+            "1": 1
           }
         }
       ],
@@ -4488,66 +4616,75 @@ export default {
         }
       ],
       [
-        "react",
+        "resonated",
         {
           "1": {
-            "24": 2
-          }
-        }
-      ],
-      [
-        "reactivity",
-        {
-          "1": {
-            "7": 1,
-            "17": 1,
-            "18": 1,
-            "21": 1,
             "24": 1
           }
         }
       ],
       [
-        "reactively",
+        "result",
         {
           "1": {
-            "1": 1
+            "20": 1
           }
         }
       ],
       [
-        "reactive",
+        "respectful",
         {
           "1": {
-            "0": 1,
-            "3": 1,
-            "5": 1,
-            "6": 1,
-            "7": 2,
-            "8": 3,
+            "13": 1
+          }
+        }
+      ],
+      [
+        "response",
+        {
+          "1": {
+            "2": 1,
+            "24": 1
+          }
+        }
+      ],
+      [
+        "reuse",
+        {
+          "1": {
+            "20": 1
+          }
+        }
+      ],
+      [
+        "reusable",
+        {
+          "1": {
+            "17": 1
+          }
+        }
+      ],
+      [
+        "return",
+        {
+          "1": {
+            "20": 1,
+            "30": 1
+          }
+        }
+      ],
+      [
+        "returns",
+        {
+          "1": {
+            "6": 2,
+            "7": 4,
+            "8": 2,
             "9": 2,
+            "10": 2,
             "11": 2,
-            "12": 1,
-            "18": 5,
-            "21": 3,
-            "24": 3,
-            "29": 1
-          }
-        }
-      ],
-      [
-        "readable",
-        {
-          "1": {
-            "23": 1
-          }
-        }
-      ],
-      [
-        "real",
-        {
-          "1": {
-            "19": 1
+            "12": 2,
+            "18": 1
           }
         }
       ],
@@ -4559,14 +4696,6 @@ export default {
             "24": 1,
             "26": 1,
             "29": 1
-          }
-        }
-      ],
-      [
-        "reusable",
-        {
-          "1": {
-            "17": 1
           }
         }
       ],
@@ -4614,6 +4743,87 @@ export default {
         }
       ],
       [
+        "react",
+        {
+          "1": {
+            "24": 2
+          }
+        }
+      ],
+      [
+        "reactivity",
+        {
+          "1": {
+            "7": 1,
+            "17": 1,
+            "18": 1,
+            "21": 1,
+            "24": 1
+          }
+        }
+      ],
+      [
+        "reactively",
+        {
+          "1": {
+            "1": 1
+          }
+        }
+      ],
+      [
+        "reactive",
+        {
+          "1": {
+            "0": 1,
+            "3": 1,
+            "5": 1,
+            "6": 1,
+            "7": 2,
+            "8": 3,
+            "9": 2,
+            "11": 2,
+            "12": 1,
+            "18": 5,
+            "20": 1,
+            "21": 3,
+            "24": 3,
+            "29": 1
+          }
+        }
+      ],
+      [
+        "real",
+        {
+          "1": {
+            "19": 1
+          }
+        }
+      ],
+      [
+        "reads",
+        {
+          "1": {
+            "28": 1
+          }
+        }
+      ],
+      [
+        "readable",
+        {
+          "1": {
+            "23": 1
+          }
+        }
+      ],
+      [
+        "read",
+        {
+          "1": {
+            "4": 1
+          }
+        }
+      ],
+      [
         "recipes",
         {
           "1": {
@@ -4646,6 +4856,50 @@ export default {
         }
       ],
       [
+        "render",
+        {
+          "1": {
+            "3": 2,
+            "5": 1
+          }
+        }
+      ],
+      [
+        "renders",
+        {
+          "1": {
+            "2": 1,
+            "3": 1,
+            "5": 1
+          }
+        }
+      ],
+      [
+        "rendered",
+        {
+          "1": {
+            "2": 1
+          }
+        }
+      ],
+      [
+        "rendering",
+        {
+          "0": {
+            "28": 1
+          },
+          "1": {
+            "1": 2,
+            "2": 1,
+            "3": 2,
+            "4": 2,
+            "17": 1,
+            "24": 2,
+            "28": 3
+          }
+        }
+      ],
+      [
         "relies",
         {
           "1": {
@@ -4672,46 +4926,31 @@ export default {
         }
       ],
       [
-        "rendering",
+        "dark",
+        {
+          "1": {
+            "24": 3
+          }
+        }
+      ],
+      [
+        "data",
         {
           "0": {
-            "28": 1
+            "21": 1
           },
           "1": {
-            "2": 1,
-            "3": 2,
-            "4": 1,
+            "0": 4,
+            "3": 5,
+            "5": 4,
+            "8": 9,
+            "15": 6,
+            "16": 7,
             "17": 1,
-            "24": 2,
-            "28": 1
-          }
-        }
-      ],
-      [
-        "renders",
-        {
-          "1": {
-            "2": 1,
-            "3": 1,
-            "5": 1
-          }
-        }
-      ],
-      [
-        "rendered",
-        {
-          "1": {
-            "2": 1
-          }
-        }
-      ],
-      [
-        "render",
-        {
-          "1": {
-            "1": 1,
-            "3": 2,
-            "5": 1
+            "18": 8,
+            "21": 18,
+            "24": 4,
+            "29": 2
           }
         }
       ],
@@ -4783,7 +5022,8 @@ export default {
             "23": 1,
             "24": 2,
             "26": 1,
-            "27": 1
+            "27": 1,
+            "28": 1
           }
         }
       ],
@@ -4821,14 +5061,6 @@ export default {
         }
       ],
       [
-        "div>",
-        {
-          "1": {
-            "24": 2
-          }
-        }
-      ],
-      [
         "digits",
         {
           "1": {
@@ -4841,6 +5073,22 @@ export default {
         {
           "1": {
             "10": 1
+          }
+        }
+      ],
+      [
+        "div>",
+        {
+          "1": {
+            "24": 2
+          }
+        }
+      ],
+      [
+        "div",
+        {
+          "1": {
+            "1": 1
           }
         }
       ],
@@ -4864,27 +5112,6 @@ export default {
             "21": 1,
             "24": 1,
             "27": 3
-          }
-        }
-      ],
-      [
-        "data",
-        {
-          "0": {
-            "21": 1
-          },
-          "1": {
-            "0": 4,
-            "3": 5,
-            "5": 4,
-            "8": 9,
-            "15": 6,
-            "16": 7,
-            "17": 1,
-            "18": 8,
-            "21": 18,
-            "24": 4,
-            "29": 2
           }
         }
       ],
@@ -4936,7 +5163,24 @@ export default {
             "9": 1,
             "10": 1,
             "11": 1,
-            "12": 1
+            "12": 1,
+            "28": 1
+          }
+        }
+      ],
+      [
+        "deploying",
+        {
+          "1": {
+            "28": 1
+          }
+        }
+      ],
+      [
+        "deployments",
+        {
+          "1": {
+            "4": 1
           }
         }
       ],
@@ -4985,7 +5229,8 @@ export default {
             "5": 1,
             "6": 1,
             "14": 1,
-            "20": 1
+            "20": 1,
+            "28": 1
           }
         }
       ],
@@ -5036,7 +5281,7 @@ export default {
         "blue",
         {
           "1": {
-            "24": 2
+            "24": 4
           }
         }
       ],
@@ -5044,7 +5289,7 @@ export default {
         "bg",
         {
           "1": {
-            "24": 1
+            "24": 2
           }
         }
       ],
@@ -5052,7 +5297,7 @@ export default {
         "border",
         {
           "1": {
-            "24": 2
+            "24": 3
           }
         }
       ],
@@ -5078,7 +5323,8 @@ export default {
         "built",
         {
           "1": {
-            "24": 2
+            "24": 2,
+            "28": 1
           }
         }
       ],
@@ -5095,6 +5341,14 @@ export default {
         {
           "1": {
             "4": 1
+          }
+        }
+      ],
+      [
+        "button",
+        {
+          "1": {
+            "1": 1
           }
         }
       ],
@@ -5200,16 +5454,25 @@ export default {
         {
           "1": {
             "0": 1,
+            "4": 4,
             "5": 1,
-            "21": 1
+            "21": 1,
+            "28": 6
           }
         }
       ],
       [
-        "before",
+        "by",
         {
           "1": {
-            "26": 3
+            "2": 1,
+            "5": 1,
+            "10": 1,
+            "20": 1,
+            "21": 1,
+            "24": 1,
+            "26": 1,
+            "27": 1
           }
         }
       ],
@@ -5225,27 +5488,8 @@ export default {
         "be",
         {
           "1": {
-            "13": 1
-          }
-        }
-      ],
-      [
-        "behaviors",
-        {
-          "1": {
+            "13": 1,
             "20": 1
-          }
-        }
-      ],
-      [
-        "behavior",
-        {
-          "1": {
-            "7": 1,
-            "8": 1,
-            "10": 1,
-            "11": 1,
-            "21": 1
           }
         }
       ],
@@ -5262,26 +5506,41 @@ export default {
         }
       ],
       [
+        "before",
+        {
+          "1": {
+            "1": 1,
+            "26": 3
+          }
+        }
+      ],
+      [
+        "behaviors",
+        {
+          "1": {
+            "20": 1
+          }
+        }
+      ],
+      [
+        "behavior",
+        {
+          "1": {
+            "1": 2,
+            "7": 1,
+            "8": 1,
+            "10": 1,
+            "11": 1,
+            "21": 1
+          }
+        }
+      ],
+      [
         "between",
         {
           "1": {
             "0": 1,
             "14": 1
-          }
-        }
-      ],
-      [
-        "by",
-        {
-          "1": {
-            "2": 1,
-            "5": 1,
-            "10": 1,
-            "20": 1,
-            "21": 1,
-            "24": 1,
-            "26": 1,
-            "27": 1
           }
         }
       ],
@@ -5330,43 +5589,6 @@ export default {
         }
       ],
       [
-        "original",
-        {
-          "1": {
-            "24": 2
-          }
-        }
-      ],
-      [
-        "or",
-        {
-          "1": {
-            "11": 1,
-            "18": 1,
-            "21": 1,
-            "24": 1,
-            "25": 1,
-            "29": 1
-          }
-        }
-      ],
-      [
-        "otherwise",
-        {
-          "1": {
-            "23": 1
-          }
-        }
-      ],
-      [
-        "other",
-        {
-          "1": {
-            "10": 1
-          }
-        }
-      ],
-      [
         "open",
         {
           "1": {
@@ -5402,7 +5624,8 @@ export default {
             "6": 1,
             "18": 1,
             "23": 2,
-            "24": 2
+            "24": 2,
+            "28": 2
           }
         }
       ],
@@ -5418,15 +5641,8 @@ export default {
         "once",
         {
           "1": {
-            "11": 1
-          }
-        }
-      ],
-      [
-        "one",
-        {
-          "1": {
-            "6": 1
+            "11": 1,
+            "20": 1
           }
         }
       ],
@@ -5456,10 +5672,59 @@ export default {
         }
       ],
       [
+        "one",
+        {
+          "1": {
+            "1": 1,
+            "6": 1
+          }
+        }
+      ],
+      [
+        "otherwise",
+        {
+          "1": {
+            "23": 1
+          }
+        }
+      ],
+      [
+        "other",
+        {
+          "1": {
+            "1": 1,
+            "10": 1
+          }
+        }
+      ],
+      [
+        "original",
+        {
+          "1": {
+            "1": 1,
+            "24": 2
+          }
+        }
+      ],
+      [
+        "or",
+        {
+          "1": {
+            "1": 1,
+            "11": 1,
+            "18": 1,
+            "21": 1,
+            "24": 1,
+            "25": 1,
+            "29": 1
+          }
+        }
+      ],
+      [
         "of",
         {
           "1": {
-            "1": 2,
+            "1": 4,
             "2": 1,
             "6": 1,
             "13": 1,
@@ -5523,7 +5788,8 @@ export default {
             "20": 1,
             "22": 1,
             "25": 1,
-            "27": 1
+            "27": 1,
+            "28": 1
           }
         }
       ],
@@ -5540,73 +5806,6 @@ export default {
         {
           "1": {
             "5": 1
-          }
-        }
-      ],
-      [
-        "custom",
-        {
-          "0": {
-            "20": 1
-          },
-          "1": {
-            "4": 4,
-            "10": 4,
-            "18": 1,
-            "20": 4,
-            "23": 1
-          }
-        }
-      ],
-      [
-        "current",
-        {
-          "1": {
-            "0": 2,
-            "1": 2,
-            "3": 1,
-            "6": 3,
-            "7": 2,
-            "9": 1,
-            "12": 2,
-            "14": 2
-          }
-        }
-      ],
-      [
-        "called",
-        {
-          "1": {
-            "21": 1
-          }
-        }
-      ],
-      [
-        "can",
-        {
-          "1": {
-            "18": 1,
-            "20": 1,
-            "22": 1
-          }
-        }
-      ],
-      [
-        "cases",
-        {
-          "1": {
-            "4": 1,
-            "10": 1,
-            "20": 1,
-            "21": 1
-          }
-        }
-      ],
-      [
-        "catch",
-        {
-          "1": {
-            "3": 2
           }
         }
       ],
@@ -5630,7 +5829,8 @@ export default {
         "correctly",
         {
           "1": {
-            "4": 1,
+            "4": 2,
+            "28": 1,
             "29": 2
           }
         }
@@ -5703,10 +5903,11 @@ export default {
         }
       ],
       [
-        "complete",
+        "complex",
         {
           "1": {
-            "28": 1
+            "22": 1,
+            "23": 2
           }
         }
       ],
@@ -5719,11 +5920,11 @@ export default {
         }
       ],
       [
-        "complex",
+        "complete",
         {
           "1": {
-            "22": 1,
-            "23": 2
+            "4": 1,
+            "28": 1
           }
         }
       ],
@@ -5763,6 +5964,7 @@ export default {
           "1": {
             "3": 2,
             "8": 2,
+            "20": 1,
             "21": 3,
             "22": 1,
             "24": 1,
@@ -5786,7 +5988,7 @@ export default {
             "14": 2,
             "17": 3,
             "18": 3,
-            "20": 1,
+            "20": 2,
             "24": 1,
             "27": 1,
             "30": 1
@@ -5806,7 +6008,8 @@ export default {
         {
           "1": {
             "13": 2,
-            "24": 1
+            "24": 1,
+            "28": 1
           }
         }
       ],
@@ -5819,10 +6022,10 @@ export default {
         }
       ],
       [
-        "config",
+        "configure",
         {
           "1": {
-            "26": 1
+            "28": 1
           }
         }
       ],
@@ -5842,7 +6045,16 @@ export default {
             "18": 1,
             "20": 1,
             "21": 1,
-            "28": 1
+            "28": 2
+          }
+        }
+      ],
+      [
+        "config",
+        {
+          "1": {
+            "26": 1,
+            "28": 2
           }
         }
       ],
@@ -5992,6 +6204,53 @@ export default {
         }
       ],
       [
+        "call",
+        {
+          "1": {
+            "20": 1
+          }
+        }
+      ],
+      [
+        "called",
+        {
+          "1": {
+            "1": 1,
+            "21": 1
+          }
+        }
+      ],
+      [
+        "cases",
+        {
+          "1": {
+            "4": 1,
+            "10": 1,
+            "20": 1,
+            "21": 1
+          }
+        }
+      ],
+      [
+        "catch",
+        {
+          "1": {
+            "3": 2
+          }
+        }
+      ],
+      [
+        "can",
+        {
+          "1": {
+            "1": 1,
+            "18": 1,
+            "20": 1,
+            "22": 1
+          }
+        }
+      ],
+      [
         "client",
         {
           "1": {
@@ -6030,6 +6289,37 @@ export default {
         {
           "1": {
             "23": 1
+          }
+        }
+      ],
+      [
+        "custom",
+        {
+          "0": {
+            "20": 1
+          },
+          "1": {
+            "1": 2,
+            "4": 4,
+            "10": 4,
+            "18": 1,
+            "20": 5,
+            "23": 1
+          }
+        }
+      ],
+      [
+        "current",
+        {
+          "1": {
+            "0": 2,
+            "1": 2,
+            "3": 1,
+            "6": 3,
+            "7": 2,
+            "9": 1,
+            "12": 2,
+            "14": 2
           }
         }
       ],
@@ -6073,7 +6363,7 @@ export default {
         {
           "1": {
             "0": 1,
-            "1": 1,
+            "1": 6,
             "5": 2,
             "8": 2,
             "18": 1,
@@ -6163,7 +6453,7 @@ export default {
         "text",
         {
           "1": {
-            "24": 1
+            "24": 3
           }
         }
       ],
@@ -6183,31 +6473,6 @@ export default {
         {
           "1": {
             "13": 2
-          }
-        }
-      ],
-      [
-        "takeaway",
-        {
-          "1": {
-            "24": 1
-          }
-        }
-      ],
-      [
-        "taking",
-        {
-          "1": {
-            "21": 1
-          }
-        }
-      ],
-      [
-        "target",
-        {
-          "1": {
-            "1": 1,
-            "2": 1
           }
         }
       ],
@@ -6240,6 +6505,47 @@ export default {
         }
       ],
       [
+        "takeaway",
+        {
+          "1": {
+            "24": 1
+          }
+        }
+      ],
+      [
+        "taking",
+        {
+          "1": {
+            "21": 1
+          }
+        }
+      ],
+      [
+        "tags",
+        {
+          "1": {
+            "1": 1
+          }
+        }
+      ],
+      [
+        "tag",
+        {
+          "1": {
+            "1": 2
+          }
+        }
+      ],
+      [
+        "target",
+        {
+          "1": {
+            "1": 1,
+            "2": 1
+          }
+        }
+      ],
+      [
         "though",
         {
           "1": {
@@ -6263,6 +6569,7 @@ export default {
             "4": 1,
             "18": 3,
             "19": 1,
+            "20": 1,
             "24": 1
           }
         }
@@ -6271,10 +6578,12 @@ export default {
         "this",
         {
           "1": {
+            "1": 1,
             "2": 1,
             "5": 1,
             "24": 4,
             "27": 1,
+            "28": 1,
             "29": 1
           }
         }
@@ -6329,7 +6638,7 @@ export default {
         {
           "1": {
             "0": 1,
-            "1": 7,
+            "1": 10,
             "2": 7,
             "3": 3,
             "4": 1,
@@ -6344,12 +6653,13 @@ export default {
             "14": 1,
             "18": 1,
             "19": 2,
-            "20": 1,
+            "20": 3,
             "21": 6,
             "22": 4,
             "23": 3,
             "24": 9,
             "25": 1,
+            "28": 1,
             "29": 1,
             "30": 1
           }
@@ -6386,6 +6696,7 @@ export default {
         {
           "1": {
             "0": 2,
+            "1": 2,
             "2": 6,
             "3": 5,
             "5": 3,
@@ -6401,13 +6712,14 @@ export default {
             "16": 1,
             "17": 1,
             "19": 1,
+            "20": 1,
             "21": 4,
             "22": 5,
             "23": 5,
             "24": 8,
             "26": 1,
             "27": 1,
-            "28": 1
+            "28": 4
           }
         }
       ],
@@ -6451,6 +6763,7 @@ export default {
             "4": 1,
             "5": 1,
             "24": 1,
+            "28": 1,
             "30": 3
           }
         }
@@ -6531,11 +6844,12 @@ export default {
             "1": 35,
             "2": 25,
             "3": 30,
-            "4": 25,
+            "4": 30,
             "5": 20,
             "24": 30,
             "26": 24,
-            "27": 20
+            "27": 20,
+            "28": 25
           }
         }
       ],
@@ -6701,6 +7015,14 @@ export default {
         }
       ],
       [
+        "pre",
+        {
+          "1": {
+            "28": 2
+          }
+        }
+      ],
+      [
         "preact",
         {
           "1": {
@@ -6729,6 +7051,14 @@ export default {
         {
           "1": {
             "7": 1
+          }
+        }
+      ],
+      [
+        "preserved",
+        {
+          "1": {
+            "1": 1
           }
         }
       ],
@@ -6875,16 +7205,18 @@ export default {
         {
           "1": {
             "0": 2,
-            "1": 1,
+            "1": 4,
             "2": 1,
             "3": 3,
-            "4": 1,
+            "4": 2,
             "5": 1,
             "7": 1,
             "8": 1,
             "18": 1,
+            "20": 1,
             "21": 2,
             "22": 2,
+            "28": 3,
             "29": 1
           }
         }
@@ -6894,7 +7226,7 @@ export default {
         {
           "1": {
             "0": 1,
-            "1": 1,
+            "1": 3,
             "2": 1,
             "3": 3,
             "4": 2,
@@ -6904,7 +7236,7 @@ export default {
             "18": 1,
             "21": 1,
             "22": 1,
-            "28": 1,
+            "28": 2,
             "30": 2
           }
         }
@@ -7059,10 +7391,11 @@ export default {
             "1": 3,
             "2": 3,
             "3": 1,
-            "4": 1,
+            "4": 5,
             "9": 1,
             "23": 3,
-            "24": 3
+            "24": 3,
+            "28": 5
           }
         }
       ],
@@ -7086,7 +7419,16 @@ export default {
         {
           "1": {
             "0": 1,
-            "21": 2
+            "21": 2,
+            "28": 2
+          }
+        }
+      ],
+      [
+        "passes",
+        {
+          "1": {
+            "28": 1
           }
         }
       ],
@@ -7133,14 +7475,6 @@ export default {
             "24": 2,
             "28": 1,
             "29": 1
-          }
-        }
-      ],
-      [
-        "about",
-        {
-          "1": {
-            "24": 1
           }
         }
       ],
@@ -7258,7 +7592,7 @@ export default {
         {
           "1": {
             "4": 1,
-            "28": 2
+            "28": 3
           }
         }
       ],
@@ -7298,6 +7632,14 @@ export default {
         }
       ],
       [
+        "avoiding",
+        {
+          "1": {
+            "1": 1
+          }
+        }
+      ],
+      [
         "adaptation",
         {
           "1": {
@@ -7330,7 +7672,8 @@ export default {
           "1": {
             "13": 1,
             "14": 1,
-            "23": 1
+            "23": 1,
+            "28": 1
           }
         }
       ],
@@ -7354,6 +7697,7 @@ export default {
         "accept",
         {
           "1": {
+            "20": 1,
             "30": 1
           }
         }
@@ -7440,12 +7784,13 @@ export default {
             "0": 1,
             "1": 1,
             "2": 3,
+            "4": 2,
             "7": 2,
             "8": 1,
             "18": 3,
             "21": 2,
             "22": 2,
-            "28": 1
+            "28": 4
           }
         }
       ],
@@ -7455,6 +7800,27 @@ export default {
           "1": {
             "2": 1,
             "17": 1
+          }
+        }
+      ],
+      [
+        "about",
+        {
+          "1": {
+            "1": 1,
+            "24": 1
+          }
+        }
+      ],
+      [
+        "as",
+        {
+          "1": {
+            "1": 1,
+            "3": 1,
+            "5": 1,
+            "7": 1,
+            "8": 1
           }
         }
       ],
@@ -7502,6 +7868,7 @@ export default {
         {
           "1": {
             "3": 2,
+            "4": 1,
             "5": 1,
             "7": 1,
             "8": 1,
@@ -7509,8 +7876,10 @@ export default {
             "11": 1,
             "13": 1,
             "18": 1,
+            "20": 1,
             "21": 3,
             "24": 2,
+            "28": 1,
             "30": 2
           }
         }
@@ -7521,6 +7890,14 @@ export default {
           "1": {
             "2": 1,
             "22": 1
+          }
+        }
+      ],
+      [
+        "allows",
+        {
+          "1": {
+            "1": 1
           }
         }
       ],
@@ -7542,9 +7919,18 @@ export default {
         }
       ],
       [
+        "another",
+        {
+          "1": {
+            "2": 1
+          }
+        }
+      ],
+      [
         "an",
         {
           "1": {
+            "1": 1,
             "2": 1,
             "6": 1,
             "12": 1,
@@ -7554,20 +7940,12 @@ export default {
         }
       ],
       [
-        "another",
-        {
-          "1": {
-            "2": 1
-          }
-        }
-      ],
-      [
         "and",
         {
           "1": {
-            "1": 2,
+            "1": 5,
             "3": 5,
-            "4": 3,
+            "4": 4,
             "5": 1,
             "6": 1,
             "8": 1,
@@ -7579,6 +7957,7 @@ export default {
             "17": 2,
             "18": 1,
             "19": 2,
+            "20": 2,
             "21": 1,
             "24": 11,
             "28": 1,
@@ -7620,22 +7999,10 @@ export default {
         }
       ],
       [
-        "as",
-        {
-          "1": {
-            "1": 1,
-            "3": 1,
-            "5": 1,
-            "7": 1,
-            "8": 1
-          }
-        }
-      ],
-      [
         "a",
         {
           "1": {
-            "1": 4,
+            "1": 7,
             "3": 1,
             "6": 4,
             "7": 2,
@@ -7647,10 +8014,12 @@ export default {
             "17": 1,
             "18": 2,
             "19": 2,
+            "20": 1,
             "21": 3,
             "23": 2,
             "24": 1,
-            "27": 1
+            "27": 1,
+            "28": 2
           }
         }
       ],
@@ -7668,6 +8037,14 @@ export default {
           "1": {
             "16": 2,
             "17": 1
+          }
+        }
+      ],
+      [
+        "want",
+        {
+          "1": {
+            "1": 1
           }
         }
       ],
@@ -7746,10 +8123,11 @@ export default {
         "works",
         {
           "1": {
-            "4": 1,
+            "4": 2,
             "21": 1,
             "22": 1,
-            "24": 1
+            "24": 1,
+            "28": 1
           }
         }
       ],
@@ -7770,7 +8148,7 @@ export default {
             "25": 1,
             "26": 3,
             "27": 3,
-            "28": 1,
+            "28": 2,
             "30": 1
           }
         }
@@ -7818,10 +8196,10 @@ export default {
         {
           "1": {
             "0": 2,
-            "1": 3,
+            "1": 7,
             "2": 1,
             "3": 1,
-            "4": 3,
+            "4": 4,
             "8": 1,
             "16": 3,
             "17": 2,
@@ -7833,7 +8211,7 @@ export default {
             "24": 10,
             "25": 1,
             "27": 1,
-            "28": 2,
+            "28": 3,
             "29": 1
           }
         }
@@ -7889,7 +8267,7 @@ export default {
         {
           "1": {
             "0": 1,
-            "1": 1,
+            "1": 2,
             "2": 2,
             "3": 3,
             "5": 1,
@@ -7900,6 +8278,7 @@ export default {
             "18": 2,
             "21": 1,
             "23": 1,
+            "28": 1,
             "29": 1
           }
         }

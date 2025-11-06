@@ -1,6 +1,8 @@
 ---
 title: Installation
 description: Install wouter-vue in your Vue 3 project
+section: Introduction
+order: 2
 ---
 
 # Installation

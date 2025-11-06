@@ -13,7 +13,11 @@
 
 ## 📚 Documentation
 
-**Full documentation is available at: [https://s00d.github.io/wouter-vue/](https://s00d.github.io/wouter-vue/)**
+<div align="center" style="margin: 2rem 0;">
+  <a href="https://s00d.github.io/wouter-vue/" style="display: inline-block; padding: 1rem 2rem; background: #3b82f6; color: white; text-decoration: none; border-radius: 0.5rem; font-size: 1.25rem; font-weight: 600;">
+    📖 View Full Documentation →
+  </a>
+</div>
 
 ## About
 

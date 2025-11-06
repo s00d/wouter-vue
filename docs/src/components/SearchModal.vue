@@ -48,7 +48,7 @@
                 </button>
               </div>
               <div v-if="searchQuery && !isLoading" class="search-stats">
-                {{ filteredResults.length }} {{ filteredResults.length === 1 ? 'result' : 'results' }}
+                {{ groupedResults.reduce((sum, group) => sum + group.items.length, 0) }} {{ groupedResults.reduce((sum, group) => sum + group.items.length, 0) === 1 ? 'result' : 'results' }}
               </div>
             </div>
 
@@ -67,21 +67,22 @@
               </div>
 
               <div v-else class="results-list">
-                <div
-                  v-for="(result, index) in filteredResults"
-                  :key="result.path"
-                  @click="navigateToPage(result.path)"
-                  @mouseenter="selectedIndex = index"
-                  class="result-item"
-                  :class="{ 'selected': selectedIndex === index }"
-                >
-                  <div class="result-header">
-                    <Link :href="result.path" class="result-title">
-                      {{ result.title }}
-                    </Link>
-                    <span class="result-path">{{ result.path }}</span>
+                <div v-for="group in groupedResults" :key="group.name" class="result-group">
+                  <h3 class="group-title">{{ group.name }}</h3>
+                  <div
+                    v-for="(result, index) in group.items"
+                    :key="result.path"
+                    @click="navigateToPage(result.path)"
+                    @mouseenter="selectedIndex = getGlobalIndex(group.name, index)"
+                    class="result-item"
+                    :class="{ 'selected': selectedIndex === getGlobalIndex(group.name, index) }"
+                  >
+                    <div class="result-header">
+                      <Link :href="result.path" class="result-title" v-html="highlightTitle(result.title, searchQuery)"></Link>
+                      <span class="result-path">{{ result.path }}</span>
+                    </div>
+                    <div class="result-content" v-html="result.highlightedContent"></div>
                   </div>
-                  <div class="result-content" v-html="result.highlightedContent"></div>
                 </div>
               </div>
             </div>
@@ -252,6 +253,68 @@ const filteredResults = computed(() => {
   }
 });
 
+// Group results by section (first path segment)
+const groupedResults = computed(() => {
+  const groups = new Map();
+  
+  filteredResults.value.forEach(result => {
+    // Extract section from path (e.g., /api/composables/use-location -> 'api')
+    const pathParts = result.path.split('/').filter(Boolean);
+    const section = pathParts.length > 0 ? pathParts[0] : 'other';
+    
+    // Map section names to display names
+    const sectionNames = {
+      'api': 'API Reference',
+      'guides': 'Guides',
+      'cookbook': 'Cookbook',
+      'getting-started': 'Introduction',
+      'installation': 'Introduction',
+      'core-concepts': 'Introduction',
+      'other': 'Other',
+    };
+    
+    const sectionName = sectionNames[section] || section.charAt(0).toUpperCase() + section.slice(1);
+    
+    if (!groups.has(sectionName)) {
+      groups.set(sectionName, []);
+    }
+    groups.get(sectionName).push(result);
+  });
+  
+  // Convert to array and sort by section order
+  const sectionOrder = ['Introduction', 'Guides', 'API Reference', 'Cookbook', 'Other'];
+  return Array.from(groups.entries())
+    .map(([name, items]) => ({
+      name,
+      items: items.sort((a, b) => (b.score || 0) - (a.score || 0)), // Sort by relevance within group
+    }))
+    .sort((a, b) => {
+      const aIndex = sectionOrder.indexOf(a.name);
+      const bIndex = sectionOrder.indexOf(b.name);
+      if (aIndex === -1 && bIndex === -1) return a.name.localeCompare(b.name);
+      if (aIndex === -1) return 1;
+      if (bIndex === -1) return -1;
+      return aIndex - bIndex;
+    });
+});
+
+// Highlight title text (similar to highlightText but for titles)
+function highlightTitle(title, query) {
+  if (!query || !title) return title;
+  
+  const queryWords = query.split(/\s+/).filter(w => w.length > 1);
+  
+  if (queryWords.length === 0) {
+    const regex = new RegExp(`(${escapeRegex(query)})`, 'gi');
+    return title.replace(regex, '<mark class="highlight">$1</mark>');
+  }
+  
+  // Create combined regex for all words
+  const combinedPattern = queryWords.map(w => escapeRegex(w)).join('|');
+  const regex = new RegExp(`(${combinedPattern})`, 'gi');
+  return title.replace(regex, '<mark class="highlight">$1</mark>');
+}
+
 function navigateToPage(path) {
   close();
   navigate(path);
@@ -262,16 +325,39 @@ function close() {
 }
 
 function handleEnter() {
-  if (selectedIndex.value >= 0 && selectedIndex.value < filteredResults.value.length) {
-    navigateToPage(filteredResults.value[selectedIndex.value].path);
-  } else if (filteredResults.value.length > 0) {
-    navigateToPage(filteredResults.value[0].path);
+  if (selectedIndex.value >= 0) {
+    // Find the result at the selected index across all groups
+    let currentIndex = 0;
+    for (const group of groupedResults.value) {
+      for (const result of group.items) {
+        if (currentIndex === selectedIndex.value) {
+          navigateToPage(result.path);
+          return;
+        }
+        currentIndex++;
+      }
+    }
+  } else if (groupedResults.value.length > 0 && groupedResults.value[0].items.length > 0) {
+    navigateToPage(groupedResults.value[0].items[0].path);
   }
 }
 
 function navigateResults(direction) {
-  const maxIndex = filteredResults.value.length - 1;
+  const totalResults = groupedResults.value.reduce((sum, group) => sum + group.items.length, 0);
+  const maxIndex = totalResults - 1;
   selectedIndex.value = Math.max(-1, Math.min(maxIndex, selectedIndex.value + direction));
+}
+
+// Get global index for a result within a group
+function getGlobalIndex(groupName, itemIndex) {
+  let globalIndex = 0;
+  for (const group of groupedResults.value) {
+    if (group.name === groupName) {
+      return globalIndex + itemIndex;
+    }
+    globalIndex += group.items.length;
+  }
+  return -1;
 }
 </script>
 
@@ -299,9 +385,18 @@ function navigateResults(direction) {
   overflow: hidden;
 }
 
+:global(.dark) .search-modal {
+  background: #1f2937;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+}
+
 .search-modal-header {
   padding: 1.5rem;
   border-bottom: 1px solid #e5e7eb;
+}
+
+:global(.dark) .search-modal-header {
+  border-bottom-color: #374151;
 }
 
 .search-input-container {
@@ -328,12 +423,25 @@ function navigateResults(direction) {
   border: 2px solid #e5e7eb;
   border-radius: 0.5rem;
   transition: border-color 0.2s;
+  background: white;
+  color: #1f2937;
+}
+
+:global(.dark) .search-input {
+  background: #374151;
+  border-color: #4b5563;
+  color: #f9fafb;
 }
 
 .search-input:focus {
   outline: none;
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+:global(.dark) .search-input:focus {
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
 }
 
 .close-button {
@@ -346,14 +454,26 @@ function navigateResults(direction) {
   transition: background-color 0.2s;
 }
 
+:global(.dark) .close-button {
+  color: #9ca3af;
+}
+
 .close-button:hover {
   background-color: #f3f4f6;
+}
+
+:global(.dark) .close-button:hover {
+  background-color: #374151;
 }
 
 .search-stats {
   margin-top: 0.75rem;
   font-size: 0.875rem;
   color: #6b7280;
+}
+
+:global(.dark) .search-stats {
+  color: #9ca3af;
 }
 
 .search-modal-content {
@@ -368,10 +488,34 @@ function navigateResults(direction) {
   color: #9ca3af;
 }
 
+:global(.dark) .empty-state {
+  color: #6b7280;
+}
+
 .results-list {
   display: flex;
   flex-direction: column;
+  gap: 1rem;
+}
+
+.result-group {
+  display: flex;
+  flex-direction: column;
   gap: 0.5rem;
+}
+
+.group-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+  padding: 0 0.5rem;
+}
+
+:global(.dark) .group-title {
+  color: #9ca3af;
 }
 
 .result-item {
@@ -383,11 +527,23 @@ function navigateResults(direction) {
   transition: all 0.2s;
 }
 
+:global(.dark) .result-item {
+  background: #374151;
+  border-color: #4b5563;
+}
+
 .result-item:hover,
 .result-item.selected {
   border-color: #3b82f6;
   background-color: #eff6ff;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+:global(.dark) .result-item:hover,
+:global(.dark) .result-item.selected {
+  border-color: #60a5fa;
+  background-color: #1e3a8a;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
 }
 
 .result-header {
@@ -406,8 +562,16 @@ function navigateResults(direction) {
   text-decoration: none;
 }
 
+:global(.dark) .result-title {
+  color: #f9fafb;
+}
+
 .result-title:hover {
   color: #3b82f6;
+}
+
+:global(.dark) .result-title:hover {
+  color: #60a5fa;
 }
 
 .result-path {
@@ -416,10 +580,18 @@ function navigateResults(direction) {
   font-family: monospace;
 }
 
+:global(.dark) .result-path {
+  color: #9ca3af;
+}
+
 .result-content {
   color: #4b5563;
   line-height: 1.5;
   font-size: 0.875rem;
+}
+
+:global(.dark) .result-content {
+  color: #d1d5db;
 }
 
 .result-content :deep(.highlight) {
@@ -428,6 +600,11 @@ function navigateResults(direction) {
   border-radius: 0.125rem;
   font-weight: 600;
   color: #92400e;
+}
+
+:global(.dark) .result-content :deep(.highlight) {
+  background-color: #78350f;
+  color: #fbbf24;
 }
 
 /* Transitions */

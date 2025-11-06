@@ -1,6 +1,8 @@
 ---
 title: Performance & Best Practices
 description: Optimize routing performance
+section: Other
+order: 82
 ---
 
 # Performance & Best Practices

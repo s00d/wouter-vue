@@ -1,6 +1,8 @@
 ---
 title: Core Concepts
 description: Understanding wouter-vue's fundamental concepts
+section: Introduction
+order: 3
 ---
 
 # Core Concepts

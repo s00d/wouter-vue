@@ -1,6 +1,8 @@
 ---
 title: Hierarchical Data Passing
 description: Pass reactive data through routing hierarchy
+section: Guides
+order: 13
 ---
 
 # Hierarchical Data Passing

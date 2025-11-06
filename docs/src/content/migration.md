@@ -1,6 +1,8 @@
 ---
 title: Migration Guide
 description: Migrate from vue-router to wouter-vue
+section: Other
+order: 84
 ---
 
 # Migration Guide

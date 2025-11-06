@@ -1,6 +1,8 @@
 ---
 title: useRouter
 description: Get router instance for advanced operations
+section: API Reference
+order: 35
 ---
 
 # useRouter

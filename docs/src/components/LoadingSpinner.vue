@@ -24,6 +24,10 @@
   animation: pulse 1.5s ease-in-out infinite;
 }
 
+:global(.dark) .loading {
+  color: #818cf8;
+}
+
 @keyframes pulse {
   0%, 100% {
     opacity: 1;

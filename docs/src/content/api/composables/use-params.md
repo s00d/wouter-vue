@@ -1,6 +1,8 @@
 ---
 title: useParams
 description: Get route parameters from the current route
+section: API Reference
+order: 32
 ---
 
 # useParams

@@ -1,6 +1,8 @@
 ---
 title: Getting Started
 description: Quick Start guide for wouter-vue
+section: Introduction
+order: 1
 ---
 
 # Getting Started

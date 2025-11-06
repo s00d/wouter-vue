@@ -1,6 +1,8 @@
 ---
 title: Nested Routing
 description: Create hierarchical route structures
+section: Guides
+order: 12
 ---
 
 # Nested Routing

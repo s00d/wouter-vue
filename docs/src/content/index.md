@@ -96,7 +96,7 @@ This project attempts to bring the same core principles and design philosophy to
 
 ---
 
-<div class="bg-blue-50 border-l-4 border-blue-500 p-4 my-8 rounded-r">
+<div class="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 dark:border-blue-400 p-4 my-8 rounded-r text-gray-900 dark:text-gray-100">
 
 ## 💡 Built with wouter-vue
 

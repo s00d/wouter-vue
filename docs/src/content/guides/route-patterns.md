@@ -1,6 +1,8 @@
 ---
 title: Route Pattern Matching
 description: Complete guide to route patterns and matching
+section: Guides
+order: 11
 ---
 
 # Route Pattern Matching

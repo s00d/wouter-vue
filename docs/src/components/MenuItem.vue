@@ -4,7 +4,7 @@
     <template v-if="level === 0 && !item.isFile">
       <button
         @click="toggleCollapse"
-        class="w-full flex items-center justify-between text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 mt-4 first:mt-0 hover:text-gray-700 transition-colors group"
+        class="w-full flex items-center justify-between text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 mt-4 first:mt-0 hover:text-gray-700 dark:hover:text-gray-300 transition-colors group"
       >
         <span>{{ item.title }}</span>
         <svg
@@ -37,7 +37,7 @@
       <div v-if="item.children.length > 0">
         <button
           @click="toggleCollapse"
-          class="w-full flex items-center justify-between px-3 py-1 text-xs font-medium text-gray-400 mb-1 hover:text-gray-600 transition-colors group"
+          class="w-full flex items-center justify-between px-3 py-1 text-xs font-medium text-gray-400 dark:text-gray-500 mb-1 hover:text-gray-600 dark:hover:text-gray-300 transition-colors group"
         >
           <span>{{ item.title }}</span>
           <svg
@@ -66,9 +66,10 @@
       </div>
       <Link
         v-else
+        ref="linkRef"
         :href="item.path"
         class="block px-3 py-2 rounded-md text-sm transition-colors duration-150"
-        :class="isActive(item.path).value ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-700 hover:bg-gray-100'"
+        :class="isActive(item.path).value ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'"
       >
         {{ item.title }}
       </Link>
@@ -77,9 +78,10 @@
     <!-- Level 2: Leaf item -->
     <template v-else-if="level === 2">
       <Link
+        ref="linkRef"
         :href="item.path"
         class="block px-3 py-2 rounded-md text-sm pl-6 transition-colors duration-150"
-        :class="isActive(item.path).value ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-700 hover:bg-gray-100'"
+        :class="isActive(item.path).value ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'"
       >
         {{ item.title }}
       </Link>
@@ -90,7 +92,7 @@
       <div v-if="item.children.length > 0" class="ml-2">
         <button
           @click="toggleCollapse"
-          class="w-full flex items-center justify-between px-3 py-2 rounded-md text-sm pl-6 transition-colors hover:bg-gray-50 group"
+          class="w-full flex items-center justify-between px-3 py-2 rounded-md text-sm pl-6 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 group text-gray-700 dark:text-gray-300"
         >
           <span>{{ item.title }}</span>
           <svg
@@ -119,9 +121,10 @@
       </div>
       <Link
         v-else
+        ref="linkRef"
         :href="item.path"
         class="block px-3 py-2 rounded-md text-sm pl-8 transition-colors duration-150"
-        :class="isActive(item.path).value ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-700 hover:bg-gray-100'"
+        :class="isActive(item.path).value ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'"
       >
         {{ item.title }}
       </Link>
@@ -130,7 +133,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch, Transition } from 'vue';
+import { computed, ref, watch, Transition, onMounted, nextTick } from 'vue';
 import { Link, useLocation } from 'wouter-vue';
 
 const props = defineProps({
@@ -145,6 +148,7 @@ const props = defineProps({
 });
 
 const [location] = useLocation();
+const linkRef = ref(null);
 
 // Check if any child is active
 const hasActiveChild = computed(() => {
@@ -219,6 +223,40 @@ const isActive = (path) => {
     return currentPath === path || currentPath.startsWith(path + '/');
   });
 };
+
+// Check if current item is active (only for file items)
+const currentItemIsActive = computed(() => {
+  if (!props.item.isFile) return false;
+  return isActive(props.item.path).value;
+});
+
+// Auto-scroll to active menu item
+watch(
+  () => currentItemIsActive.value,
+  async (active) => {
+    if (active && linkRef.value) {
+      await nextTick();
+      const element = linkRef.value.$el || linkRef.value;
+      if (element && typeof element.scrollIntoView === 'function') {
+        // Check if element is already visible in viewport
+        const rect = element.getBoundingClientRect();
+        const sidebar = element.closest('aside');
+        if (sidebar) {
+          const sidebarRect = sidebar.getBoundingClientRect();
+          const isVisible = rect.top >= sidebarRect.top && rect.bottom <= sidebarRect.bottom;
+          
+          if (!isVisible) {
+            element.scrollIntoView({
+              behavior: 'smooth',
+              block: 'center',
+            });
+          }
+        }
+      }
+    }
+  },
+  { immediate: true }
+);
 </script>
 
 <style scoped>

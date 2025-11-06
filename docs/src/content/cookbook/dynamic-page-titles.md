@@ -1,6 +1,8 @@
 ---
 title: Dynamic Page Titles
 description: Update document.title using route data
+section: Cookbook
+order: 63
 ---
 
 # Dynamic Page Titles

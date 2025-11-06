@@ -1,6 +1,8 @@
 ---
 title: Redirect
 description: Redirect to another route programmatically
+section: API Reference
+order: 45
 ---
 
 # Redirect

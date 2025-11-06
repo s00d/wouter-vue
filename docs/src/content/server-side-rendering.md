@@ -1,6 +1,8 @@
 ---
 title: Server-Side Rendering (SSR)
 description: Render wouter-vue routes on the server
+section: Other
+order: 81
 ---
 
 # Server-Side Rendering (SSR)

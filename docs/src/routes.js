@@ -14,6 +14,7 @@ export function createRoutes() {
   });
 
   const routes = [];
+  
   for (const path in pages) {
     // Convert file path to URL
     // './content/index.md' -> '/'

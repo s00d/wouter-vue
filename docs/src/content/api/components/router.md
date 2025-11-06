@@ -1,6 +1,8 @@
 ---
 title: Router
 description: Optional router component for nested routes and SSR
+section: API Reference
+order: 40
 ---
 
 # Router
