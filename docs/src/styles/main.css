@@ -130,3 +130,10 @@ mark.highlight {
   color: #fbbf24;
 }
 
+/* Override highlight.js variable colors in dark theme */
+.hljs-variable,
+.hljs-variable.language_,
+.hljs-template-variable {
+  color: #e5e7eb !important;
+}
+
