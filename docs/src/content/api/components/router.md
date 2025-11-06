@@ -22,6 +22,7 @@ The `<Router>` component is **optional** - wouter-vue works without it for simpl
 | `location` | `LocationHook?` | `undefined` | Custom location hook (optional) |
 | `ssrPath` | `string?` | `undefined` | Initial path for SSR (optional) |
 | `ssrSearch` | `string?` | `undefined` | Initial search string for SSR (optional) |
+| `base` | `string?` | `undefined` | Base path for routing (e.g., `/my-app`). Automatically read from `import.meta.env.BASE_URL` in Vite |
 
 ## Usage
 
@@ -40,20 +41,26 @@ The `<Router>` component is **optional** - wouter-vue works without it for simpl
 </template>
 ```
 
-**With SSR:**
+**With SSR and base path:**
 
 ```vue
 <template>
-  <Router :ssr-path="ssrPath" :ssr-search="ssrSearch">
+  <Router :ssr-path="ssrPath" :ssr-search="ssrSearch" :base="basePath">
     <AppRoutes />
   </Router>
 </template>
 
 <script setup>
+import { Router } from 'wouter-vue';
+import AppRoutes from './components/AppRoutes.vue';
+
 const props = defineProps({
   ssrPath: String,
   ssrSearch: String
 });
+
+// Get base path from Vite's BASE_URL (automatically set from vite.config.js base)
+const basePath = (import.meta.env.BASE_URL || '').replace(/\/$/, '');
 </script>
 ```
 
@@ -80,6 +87,9 @@ const hashLocation = useHashLocation();
 
 - Without `<Router>`, routes still work but nested routing may not function correctly
 - For SSR, always wrap your app with `<Router>` and pass `ssrPath` and `ssrSearch` props
+- Set `base` prop automatically from `import.meta.env.BASE_URL` for subdirectory deployments
+- Router handles base path internally - all navigation works correctly with base path
 - See [Custom Location Hooks](/guides/custom-location-hooks) for more information
+- See [Server-Side Rendering](/server-side-rendering) for complete SSR setup
 
 

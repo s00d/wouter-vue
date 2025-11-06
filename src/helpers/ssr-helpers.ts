@@ -39,7 +39,3 @@ export function isSSR(): boolean {
 export function isBrowser(): boolean {
   return typeof window !== 'undefined'
 }
-
-
-
-

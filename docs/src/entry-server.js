@@ -4,9 +4,6 @@ import App from './App.vue';
 
 export async function render(url) {
   try {
-    // Упрощаем: БОЛЬШЕ НЕТ ЛОГИКИ С basePath.
-    // Просто передаем полученный URL дальше.
-    // wouter-vue сам обработает base, который ему передаст App.vue.
     console.log(`[SSR Render] Received URL: ${url}`);
     
     let path = url || '/';
@@ -19,8 +16,8 @@ export async function render(url) {
       }
     }
 
-    // В App передаем ПОЛНЫЙ путь (например, /wouter-vue/getting-started)
-    // wouter-vue сам обработает base и корректно найдет маршрут
+    // Pass the full path to App.vue
+    // Router will handle base path internally
     const app = createSSRApp(() => h(App, { ssrPath: path, ssrSearch: search }));
     
     const html = await renderToString(app);

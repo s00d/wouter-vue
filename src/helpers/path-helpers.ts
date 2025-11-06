@@ -78,7 +78,3 @@ export function validateTargetPathProps(
 export function shouldIgnoreNavigationClick(event: MouseEvent): boolean {
   return event.ctrlKey || event.metaKey || event.altKey || event.shiftKey || event.button !== 0
 }
-
-
-
-

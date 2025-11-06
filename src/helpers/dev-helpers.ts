@@ -37,7 +37,3 @@ export function devWarn(componentName: string, message: string): void {
     console.warn(`[wouter-vue] ${componentName} component: ${message}`)
   }
 }
-
-
-
-

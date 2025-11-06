@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const toAbsolute = (p) => path.resolve(__dirname, p);
@@ -50,26 +50,25 @@ function getRoutesFromMenu() {
 }
 
 async function run() {
-  // Check if we're building for GitHub Pages
   const isGitHubPages = process.env.GITHUB_PAGES === 'true';
   const basePath = isGitHubPages ? '/wouter-vue' : '';
   
-  console.log(`Prerendering for ${isGitHubPages ? 'GitHub Pages' : 'local'} (base: ${basePath || '/'})`);
-  console.log(`GITHUB_PAGES env: ${process.env.GITHUB_PAGES}`);
-  
-  // Find entry-server.js file (it has a hash in the name and is in client subfolder)
-  const serverDir = toAbsolute('dist/server/client');
+  console.log(`Prerendering for ${isGitHubPages ? 'GitHub Pages' : 'local'}`);
+
+  // Find entry-server.js file (Vite may output it with a hash in client subfolder)
   let entryServerPath = null;
   
-  if (fs.existsSync(serverDir)) {
-    const files = fs.readdirSync(serverDir);
+  // Try dist/server/client/entry-server-*.js first (with hash)
+  const serverClientDir = toAbsolute('dist/server/client');
+  if (fs.existsSync(serverClientDir)) {
+    const files = fs.readdirSync(serverClientDir);
     const entryFile = files.find(f => f.startsWith('entry-server') && f.endsWith('.js'));
     if (entryFile) {
-      entryServerPath = path.resolve(serverDir, entryFile);
+      entryServerPath = path.join(serverClientDir, entryFile);
     }
   }
   
-  // Fallback: try direct path
+  // Fallback: try dist/server/entry-server.js (without hash)
   if (!entryServerPath) {
     const directPath = toAbsolute('dist/server/entry-server.js');
     if (fs.existsSync(directPath)) {
@@ -86,18 +85,7 @@ async function run() {
   console.log(`Found entry-server at: ${entryServerPath}`);
   
   // Import the SSR render function
-  // entryServerPath is already absolute, convert to file:// URL
-  const entryServerUrl = path.isAbsolute(entryServerPath)
-    ? `file://${entryServerPath}`
-    : `file://${path.resolve(entryServerPath)}`;
-  
-  // Ensure GITHUB_PAGES env is available for the imported module
-  // Set it before importing so it's available in entry-server.js
-  if (isGitHubPages) {
-    process.env.GITHUB_PAGES = 'true';
-  }
-  
-  const { render } = await import(entryServerUrl);
+  const { render } = await import(pathToFileURL(entryServerPath).href);
   
   // Ensure dist/client exists
   const distPath = toAbsolute('dist/client');
@@ -116,20 +104,16 @@ async function run() {
   // Render each route
   for (const routePath of routesToPrerender) {
     try {
-      // Формируем полный URL, который увидит сервер, включая basePath
-      // Это имитирует реальный запрос на GitHub Pages
-      const urlToRender = basePath 
-        ? `${basePath}${routePath}`.replace(/\/+/g, '/') // Убираем двойные слеши
-        : routePath;
+      // Form full URL for rendering (simulates real GitHub Pages request)
+      const urlToRender = `${basePath}${routePath}`.replace(/\/+/g, '/');
       console.log(`Rendering URL: ${urlToRender}`);
       
-      // Передаем ПОЛНЫЙ URL в функцию рендеринга
       const appHtml = await render(urlToRender);
       
       // File path should be relative to dist/client (without base path)
       const filePath = routePath.endsWith('/') 
-        ? `${routePath}index.html` 
-        : `${routePath}/index.html`;
+        ? path.join(routePath, 'index.html')
+        : path.join(routePath, 'index.html');
       
       const fullPath = path.join(distPath, filePath);
       const dir = path.dirname(fullPath);
@@ -141,10 +125,21 @@ async function run() {
       const html = template.replace(/<!--ssr-outlet-->/, appHtml);
       
       fs.writeFileSync(fullPath, html);
-      console.log(`✓ Prerendered: ${routePath} -> ${filePath}`);
+      console.log(`✓ Prerendered: ${urlToRender} -> ${fullPath.replace(__dirname, '')}`);
     } catch (error) {
       console.error(`✗ Failed to prerender ${routePath}:`, error);
       throw error; // Re-throw to fail the build
+    }
+  }
+
+  // Generate 404.html for GitHub Pages
+  if (isGitHubPages) {
+    try {
+      const notFoundHtml = template.replace(/<!--ssr-outlet-->/, await render('/404'));
+      fs.writeFileSync(path.join(distPath, '404.html'), notFoundHtml);
+      console.log('✓ Prerendered: /404.html');
+    } catch (error) {
+      console.warn('⚠ Failed to prerender 404.html:', error);
     }
   }
   
